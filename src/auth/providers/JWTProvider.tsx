@@ -12,12 +12,10 @@ import {
 
 import { type AuthModel, type UserModel } from '@/auth';
 
-const API_URL = import.meta.env.VITE_APP_API_URL;
-
-export const GET_USER_BY_ACCESSTOKEN_URL = `${API_URL}/user-admin`;
-export const LOGIN_URL = `${API_URL}/user/login`;
-export const REGISTER_URL = `${API_URL}/register`;
-export const REQUEST_PASSWORD_URL = `${API_URL}/forgotpassword`;
+export const GET_USER_BY_ACCESSTOKEN_URL = `/user-admin`;
+export const LOGIN_URL = `/user/login`;
+export const REGISTER_URL = `/register`;
+export const REQUEST_PASSWORD_URL = `/forgotpassword`;
 
 interface AuthContextProps {
   isLoading: boolean;
@@ -72,7 +70,7 @@ const AuthProvider = ({ children }: PropsWithChildren) => {
   // Login user with email and password
   const login = async (phone : string, email: string, password: string) => {
     try {
-      const formData = new URLSearchParams();
+      const formData = new FormData();
       formData.append('phone', phone);
       formData.append('email', email);
       formData.append('password', password);

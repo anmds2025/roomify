@@ -2,7 +2,9 @@ import { User as Auth0UserModel } from '@auth0/auth0-spa-js';
 
 import { getData, setData } from '@/utils';
 import { type AuthModel } from './_models';
-import { useAuthContext } from './useAuthContext';
+// import { useAuthContext } from './useAuthContext';
+
+const BASE_API_URL = import.meta.env.VITE_APP_API_URL;
 
 const AUTH_LOCAL_STORAGE_KEY = `${import.meta.env.VITE_APP_NAME}-auth-v${
   import.meta.env.VITE_APP_VERSION
@@ -55,6 +57,8 @@ const removeAuth = () => {
 
 export function setupAxios(axios: any, token?: string) {
   axios.defaults.headers.Accept = 'application/json';
+  axios.defaults.baseURL = BASE_API_URL;
+
   axios.interceptors.request.use(
     (config: { headers: { Authorization: string } }) => {
       const auth = getAuth();
