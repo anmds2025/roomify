@@ -8,7 +8,7 @@ import {
   useReactTable
 } from '@tanstack/react-table';
 import { DataGridInner, DataGridProvider } from './';
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState, useCallback } from 'react';
 
 export type TDataGridTableSpacingType = 'xs' | 'sm' | 'lg';
 
@@ -82,8 +82,7 @@ const DataGrid = <TData extends object>(props: TDataGridProps<TData>) => {
     };
   };
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const saveState = (newState: any) => {
+  const saveState = useCallback((newState: any) => {
     if (props.saveState && props.saveStateId) {
       const existingState = localStorage.getItem(props.saveStateId);
       let mergedState = newState;
@@ -95,7 +94,7 @@ const DataGrid = <TData extends object>(props: TDataGridProps<TData>) => {
 
       localStorage.setItem(props.saveStateId, JSON.stringify(mergedState));
     }
-  };
+  }, [props.saveState, props.saveStateId]);
 
   // Load initial saved state (pagination, sorting)
   const { pagination: initialPagination, sorting: initialSorting } = loadSavedState();
@@ -104,10 +103,7 @@ const DataGrid = <TData extends object>(props: TDataGridProps<TData>) => {
   const [sorting, setSorting] = useState<any[]>(initialSorting);
   const { onPaginationChange } = props;
 
-  const [pagination, setPagination] = useState<PaginationState>({
-    pageIndex: 0,
-    pageSize: props.paginationSize || 5,
-  });
+  const [pagination, setPagination] = useState<PaginationState>(initialPagination);
 
   // Initialize the table using useReactTable and pass props.columns and props.data
   const table = useReactTable({
@@ -143,7 +139,7 @@ const DataGrid = <TData extends object>(props: TDataGridProps<TData>) => {
       pageSize: table.getState().pagination.pageSize,
       sorting: table.getState().sorting
     });
-  }, [saveState, table]);
+  }, [saveState, table.getState().pagination.pageIndex, table.getState().pagination.pageSize, table.getState().sorting]);
 
   return (
     <DataGridProvider table={table} props={mergedProps}>

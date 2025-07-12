@@ -1,6 +1,6 @@
 import { changePasswordApi, deleteUserApi, getUserApi, sendMailCheckPasswordApi, sendMailNewPasswordApi, updateUserApi, UpdateUserPayload } from '@/api/user';
 import { useAuthContext } from '@/auth';
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { toast } from 'react-toastify';
 
 export const useUser = () => {
@@ -10,7 +10,7 @@ export const useUser = () => {
     const { currentUser } = useAuthContext();
 
     // Fetch all user
-    const getUsers = async () => {
+    const getUsers = useCallback(async () => {
         setIsLoading(true);
         setError(null);
 
@@ -31,10 +31,10 @@ export const useUser = () => {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [currentUser]);
 
     // Create a new user
-    const createUser = async (data: UpdateUserPayload) => {
+    const createUser = useCallback(async (data: UpdateUserPayload) => {
         setIsLoading(true);
         setError(null);
         setSuccessMessage(null);
@@ -53,7 +53,7 @@ export const useUser = () => {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [currentUser]);
 
     const updateUser = async (data: UpdateUserPayload) => {
         setIsLoading(true);

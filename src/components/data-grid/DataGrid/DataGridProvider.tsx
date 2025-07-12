@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react-refresh/only-export-components */
 /* eslint-disable react-hooks/exhaustive-deps */
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { TDataGridProps, TDataGridSelectedRowIds } from './DataGrid';
 import { Table } from '@tanstack/react-table';
 
@@ -48,25 +48,26 @@ const DataGridProvider = <TData extends object>({
   const currentRows = table.getRowModel().rows.map((row) => row.id);
 
   // Handle sorting, pagination, and search loading
-  const handleStateChange = () => {
+  const handleStateChange = useCallback(() => {
     setLoading(true);
     const timer = setTimeout(() => {
       setLoading(false); // Stop loading after action completes
     }, 300); // Delay for smooth experience
     return () => clearTimeout(timer);
-  };
+  }, []);
 
   // Listen for sorting changes
   useEffect(() => {
-    if (table.getState().sorting.length > 0) {
+    const sorting = table.getState().sorting;
+    if (sorting.length > 0) {
       handleStateChange();
     }
-  }, [table.getState().sorting]);
+  }, [table.getState().sorting, handleStateChange]);
 
   // Listen for pagination changes
   useEffect(() => {
     handleStateChange();
-  }, [table.getState().pagination]);
+  }, [table.getState().pagination, handleStateChange]);
 
   // Handle data loading (trigger loading when data is being fetched)
   useEffect(() => {
@@ -75,7 +76,7 @@ const DataGridProvider = <TData extends object>({
     } else {
       setLoading(false); // Data loaded
     }
-  }, [props.data]);
+  }, [props.data.length]);
 
   // Toggle individual row selection
   const toggleRowSelection = (id: string) => {

@@ -1,4 +1,4 @@
-export default {
+module.exports = {
   content: ['index.html', './src/**/*.{ts,tsx}'],
   safelist: [
     'demo1',
@@ -370,6 +370,24 @@ export default {
         lg: '1024px',
         xl: '1280px',
         '2xl': '1536px'
+      },
+      keyframes: {
+        fadeIn: { '0%': { opacity: 0 }, '100%': { opacity: 1 } },
+        fadeOut: { '0%': { opacity: 1 }, '100%': { opacity: 0 } },
+        scaleIn: {
+          '0%': { opacity: 0, transform: 'translate(-50%, -50%) scale(0.95)' },
+          '100%': { opacity: 1, transform: 'translate(-50%, -50%) scale(1)' },
+        },
+        scaleOut: {
+          '0%': { opacity: 1, transform: 'translate(-50%, -50%) scale(1)' },
+          '100%': { opacity: 0, transform: 'translate(-50%, -50%) scale(0.95)' },
+        },
+      },
+      animation: {
+        fadeIn: 'fadeIn 0.2s ease-out',
+        fadeOut: 'fadeOut 0.2s ease-in',
+        scaleIn: 'scaleIn 0.2s ease-out',
+        scaleOut: 'scaleOut 0.2s ease-in',
       }
     },
     custom: ({ theme }) => ({

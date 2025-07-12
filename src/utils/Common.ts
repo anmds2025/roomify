@@ -1,3 +1,6 @@
+import { clsx, type ClassValue } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+
 // eslint-disable-next-line no-unused-vars
 export const throttle = (func: (...args: any[]) => void, limit: number) => {
   let lastFunc: any;
@@ -20,3 +23,7 @@ export const throttle = (func: (...args: any[]) => void, limit: number) => {
     }
   };
 };
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
