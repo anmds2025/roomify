@@ -122,7 +122,7 @@ const ActionButtons = React.memo(({
         </div>
       ) : (
         <>
-          <KeenIcon icon={isEdit ? "check-circle" : "add-circle"} className="w-4 h-4" />
+          <KeenIcon icon={isEdit ? "pencil" : "add-notepad"} className="w-4 h-4" />
           {isEdit ? "Cập nhật" : "Tạo mới"}
         </>
       )}
@@ -326,7 +326,7 @@ const ModalUpdateUser = forwardRef<HTMLDivElement, ModalUpdateUserProps>(
             <div className="space-y-8">
               <div>
                 <div className="flex items-center gap-2 mb-4 font-semibold text-gray-800 text-lg">
-                  <KeenIcon icon="settings" className="w-4 h-4 text-blue-400" />
+                  <KeenIcon icon="information-2" className="w-4 h-4 text-blue-400" />
                   Thông tin bổ sung
                 </div>
                 <div className="space-y-5">

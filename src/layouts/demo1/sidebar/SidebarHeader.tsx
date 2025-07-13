@@ -4,6 +4,8 @@ import { useDemo1Layout } from '../';
 import { toAbsoluteUrl } from '@/utils';
 import { SidebarToggle } from './';
 
+const { VITE_APP_NAME } = import.meta.env ?? { VITE_APP_NAME: 'ADMIN' };
+
 const SidebarHeader = forwardRef<HTMLDivElement>(() => {
   const { layout } = useDemo1Layout();
 
@@ -57,9 +59,9 @@ const SidebarHeader = forwardRef<HTMLDivElement>(() => {
   );
 
   return (
-    <div className="sidebar-header hidden lg:flex items-center relative justify-center px-6 shrink-0 text-lg font-bold">
-      <div className='text-white bg-[#1A2B49] p-2 text-[18px]'>
-        ADMIN
+    <div className="sidebar-header hidden lg:flex items-center relative px-6 shrink-0 text-lg font-bold">
+      <div className='p-2 text-[18px] text-white bg-[#1A2B49] rounded-lg'>
+        {VITE_APP_NAME}
       </div>
       <SidebarToggle />
     </div>

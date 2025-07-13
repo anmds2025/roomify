@@ -8,7 +8,7 @@ import { Users } from '../light-sidebar';
 const UsersPage = () => {
   return (
     <Fragment>  
-      <Container>
+      <Container width="fluid">
         <div className="grid lg:grid-cols-3 gap-5 lg:gap-7.5 items-stretch">
             <div className="lg:col-span-3">
                 <Users />

@@ -25,7 +25,7 @@ const Header = () => {
         headerSticky && 'shadow-sm'
       )}
     >
-      <Container className="flex justify-between items-stretch lg:gap-4">
+      <Container className="flex justify-between items-stretch lg:gap-4" width="fluid">
         <HeaderLogo />
           <Breadcrumbs />
         <HeaderTopbar />
