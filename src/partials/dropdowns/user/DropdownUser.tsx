@@ -8,14 +8,14 @@ import {
   MenuArrow,
   MenuIcon
 } from '@/components/menu';
-import { ChangeEvent, Fragment } from 'react';
+import { ChangeEvent, Fragment, useState } from 'react';
 import { toAbsoluteUrl } from '@/utils';
 import { DropdownUserLanguages } from './DropdownUserLanguages';
 import { Link } from 'react-router-dom';
 import { useSettings } from '@/providers/SettingsProvider';
 import { useAuthContext } from '@/auth';
 
-const DropdownUser = () => {
+const DropdownUser = ({ menuTtemRef = undefined }: { menuTtemRef?: React.RefObject<HTMLDivElement> }) => {
   const { settings, storeSettings } = useSettings();
   const { logout } = useAuthContext();
   const { currentUser } = useAuthContext();
@@ -40,13 +40,13 @@ const DropdownUser = () => {
           />
           <div className="flex flex-col gap-1.5">
             <Link
-              to="/account/hoteme/get-stard"
+              to="/account/home/user-profile"
               className="text-sm text-gray-800 hover:text-primary font-semibold leading-none"
             >
               {currentUser?.fullname}
             </Link>
             <a
-              href="mailto:c.fisher@gmail.com"
+              href={`mailto:${currentUser?.email}`}
               className="text-xs text-gray-600 hover:text-primary font-medium leading-none"
             >
               {currentUser?.email}
@@ -63,30 +63,38 @@ const DropdownUser = () => {
         <MenuSeparator />
         <div className="flex flex-col">
           <MenuItem>
-            <MenuLink path="/profile">
+            <MenuLink path="/account/home/user-profile">
               <MenuIcon>
                 <KeenIcon icon="profile-circle" />
               </MenuIcon>
-              <MenuTitle>Thông tin tài khoản</MenuTitle>
+              <MenuTitle>Hồ sơ cá nhân</MenuTitle>
             </MenuLink>
           </MenuItem>
-          <MenuItem
-            toggle="dropdown"
-            trigger="hover"
-            dropdownProps={{
-              placement: 'left-start',
-              modifiers: [
-                {
-                  name: 'offset',
-                  options: {
-                    offset: [-50, 0] // [skid, distance]
-                  }
-                }
-              ]
-            }}
-          >
-          </MenuItem>
+          {/* <MenuItem>
+            <MenuLink path="/account/home/settings-sidebar">
+              <MenuIcon>
+                <KeenIcon icon="setting-2" />
+              </MenuIcon>
+              <MenuTitle>Cài đặt</MenuTitle>
+            </MenuLink>
+          </MenuItem> */}
+          {/* <MenuItem>
+            <MenuLink path="/account/billing/basic">
+              <MenuIcon>
+                <KeenIcon icon="card" />
+              </MenuIcon>
+              <MenuTitle>Thanh toán</MenuTitle>
+            </MenuLink>
+          </MenuItem> */}
           <MenuSeparator />
+          {/* <MenuItem>
+            <MenuLink path="/help">
+              <MenuIcon>
+                <KeenIcon icon="question" />
+              </MenuIcon>
+              <MenuTitle>Trợ giúp</MenuTitle>
+            </MenuLink>
+          </MenuItem> */}
         </div>
       </Fragment>
     );
@@ -97,7 +105,7 @@ const DropdownUser = () => {
       <div className="flex flex-col">
         <div className="menu-item px-4 py-1.5">
           <a onClick={logout} className="btn btn-sm btn-light justify-center">
-            Đăng xuất
+          Đăng xuất
           </a>
         </div>
       </div>

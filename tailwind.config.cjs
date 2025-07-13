@@ -631,6 +631,7 @@ module.exports = {
     })
   },
   plugins: [
+    require("tailwindcss-animate"),
     require('./src/plugins/plugin'),
     require('./src/plugins/components/theme'),
     require('./src/plugins/components/breakpoints'),

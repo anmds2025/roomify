@@ -263,7 +263,7 @@ const Users = () => {
         <div className="card-body">
           <DataGrid
             columns={columns}
-            data={filteredData}
+            data={data}
             rowSelect={true}
             paginationSize={20}
             paginationSizes={[5, 10, 20, 50, 100]}

@@ -5,10 +5,13 @@ import { Menu, MenuItem, MenuToggle } from '@/components';
 import { DropdownUser } from '@/partials/dropdowns/user';
 import { DropdownNotifications } from '@/partials/dropdowns/notifications';
 import { DropdownChat } from '@/partials/dropdowns/chat';
+import { useAuthContext } from '@/auth';
 
 const HeaderTopbar = () => {
   const itemChatRef = useRef<any>(null);
   const itemNotificationsRef = useRef<any>(null);
+  const itemUserRef = useRef<any>(null);
+  const { currentUser } = useAuthContext();
 
   const handleDropdownChatShow = () => {
     window.dispatchEvent(new Event('resize'));
@@ -72,6 +75,7 @@ const HeaderTopbar = () => {
 
       <Menu className="items-stretch -me-2">
         <MenuItem
+          ref={itemUserRef}
           toggle="dropdown"
           trigger="click"
           dropdownProps={{
@@ -87,15 +91,23 @@ const HeaderTopbar = () => {
           }}
         >
           <MenuToggle>
-            <div className="btn btn-icon rounded-full">
+            <div className="flex items-center gap-2">
               <img
-                className="size-9 rounded-full justify-center border border-gray-500 shrink-0"
-                src={toAbsoluteUrl('media/avatars/300-2.png')}
+                className="size-8 rounded-full border-2 border-success"
+                src={"https://my-bucket-kiai-image.s3.ap-southeast-1.amazonaws.com/uploads/user-default.png"}
                 alt=""
               />
+              <div className="flex flex-col gap-1">
+                <span className="text-sm text-gray-800 font-semibold leading-none">
+                  {currentUser?.fullname}
+                </span>
+                <span className="text-xs text-gray-600 font-medium leading-none">
+                  {currentUser?.level}
+                </span>
+              </div>
             </div>
           </MenuToggle>
-          {DropdownUser()}
+          {DropdownUser({ menuTtemRef: itemUserRef })}
         </MenuItem>
       </Menu>
     </div>

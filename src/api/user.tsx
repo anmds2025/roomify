@@ -11,7 +11,7 @@ const DELETE_USER_URL = `${API_URL}/user/delete`;
 const UPDATE_USER_URL = `${API_URL}/user/update`;
 const USER_ROLE_URL = `${API_URL}/userRoles`;
 const UPDATE_PROFILE_URL = `${API_URL}/update-profile`;
-const CHANGEPASSWORD_URL = `${API_URL}/change-password-user`;
+const CHANGEPASSWORD_URL = `${API_URL}/user/changePassword`;
 const CHECK_MAIL_PASSWORD = `${API_URL}/send-mail-check-password`;
 const SEND_NEW_PASSWORD = `${API_URL}/send-mail-new-password`;
 

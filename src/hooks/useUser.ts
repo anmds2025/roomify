@@ -107,13 +107,14 @@ export const useUser = () => {
         setSuccessMessage(null);
     
         try {
-            const response = await changePasswordApi(data);
+            const response = await changePasswordApi({...data, token: currentUser?.token || ''});
             setSuccessMessage('Mật khẩu đã cập nhật thành công');
             toast.success('Mật khẩu đã cập nhật thành công');
             return response;
         } catch (error: any) {
-            setError(error.message || 'Failed to update password');
-            toast.error(error.response.data.message || 'Failed to update password');
+            const errorData = error.response.data;
+            setError(errorData.Error || 'Failed to update password');
+            toast.error(errorData.Error || 'Failed to update password');
         } finally {
             setIsLoading(false);
         }

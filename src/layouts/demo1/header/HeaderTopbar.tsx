@@ -13,6 +13,7 @@ const HeaderTopbar = () => {
   const itemChatRef = useRef<any>(null);
   const itemAppsRef = useRef<any>(null);
   const itemNotificationsRef = useRef<any>(null);
+  const itemUserRef = useRef<any>(null);
   const { currentUser } = useAuthContext();
 
   const handleShow = () => {
@@ -148,7 +149,7 @@ const HeaderTopbar = () => {
               />
             </div>
           </MenuToggle>
-          {DropdownUser()}
+          {DropdownUser({ menuTtemRef: itemUserRef })}
         </MenuItem>
       </Menu>
     </div>

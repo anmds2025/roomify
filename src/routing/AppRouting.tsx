@@ -169,7 +169,7 @@ const AppRouting = (): ReactElement => {
             <Route path="/users" element={<UsersPage />} />
           </Route>
           
-          {/* <Route path="/profile" element={<AccountUserProfilePage />} /> */}
+          <Route path="/account/home/user-profile" element={<AccountUserProfilePage />} />
           
           {/* <Route element={<RequireAuth allowedRoles={[]} />}>
             <Route path="/info" element={<InfoPage />} />

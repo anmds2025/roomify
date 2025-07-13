@@ -12,21 +12,21 @@ const DemoLayout = () => {
   return (
     <Demo1LayoutProvider>
       <Fragment>
-            <Helmet>
-            </Helmet>
-      
-            <div className="flex grow">      
-              <div className="wrapper flex grow flex-col">
-                <Header />
-                <div className='w-full h-full flex justify-center items-center px-2'>
-                  Tài khoản của bạn hiện chưa có quyền để sử dụng ứng dụng, vui lòng nâng cấp gói hoặc liên hệ với quản trị viên!
-                </div>
-                <Content />
-      
-                {/* <Footer /> */}
-              </div>
+        <Helmet>
+        </Helmet>
+
+        <div className="flex grow">
+          <div className="wrapper flex grow flex-col">
+            <Header />
+            <div className='w-full h-full flex justify-center items-center px-2'>
+              Tài khoản của bạn hiện chưa có quyền để sử dụng ứng dụng, vui lòng nâng cấp gói hoặc liên hệ với quản trị viên!
             </div>
-          </Fragment>
+            <Content />
+
+            {/* <Footer /> */}
+          </div>
+        </div>
+      </Fragment>
     </Demo1LayoutProvider>
   );
 };

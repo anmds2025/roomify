@@ -1,367 +1,340 @@
 import React, { forwardRef, useCallback, useEffect, useMemo, useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { KeenIcon } from '@/components';
 import { toast } from 'react-toastify';
 import { ModalUpdateUserProps } from '@/pages/dashboards/light-sidebar/blocks/users/UsersData';
 import { useUser } from '@/hooks/useUser';
 
-// Component cho form field với style hiện đại
+interface RenderFieldProps {
+  type: string;
+  value: any;
+  onChange: (value: any) => void;
+  label: string;
+  error?: boolean;
+  disabled?: boolean;
+  options?: Array<{ value: string; label: string }>;
+}
+
+function renderField({ type, value, onChange, label, error, disabled, options }: RenderFieldProps) {
+  if (type === 'select') {
+    return (
+      <Select value={value} onValueChange={onChange} disabled={disabled}>
+        <SelectTrigger className={error ? 'border-red-500 focus-visible:ring-red-500' : ''}>
+          <SelectValue placeholder={`Chọn ${label.toLowerCase()}`} />
+        </SelectTrigger>
+        <SelectContent>
+          {options?.map((option: { value: string; label: string }) => (
+            <SelectItem key={option.value} value={option.value}>
+              {option.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    );
+  }
+  if (type === 'textarea') {
+    return (
+      <Textarea
+        value={value}
+        placeholder={`Nhập ${label.toLowerCase()}`}
+        onChange={e => onChange(e.target.value)}
+        disabled={disabled}
+        className={error ? 'border-red-500 focus-visible:ring-red-500' : ''}
+      />
+    );
+  }
+  // Default: Input
+  return (
+    <Input
+      type={type}
+      value={value}
+      placeholder={`Nhập ${label.toLowerCase()}`}
+      onChange={e => {
+        if (type === 'tel') {
+          onChange(e.target.value.replace(/[^0-9]/g, ''));
+        } else {
+          onChange(e.target.value);
+        }
+      }}
+      disabled={disabled}
+      className={error ? 'border-red-500 focus-visible:ring-red-500' : ''}
+    />
+  );
+}
+
+// Component cho form field với shadcn UI
 const FormField = React.memo(({ 
   label, 
   value, 
   onChange, 
   type = "text", 
   error = false, 
-  options = null,
-  disabled = false 
+  options,
+  disabled = false,
+  required = false
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
   type?: string;
   error?: boolean;
-  options?: { value: string; label: string }[] | null;
+  options?: { value: string; label: string }[];
   disabled?: boolean;
+  required?: boolean;
 }) => (
   <div className="space-y-2">
-    <label className="text-base font-semibold text-gray-700 flex items-center gap-1">
+    <Label className="text-sm font-medium text-gray-700 flex items-center gap-1">
       {label}
-      <span className="text-red-500">*</span>
-    </label>
-    <div className="relative">
-      {type === "select" ? (
-        <select
-          className={`
-            w-full px-4 py-3 border rounded-xl transition-all duration-200
-            font-medium text-base text-gray-900
-            focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
-            disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed
-            placeholder-gray-500
-            ${error 
-              ? 'border-red-500 bg-red-50 focus:ring-red-500 shadow-sm' 
-              : 'border-gray-300 bg-white hover:border-gray-400 focus:shadow-md'
-            }
-          `}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          disabled={disabled}
-        >
-          <option value="">Chọn cấp độ tài khoản</option>
-          {options?.map(option => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-      ) : (
-        <input
-          className={`
-            w-full px-4 py-3 border rounded-xl transition-all duration-200
-            font-medium text-base text-gray-900
-            focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
-            disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed
-            placeholder-gray-500
-            ${error 
-              ? 'border-red-500 bg-red-50 focus:ring-red-500 shadow-sm' 
-              : 'border-gray-300 bg-white hover:border-gray-400 focus:shadow-md'
-            }
-          `}
-          type={type}
-          value={value}
-          placeholder={`Nhập ${label.toLowerCase()}`}
-          onChange={(e) => {
-            if (type === "tel") {
-              const value = e.target.value.replace(/[^0-9]/g, '');
-              onChange(value);
-            } else {
-              onChange(e.target.value);
-            }
-          }}
-          disabled={disabled}
-        />
-      )}
-      {error && (
-        <div className="flex items-center gap-1 mt-2 text-sm font-medium text-red-600">
-          <KeenIcon icon="warning" className="w-4 h-4" />
-          <span>{label} là bắt buộc</span>
-        </div>
-      )}
-    </div>
+      {required && <span className="text-red-500">*</span>}
+    </Label>
+    
+    {renderField({ type, value, onChange, label, error, disabled, options })}
+    {error && (
+      <div className="flex items-center gap-1 mt-2 text-sm font-medium text-red-600">
+        <KeenIcon icon="warning" className="w-4 h-4" />
+        <span>{label} là bắt buộc</span>
+      </div>
+    )}
   </div>
 ));
 
-// Component cho action buttons với style hiện đại
-const ActionButtons = React.memo(({ 
-  onCancel, 
-  onSubmit, 
-  isEdit, 
-  isLoading = false 
-}: {
-  onCancel: () => void;
-  onSubmit: () => void;
-  isEdit: boolean;
-  isLoading?: boolean;
-}) => (
-  <div className="flex gap-3 justify-end">
-    <button 
-      onClick={onCancel} 
-      className="px-4 py-2 min-w-[100px] h-10 text-base font-semibold text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
-      disabled={isLoading}
-    >
-      Hủy bỏ
-    </button>
-    <button 
-      onClick={onSubmit} 
-      className="px-4 py-2 min-w-[100px] h-10 text-base font-semibold text-white bg-gradient-to-r from-blue-600 to-blue-700 border border-transparent rounded-lg hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg flex items-center gap-2"
-      disabled={isLoading}
-    >
-      {isLoading ? (
-        <div className="flex items-center gap-2">
-          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-          Đang xử lý...
-        </div>
-      ) : (
-        <>
-          <KeenIcon icon={isEdit ? "pencil" : "add-notepad"} className="w-4 h-4" />
-          {isEdit ? "Cập nhật" : "Tạo mới"}
-        </>
-      )}
-    </button>
-  </div>
-));
+FormField.displayName = 'FormField';
 
 const ModalUpdateUser = forwardRef<HTMLDivElement, ModalUpdateUserProps>(
   ({ open, onClose, user, fetchUsers }, ref) => {
-  const { createUser, updateUser } = useUser();
-  const [isLoading, setIsLoading] = useState(false);
-  
-  // Form state
-  const [formData, setFormData] = useState({
-    fullname: '',
-    email: '',
-    phone: '',
-    address: '',
-    level: ''
-  });
-  
-  // Error state
-  const [errors, setErrors] = useState({
-    fullname: false,
-    email: false,
-    address: false,
-    phone: false,
-    level: false,
-    emailInvalid: false
-  });
+    const { createUser, updateUser } = useUser();
 
-  // Level options
-  const levelOptions = useMemo(() => [
-    { value: 'Basic', label: 'Basic' },
-    { value: 'Pro', label: 'Pro' },
-    { value: 'Premium', label: 'Premium' },
-    { value: 'Enterprise', label: 'Enterprise' }
-  ], []);
-
-  // Validation functions
-  const validateEmail = useCallback((email: string) => {
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return regex.test(email);
-  }, []);
-
-  const validateFields = useCallback(() => {
-    const isEmailInvalid = !validateEmail(formData.email.trim());
-    const newErrors = {
-      fullname: !formData.fullname.trim(),
-      email: !formData.email.trim(),
-      phone: !formData.phone.trim(),
-      level: !formData.level.trim(),
-      address: !formData.address.trim(),
-      emailInvalid: isEmailInvalid
-    };
-
-    setErrors(newErrors);
-
-    const hasError = Object.values(newErrors).some((error) => error);
-    if (hasError) {
-      if (newErrors.fullname) toast.error("Họ tên là bắt buộc");
-      if (newErrors.email) toast.error("Email là bắt buộc");
-      if (newErrors.phone) toast.error("Số điện thoại là bắt buộc");
-      if (newErrors.level) toast.error("Cấp độ là bắt buộc");
-      if (newErrors.address) toast.error("Địa chỉ là bắt buộc");
-      if (newErrors.emailInvalid) toast.error("Email không đúng định dạng");
-    }
-    return !hasError;
-  }, [formData, validateEmail]);
-
-  // Initialize form data when user changes
-  useEffect(() => {
-    setFormData({
-      fullname: user?.fullname || "",
-      email: user?.email || "",
-      phone: user?.phone || "",
-      level: user?.level || "",
-      address: user?.address || ""
-    });
-  }, [user]);
-
-  // Reset form and errors
-  const resetForm = useCallback(() => {
-    setFormData({
+    // Form state
+    const [formData, setFormData] = useState({
       fullname: '',
       email: '',
       phone: '',
+      level: '',
       address: '',
-      level: ''
     });
-    setErrors({
+
+    // Error state
+    const [errors, setErrors] = useState({
       fullname: false,
       email: false,
-      address: false,
       phone: false,
       level: false,
-      emailInvalid: false
+      emailInvalid: false,
     });
-  }, []);
 
-  const handleClose = useCallback(() => {
-    resetForm();
-    onClose();
-  }, [resetForm, onClose]);
+    // Initialize form data when user changes
+    useEffect(() => {
+      if (user) {
+        setFormData({
+          fullname: user?.fullname || '',
+          email: user?.email || '',
+          phone: user?.phone || '',
+          level: user?.level || '',
+          address: user?.address || '',
+        });
+      }
+    }, [user]);
 
-  // Handle form field changes
-  const handleFieldChange = useCallback((field: keyof typeof formData, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    setErrors(prev => ({ ...prev, [field]: false }));
-  }, []);
+    // Reset form when modal closes
+    const resetForm = useCallback(() => {
+      setFormData({
+        fullname: '',
+        email: '',
+        phone: '',
+        level: '',
+        address: '',
+      });
+      setErrors({
+        fullname: false,
+        email: false,
+        phone: false,
+        level: false,
+        emailInvalid: false,
+      });
+    }, []);
 
-  // Submit handler - gộp create và update
-  const handleSubmit = useCallback(async () => {
-    if (validateFields()) {
-      setIsLoading(true);
+    
+    const isEdit: Boolean = useCallback(() => Boolean(user._id), [user])();
+    
+    const handleClose = useCallback(() => {
+      resetForm();
+      onClose();
+    }, [resetForm, onClose]);
+
+    // Handle field change
+    const handleFieldChange = useCallback((field: keyof typeof formData, value: string) => {
+      setFormData(prev => ({ ...prev, [field]: value }));
+      setErrors(prev => ({ ...prev, [field]: false, emailInvalid: false }));
+    }, []);
+
+    // Validation
+    const validateForm = useCallback((): boolean => {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      
+             const newErrors = {
+         fullname: !formData.fullname.trim(),
+         email: !formData.email.trim(),
+         phone: !formData.phone.trim(),
+         level: !formData.level.trim(),
+         emailInvalid: Boolean(formData.email.trim() && !emailRegex.test(formData.email)),
+       };
+
+      setErrors(newErrors);
+
+      const hasError = Object.values(newErrors).some(error => error);
+      
+      if (hasError) {
+        if (newErrors.fullname) toast.error("Họ tên là bắt buộc");
+        if (newErrors.email) toast.error("Email là bắt buộc");
+        if (newErrors.emailInvalid) toast.error("Email không hợp lệ");
+        if (newErrors.phone) toast.error("Số điện thoại là bắt buộc");
+        if (newErrors.level) toast.error("Cấp độ tài khoản là bắt buộc");
+      }
+
+      return !hasError;
+    }, [formData]);
+
+    // Handle form submission
+    const handleUpdate = useCallback(async () => {
+      if (!validateForm()) return;
+
       try {
-        const payload = { 
-          pk: user?._id?.$oid || '',
-          email: formData.email, 
-          fullname: formData.fullname, 
+        const payload = {
+          pk: user?._id?.$oid || "",
+          fullname: formData.fullname,
+          email: formData.email,
           phone: formData.phone,
           level: formData.level,
           address: formData.address,
           typeLogin: 'admin_add',
         };
 
-        if (isEditMode) {
+        if(isEdit) {
           await updateUser(payload);
-          toast.success('Cập nhật tài khoản thành công');
         } else {
           await createUser(payload);
-          toast.success('Tạo tài khoản thành công');
         }
         
-        fetchUsers();
         handleClose();
+        
+        // Refresh user list
+        if (fetchUsers) {
+          console.log('??');
+          fetchUsers();
+        }
       } catch (error) {
-        console.error('Failed to save user', error);
-      } finally {
-        setIsLoading(false);
+        console.error('Failed to update user', error);
+        toast.error("Lỗi cập nhật thông tin");
       }
-    }
-  }, [validateFields, formData, user?._id?.$oid, updateUser, createUser, fetchUsers, handleClose]);
+    }, [validateForm, user, formData, updateUser, handleClose, fetchUsers, isEdit, createUser]);
 
-  // Check if this is edit mode
-  const isEditMode = useMemo(() => Boolean(user?._id?.$oid), [user?._id?.$oid]);
+    // Level options
+    const levelOptions = useMemo(() => [
+      { value: 'Basic', label: 'Basic' },
+      { value: 'Pro', label: 'Pro' },
+      { value: 'Premium', label: 'Premium' },
+      { value: 'Enterprise', label: 'Enterprise' }
+    ], []);
 
-  return (
-    <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[800px] lg:max-w-[900px] max-h-[85vh] overflow-y-auto rounded-2xl shadow-2xl border-0 px-0 py-0">
-        {/* Header */}
-        <div className="bg-gray-50 px-6 py-3 rounded-t-2xl border-b border-gray-200 flex items-center gap-3">
-          <div className="p-2 bg-blue-100 rounded-lg">
-            <KeenIcon icon={isEditMode ? "notepad-edit" : "add-notepad"} className="w-5 h-5 text-blue-500" />
-          </div>
-          <div className="flex-1">
-            <DialogTitle className="font-bold text-2xl text-gray-900 leading-tight">
-              {isEditMode ? "Cập nhật tài khoản" : "Thêm tài khoản mới"}
+    return (
+      <Dialog open={open} onOpenChange={handleClose}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-semibold text-gray-900">
+              {isEdit ? 'Cập nhật thông tin người dùng' : 'Thêm mới người dùng'}
             </DialogTitle>
-            <p className="text-sm text-gray-600 mt-1 font-normal">
-              {isEditMode ? "Cập nhật thông tin tài khoản người dùng" : "Tạo tài khoản mới cho người dùng"}
-            </p>
-          </div>
-        </div>
+          </DialogHeader>
 
-        {/* Body */}
-        <div className="py-6 px-6 pb-24">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            {/* Cột trái - Thông tin cơ bản */}
-            <div className="space-y-8">
-              <div>
-                <div className="flex items-center gap-2 mb-4 font-semibold text-gray-800 text-lg">
-                  <KeenIcon icon="user" className="w-4 h-4 text-blue-400" />
-                  Thông tin cơ bản
+          <div className="py-6 px-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+              {/* Cột trái - Thông tin cơ bản */}
+              <div className="space-y-8">
+                <div>
+                  <div className="flex items-center gap-2 mb-4 font-semibold text-gray-800 text-lg">
+                    <KeenIcon icon="user" className="w-4 h-4 text-blue-400" />
+                    Thông tin cơ bản
+                  </div>
+                  <div className="space-y-5">
+                    <FormField
+                      label="Họ tên"
+                      value={formData.fullname}
+                      onChange={(value) => handleFieldChange('fullname', value)}
+                      error={errors.fullname}
+                      required={true}
+                    />
+                    <FormField
+                      label="Email"
+                      value={formData.email}
+                      onChange={(value) => handleFieldChange('email', value)}
+                      error={errors.email || errors.emailInvalid}
+                      required={true}
+                    />
+                    <FormField
+                      label="Số điện thoại"
+                      value={formData.phone}
+                      onChange={(value) => handleFieldChange('phone', value)}
+                      type="tel"
+                      error={errors.phone}
+                      required={true}
+                    />
+                    <FormField
+                      label="Địa chỉ"
+                      value={formData.address}
+                      onChange={(value) => handleFieldChange('address', value)}
+                      type="textarea"
+                    />
+                  </div>
                 </div>
-                <div className="space-y-5">
-                  <FormField
-                    label="Họ tên"
-                    value={formData.fullname}
-                    onChange={(value) => handleFieldChange('fullname', value)}
-                    error={errors.fullname}
-                  />
-                  <FormField
-                    label="Email"
-                    value={formData.email}
-                    onChange={(value) => handleFieldChange('email', value)}
-                    error={errors.email || errors.emailInvalid}
-                  />
-                  <FormField
-                    label="Số điện thoại"
-                    value={formData.phone}
-                    onChange={(value) => handleFieldChange('phone', value)}
-                    type="tel"
-                    error={errors.phone}
-                  />
+              </div>
+
+              {/* Cột phải - Thông tin bổ sung */}
+              <div className="space-y-8">
+                <div>
+                  <div className="flex items-center gap-2 mb-4 font-semibold text-gray-800 text-lg">
+                    <KeenIcon icon="setting-2" className="w-4 h-4 text-green-400" />
+                    Cài đặt tài khoản
+                  </div>
+                  <div className="space-y-5">
+                    <FormField
+                      label="Cấp độ tài khoản"
+                      value={formData.level}
+                      onChange={(value) => handleFieldChange('level', value)}
+                      type="select"
+                      options={levelOptions}
+                      error={errors.level}
+                      required={true}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
-
-            {/* Cột phải - Thông tin bổ sung */}
-            <div className="space-y-8">
-              <div>
-                <div className="flex items-center gap-2 mb-4 font-semibold text-gray-800 text-lg">
-                  <KeenIcon icon="information-2" className="w-4 h-4 text-blue-400" />
-                  Thông tin bổ sung
-                </div>
-                <div className="space-y-5">
-                  <FormField
-                    label="Cấp độ tài khoản"
-                    value={formData.level}
-                    onChange={(value) => handleFieldChange('level', value)}
-                    type="select"
-                    options={levelOptions}
-                    error={errors.level}
-                  />
-                  <FormField
-                    label="Địa chỉ"
-                    value={formData.address}
-                    onChange={(value) => handleFieldChange('address', value)}
-                    error={errors.address}
-                  />
-                </div>
-              </div>
-            </div>
           </div>
-        </div>
 
-        {/* Footer cố định bottom */}
-        <DialogFooter className="sticky bottom-0 left-0 w-full bg-white border-t border-gray-200 px-6 py-4 z-10 shadow-sm flex justify-end">
-          <ActionButtons
-            onCancel={handleClose}
-            onSubmit={handleSubmit}
-            isEdit={isEditMode}
-            isLoading={isLoading}
-          />
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  );
-});
+          {/* Action Buttons */}
+          <div className="flex justify-end gap-3 pt-6 border-t border-gray-200">
+            <button
+              onClick={handleClose}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors"
+            >
+              Hủy bỏ
+            </button>
+            <button
+              onClick={handleUpdate}
+              className="px-4 py-2 text-sm font-medium text-white bg-primary border border-transparent rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors"
+            >
+              {isEdit ? 'Cập nhật' : 'Thêm mới'}
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+);
+
+ModalUpdateUser.displayName = 'ModalUpdateUser';
 
 export { ModalUpdateUser };

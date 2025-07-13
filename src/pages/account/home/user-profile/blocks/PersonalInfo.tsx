@@ -1,12 +1,9 @@
 import { useAuthContext, UserModel } from '@/auth';
-import {KeenIcon } from '@/components';
-
-import { CrudAvatarUpload } from '@/partials/crud';
+import { KeenIcon } from '@/components';
 import { ModalUpdatePassword } from '@/partials/modals/profile/ModalUpdatePassword';
 import { ModalUpdateProfile } from '@/partials/modals/profile/ModalUpdateProfile';
 import { toAbsoluteUrl } from '@/utils/Assets';
-import moment from 'moment';
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 
 const PersonalInfo = () => {
   const { currentUser } = useAuthContext();
@@ -22,74 +19,141 @@ const PersonalInfo = () => {
   const handleCloseEditPasswordModal = () => {
     setOpenEditPasswordModal(false);
   };
-  const emptyUser: UserModel = {} as UserModel
+
+  const emptyUser: UserModel = {} as UserModel;
 
   const handleOpenEditModal = () => {
-    setSelectUser(currentUser || emptyUser)
+    setSelectUser(currentUser);
     setOpenEditModal(true);
   };
 
   const handleCloseEditModal = () => {
-    setSelectUser({} as UserModel)
     setOpenEditModal(false);
   };
-  const avatarDefault = toAbsoluteUrl(`/media/avatars/blank.png`);
+
+  const avatarDefault = toAbsoluteUrl(`media/avatars/blank.png`);
 
   return (
-    <>
-    <ModalUpdateProfile open={openEditModal} onClose={handleCloseEditModal} user={currentUser || emptyUser}/>
-    <ModalUpdatePassword open={openEditPasswordModal} onClose={handleCloseEditPasswordModal}/>
-    <div className="card min-w-full">
-      <div className="card-header w-full justify-between">
-        <h3 className="card-title">Thông tin cá nhân</h3>
-        <button onClick={handleOpenEditModal} className='btn border border-[#DBDFE9]'>Chỉnh sửa</button>
-      </div>
-      <div className="card-table scrollable-x-auto pb-3">
-        <table className="table align-middle text-sm text-gray-500">
-          <tbody>
-            <tr>
-              <td className="py-2 min-w-28 text-gray-600 font-normal">Photo</td>
-              
-              <td className="py-2 text-center">
-                <div className="flex justify-start items-center gap-2">
-                  <img
-                    src={avatarDefault}
-                    alt="avatar"
-                    className="h-full object-cover rounded-full"
-                    height={60}
-                    width={60}
-                  />
-                  <p className='text-[#4B5675]'>150x150px JPEG, PNG</p>
+    <Fragment>
+      <div className="card min-w-full">
+        <div className="card-header w-full justify-between">
+          <h3 className="card-title">Thông tin cá nhân</h3>
+          <button onClick={handleOpenEditModal} className="btn btn-sm btn-primary flex items-center gap-2">
+            <KeenIcon icon="pencil" />
+            <span>Chỉnh sửa</span>
+          </button>
+        </div>
+        <div className="card-body">
+          <div className="grid lg:grid-cols-2 grid-cols-1 gap-6">
+            {/* Thông tin cơ bản */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-4">
+                <img
+                  src={avatarDefault}
+                  alt="avatar"
+                  className="h-16 w-16 rounded-full object-cover border-2 border-gray-200"
+                />
+                <div>
+                  <h4 className="text-lg font-semibold text-gray-800">
+                    {currentUser?.fullname || 'Chưa cập nhật'}
+                  </h4>
+                  <p className="text-sm text-gray-600">{currentUser?.level || 'Người dùng'}</p>
                 </div>
-              </td>
-            </tr>
-            <tr>
-              <td className="py-2 text-gray-600 font-normal">Họ tên</td>
-              <td className="py-2 text-gray-800 text-sm font-semibold">{currentUser?.fullname}</td>
-            </tr>
-            <tr>
-              <td className="py-2 text-gray-600 font-normal">Địa chỉ</td>
-              <td className="py-2 text-[#99A1B7] font-normal text-sm">{currentUser?.address}</td>
-            </tr>
-            <tr>
-              <td className="py-2 text-gray-600 font-normal">Số điện thoại</td>
-              <td className="py-2 text-[#99A1B7] font-normal text-sm">{currentUser?.phone}</td>
-            </tr>
-            <tr>
-              <td className="py-2 text-gray-600 font-normal">Email</td>
-              <td className="py-2 text-[#99A1B7] font-normal text-sm">{currentUser?.email}</td>
-            </tr>
-            <tr>
-              <td className="py-2 text-gray-600 font-normal">Password</td>
-              <td className="py-2 text-gray-800 font-normal text-sm">************
-                <button onClick={handleOpenEditPasswordModal} style={{color: '#056EE9'}} className='badge badge-outline badge-primary ml-2'>Change</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+              </div>
+
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <KeenIcon icon="profile-circle" className="w-5 h-5 text-gray-400" />
+                  <div>
+                    <p className="text-sm font-medium text-gray-600">Họ tên</p>
+                    <p className="text-sm text-gray-800">{currentUser?.fullname || 'Chưa cập nhật'}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <KeenIcon icon="phone" className="w-5 h-5 text-gray-400" />
+                  <div>
+                    <p className="text-sm font-medium text-gray-600">Số điện thoại</p>
+                    <p className="text-sm text-gray-800">{currentUser?.phone || 'Chưa cập nhật'}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <KeenIcon icon="message-text-2" className="w-5 h-5 text-gray-400" />
+                  <div>
+                    <p className="text-sm font-medium text-gray-600">Email</p>
+                    <p className="text-sm text-gray-800">{currentUser?.email || 'Chưa cập nhật'}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Thông tin bổ sung */}
+            <div className="space-y-4">
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <KeenIcon icon="geolocation-home" className="w-5 h-5 text-gray-400" />
+                  <div>
+                    <p className="text-sm font-medium text-gray-600">Địa chỉ</p>
+                    <p className="text-sm text-gray-800">{currentUser?.address || 'Chưa cập nhật'}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <KeenIcon icon="document" className="w-5 h-5 text-gray-400" />
+                  <div>
+                    <p className="text-sm font-medium text-gray-600">Số CCCD</p>
+                    <p className="text-sm text-gray-800">{currentUser?.cccd_code || 'Chưa cập nhật'}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <KeenIcon icon="geolocation-home" className="w-5 h-5 text-gray-400" />
+                  <div>
+                    <p className="text-sm font-medium text-gray-600">Địa chỉ CCCD</p>
+                    <p className="text-sm text-gray-800">{currentUser?.cccd_address || 'Chưa cập nhật'}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <KeenIcon icon="calendar" className="w-5 h-5 text-gray-400" />
+                  <div>
+                    <p className="text-sm font-medium text-gray-600">Ngày cấp CCCD</p>
+                    <p className="text-sm text-gray-800">{currentUser?.cccd_day || 'Chưa cập nhật'}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <KeenIcon icon="shield-tick" className="w-5 h-5 text-gray-400" />
+                  <div>
+                    <p className="text-sm font-medium text-gray-600">Mật khẩu</p>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-gray-800">••••••••</span>
+                      <button 
+                        onClick={handleOpenEditPasswordModal} 
+                        className="text-xs text-blue-600 hover:text-blue-800 underline"
+                      >
+                        Đổi mật khẩu
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-    </>
+
+      <ModalUpdateProfile 
+        open={openEditModal} 
+        onClose={handleCloseEditModal} 
+        user={currentUser || emptyUser}
+      />
+      <ModalUpdatePassword 
+        open={openEditPasswordModal} 
+        onClose={handleCloseEditPasswordModal}
+      />
+    </Fragment>
   );
 };
 
