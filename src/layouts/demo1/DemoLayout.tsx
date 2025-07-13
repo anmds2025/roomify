@@ -2,6 +2,7 @@ import useBodyClasses from '@/hooks/useBodyClasses';
 import { Content, Demo1LayoutProvider, Header, Main } from '.';
 import { Fragment } from 'react/jsx-runtime';
 import { Helmet } from 'react-helmet-async';
+import { ComingSoon } from '@/components/common';
 
 const DemoLayout = () => {
   // Using the useBodyClasses hook to set background styles for light and dark modes
@@ -17,11 +18,12 @@ const DemoLayout = () => {
 
         <div className="flex grow">
           <div className="wrapper flex grow flex-col">
-            <Header />
+            {/* <Header /> */}
             <div className='w-full h-full flex justify-center items-center px-2'>
-              Tài khoản của bạn hiện chưa có quyền để sử dụng ứng dụng, vui lòng nâng cấp gói hoặc liên hệ với quản trị viên!
+              {/* Tài khoản của bạn hiện chưa có quyền để sử dụng ứng dụng, vui lòng nâng cấp gói hoặc liên hệ với quản trị viên! */}
+              <ComingSoon />
             </div>
-            <Content />
+            {/* <Content /> */}
 
             {/* <Footer /> */}
           </div>

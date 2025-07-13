@@ -17,16 +17,17 @@ interface RenderFieldProps {
   error?: boolean;
   disabled?: boolean;
   options?: Array<{ value: string; label: string }>;
+  inputMode?: "search" | "text" | "email" | "tel" | "url" | "none" | "numeric" | "decimal" | undefined;
 }
 
-function renderField({ type, value, onChange, label, error, disabled, options }: RenderFieldProps) {
+function renderField({ type, value, onChange, label, error, disabled, options, inputMode }: RenderFieldProps) {
   if (type === 'select') {
     return (
       <Select value={value} onValueChange={onChange} disabled={disabled}>
         <SelectTrigger className={error ? 'border-red-500 focus-visible:ring-red-500' : ''}>
           <SelectValue placeholder={`Chọn ${label.toLowerCase()}`} />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="bg-white">
           {options?.map((option: { value: string; label: string }) => (
             <SelectItem key={option.value} value={option.value}>
               {option.label}
@@ -62,6 +63,7 @@ function renderField({ type, value, onChange, label, error, disabled, options }:
       }}
       disabled={disabled}
       className={error ? 'border-red-500 focus-visible:ring-red-500' : ''}
+      inputMode={inputMode}
     />
   );
 }
@@ -75,7 +77,8 @@ const FormField = React.memo(({
   error = false, 
   options,
   disabled = false,
-  required = false
+  required = false,
+  inputMode
 }: {
   label: string;
   value: string;
@@ -85,6 +88,7 @@ const FormField = React.memo(({
   options?: { value: string; label: string }[];
   disabled?: boolean;
   required?: boolean;
+  inputMode?: "search" | "text" | "email" | "tel" | "url" | "none" | "numeric" | "decimal" | undefined;
 }) => (
   <div className="space-y-2">
     <Label className="text-sm font-medium text-gray-700 flex items-center gap-1">
@@ -92,7 +96,7 @@ const FormField = React.memo(({
       {required && <span className="text-red-500">*</span>}
     </Label>
     
-    {renderField({ type, value, onChange, label, error, disabled, options })}
+    {renderField({ type, value, onChange, label, error, disabled, options, inputMode })}
     {error && (
       <div className="flex items-center gap-1 mt-2 text-sm font-medium text-red-600">
         <KeenIcon icon="warning" className="w-4 h-4" />
@@ -272,6 +276,8 @@ const ModalUpdateUser = forwardRef<HTMLDivElement, ModalUpdateUserProps>(
                       onChange={(value) => handleFieldChange('email', value)}
                       error={errors.email || errors.emailInvalid}
                       required={true}
+                      inputMode="email"
+                      type="email"
                     />
                     <FormField
                       label="Số điện thoại"
@@ -280,6 +286,7 @@ const ModalUpdateUser = forwardRef<HTMLDivElement, ModalUpdateUserProps>(
                       type="tel"
                       error={errors.phone}
                       required={true}
+                      inputMode="numeric"
                     />
                     <FormField
                       label="Địa chỉ"

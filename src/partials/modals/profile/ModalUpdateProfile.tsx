@@ -188,7 +188,7 @@ const ModalUpdateProfile = forwardRef<HTMLDivElement, ModalUpdateProfileProps>(
           setCurrentUser(updatedUser);
         }
 
-        toast.success("Cập nhật thông tin thành công");
+        // toast.success("Cập nhật thông tin thành công");
         handleClose();
       } catch (error) {
         console.error('Failed to update Profile', error);
