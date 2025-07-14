@@ -168,8 +168,13 @@ const AppRouting = (): ReactElement => {
           <Route element={<RequireAuth allowedLelves={['Root', 'Admin']} />}>
             <Route path="/users" element={<UsersPage />} />
           </Route>
+
+          <Route element={<RequireAuth allowedLelves={['Root', 'Admin']} />}>
+            <Route path="/homes" element={<Demo1Layout />} />
+          </Route>
           
           <Route path="/account/home/user-profile" element={<AccountUserProfilePage />} />
+          <Route path="/profile" element={<AccountUserProfilePage />} />
           
           {/* <Route element={<RequireAuth allowedRoles={[]} />}>
             <Route path="/info" element={<InfoPage />} />

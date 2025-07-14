@@ -2,6 +2,24 @@ import { type MenuConfigType } from '@/components/menu';
 
 export const MENU_SIDEBAR: MenuConfigType = [
   {
+    title: 'Quản lý tòa nhà',
+    icon: 'home',
+    children: [
+      {
+        title: 'Danh sách tòa nhà',
+        path: '/homes'
+      },
+      {
+        title: 'Danh sách phòng',
+        
+      },
+      {
+        title: 'Danh sách người thuê',
+        
+      },
+    ]
+  },
+  {
     title: 'Quản lý người dùng',
     icon: 'users',
     children: [
