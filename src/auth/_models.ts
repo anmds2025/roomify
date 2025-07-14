@@ -18,4 +18,5 @@ export interface UserModel {
   cccd_day: string; 
   isDeleted: boolean;
   token: string;
+  avatar?: string;
 }

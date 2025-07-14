@@ -5,3 +5,4 @@ export * from './Dom';
 export * from './LocalStorage';
 export * from './Router';
 export * from './Common';
+export * from './Cloudinary';

@@ -2,7 +2,7 @@ import { forwardRef, useEffect, useRef, useState, useCallback, useMemo } from 'r
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { KeenIcon } from '@/components';
 import { toast } from 'react-toastify';
-import useS3Uploader from '@/hooks/useS3Uploader';
+import { useCloudinary } from '@/utils/Cloudinary';
 import { useAuthContext, UserModel } from '@/auth';
 import { toAbsoluteUrl } from '@/utils/Assets';
 import { useUser } from '@/hooks/useUser';
@@ -39,7 +39,7 @@ const ModalUpdateProfile = forwardRef<HTMLDivElement, ModalUpdateProfileProps>(
   ({ open, onClose, user }, ref) => {
     const { updateUser } = useUser();
     const { setCurrentUser } = useAuthContext();
-    const { uploadFileToS3 } = useS3Uploader();
+    const { uploadImage, deleteImage, getAvatarUrl, extractPublicId } = useCloudinary();
     
     const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -165,8 +165,43 @@ const ModalUpdateProfile = forwardRef<HTMLDivElement, ModalUpdateProfileProps>(
     // Handle form submission
     const handleUpdate = useCallback(async () => {
       if (!validateForm()) return;
+      let avatarUrl = user.avatar || '';
+      let imgPublicId = null;
 
       try {
+
+        // Upload ảnh lên Cloudinary nếu có file được chọn
+        if (imageFile) {
+          toast.info("Đang upload ảnh...");
+          
+          try {
+            const uploadResult = await uploadImage(
+              imageFile,
+              'avatars', // folder trên Cloudinary
+              ['user_avatar'] // tags
+            );
+            
+            avatarUrl = uploadResult.secure_url;
+            imgPublicId = uploadResult.public_id;
+
+            toast.success("Upload ảnh thành công!");
+            
+            // Xóa ảnh cũ nếu có (không phải ảnh mặc định)
+            if (user.avatar && !user.avatar.includes('blank.png') && !user.avatar.includes('user-default.png')) {
+              const oldPublicId = extractPublicId(user.avatar);
+              if (oldPublicId) {
+                await deleteImage(oldPublicId);
+              }
+            }
+          } catch (uploadError) {
+            console.error('Failed to upload image:', uploadError);
+            if (imgPublicId) {
+              await deleteImage(imgPublicId);
+            }
+            toast.error("Lỗi upload ảnh, nhưng thông tin khác đã được cập nhật");
+          }
+        }
+
         const payload = {
           pk: user._id.$oid,
           phone: formData.phone,
@@ -175,6 +210,7 @@ const ModalUpdateProfile = forwardRef<HTMLDivElement, ModalUpdateProfileProps>(
           address: formData.address,
           level: user.level,
           typeLogin: 'profile_update',
+          avatar: avatarUrl, // Thêm avatar vào payload
         };
 
         await updateUser(payload);
@@ -184,17 +220,18 @@ const ModalUpdateProfile = forwardRef<HTMLDivElement, ModalUpdateProfileProps>(
           const updatedUser = {
             ...user,
             ...formData,
+            avatar: avatarUrl,
           };
           setCurrentUser(updatedUser);
         }
 
-        // toast.success("Cập nhật thông tin thành công");
+        toast.success("Cập nhật thông tin thành công");
         handleClose();
       } catch (error) {
         console.error('Failed to update Profile', error);
         toast.error("Lỗi cập nhật thông tin");
       }
-    }, [validateForm, user, formData, updateUser, setCurrentUser, handleClose]);
+    }, [validateForm, user, formData, imageFile, updateUser, setCurrentUser, handleClose, uploadImage, deleteImage, extractPublicId]);
 
     // Format date for input
     const formatDateForInput = useCallback((isoString: string) => {
