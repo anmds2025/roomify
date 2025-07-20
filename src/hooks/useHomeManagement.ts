@@ -51,7 +51,7 @@ export const useHomeManagement = () => {
     });
 
     setFilteredData(filtered);
-  }, [searchTerm, data.length]);
+  }, [searchTerm, data]);
 
   // Update search term
   const updateSearchTerm = useCallback((term: string) => {
@@ -86,7 +86,7 @@ export const useHomeManagement = () => {
   // }, [homeId, closeDeleteModalHandler, fetchHomes, enqueueSnackbar]);
 
   const openEditModalHandler = useCallback((home: IHomeData) => {
-    setHomeId(home.pk || "");
+    setHomeId(home._id?.$oid || "");
     setHomeUpdate(home);
     setOpenEditModal(true);
   }, []);

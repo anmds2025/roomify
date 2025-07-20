@@ -1,5 +1,5 @@
 import React, { forwardRef, useCallback, useEffect, useMemo, useState, useRef } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -196,7 +196,7 @@ const ModalUpdateHome = forwardRef<HTMLDivElement, ModalUpdateHomeProps>(
       });
     }, []);
 
-    const isEdit: Boolean = useCallback(() => Boolean(home.pk), [home])();
+    const isEdit: Boolean = useCallback(() => Boolean(home._id?.$oid), [home])();
     
     const handleClose = useCallback(() => {
       resetForm();
@@ -281,7 +281,7 @@ const ModalUpdateHome = forwardRef<HTMLDivElement, ModalUpdateHomeProps>(
         }
 
         const payload = {
-          pk: home?.pk || "",
+          pk: home?._id?.$oid || "",
           home_name: formData.home_name,
           phone: formData.phone,
           address: formData.address,
@@ -299,14 +299,14 @@ const ModalUpdateHome = forwardRef<HTMLDivElement, ModalUpdateHomeProps>(
 
         await updateHome(payload);
         
-        handleClose();
+        toast.success(isEdit ? 'Cập nhật tòa nhà thành công' : 'Thêm tòa nhà thành công');
         
         // Refresh home list
         if (fetchHomes) {
           fetchHomes();
         }
         
-        toast.success(isEdit ? 'Cập nhật tòa nhà thành công' : 'Thêm tòa nhà thành công');
+        handleClose();
       } catch (error) {
         console.error('Failed to update home', error);
         toast.error("Lỗi cập nhật thông tin");
@@ -328,7 +328,7 @@ const ModalUpdateHome = forwardRef<HTMLDivElement, ModalUpdateHomeProps>(
     return (
       <Dialog open={open} onOpenChange={handleClose}>
         <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto bg-white">
-          <DialogHeader>
+          <DialogHeader className='sticky top-0 bg-white'>
             <DialogTitle className="text-lg font-semibold text-gray-900">
               {isEdit ? 'Cập nhật thông tin tòa nhà' : 'Thêm mới tòa nhà'}
             </DialogTitle>
@@ -502,7 +502,7 @@ const ModalUpdateHome = forwardRef<HTMLDivElement, ModalUpdateHomeProps>(
           </div>
 
           {/* Action Buttons */}
-          <div className="flex justify-end gap-3 pt-6 border-t border-gray-200">
+          <div className="flex justify-end gap-3 pt-6 border-t border-gray-200 sticky bottom-0 bg-white">
             <button
               onClick={handleClose}
               className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors"

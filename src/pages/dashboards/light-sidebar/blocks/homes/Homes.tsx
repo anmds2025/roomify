@@ -74,7 +74,7 @@ const Homes = () => {
 
   useEffect(() => {
     filterData();
-  }, [searchTerm, data]); // Chạy khi searchTerm hoặc data thay đổi
+  }, [searchTerm, data, filterData]); // Chạy khi searchTerm, data hoặc filterData thay đổi
 
   // Table columns với useMemo để tối ưu performance
   const columns = useMemo<ColumnDef<IHomeData>[]>(
