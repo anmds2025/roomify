@@ -46,15 +46,30 @@ const LevelFilter = React.memo(({ value, onChange }: {
 ));
 
 // Component cho action buttons
-const ActionButtons = React.memo(({ onAddNew }: { onAddNew: () => void }) => (
-  <button 
-    onClick={onAddNew} 
-    className="btn btn-sm btn-primary badge badge-outline badge-primary gap-1 items-center rounded-lg"
-    style={{minWidth: "90px"}}
-  >
-    <KeenIcon icon="add-notepad" />
-    Thêm mới
-  </button>
+const ActionButtons = React.memo(({ onAddNew, onRefresh, isLoading }: { 
+  onAddNew: () => void;
+  onRefresh: () => void;
+  isLoading: boolean;
+}) => (
+  <div className="flex gap-2">
+    <button 
+      onClick={onRefresh}
+      disabled={isLoading}
+      className="btn btn-sm btn-light gap-1 items-center rounded-lg"
+      style={{minWidth: "80px"}}
+    >
+      <KeenIcon icon="refresh" />
+      {isLoading ? 'Đang tải...' : 'Làm mới'}
+    </button>
+    <button 
+      onClick={onAddNew} 
+      className="btn btn-sm btn-primary badge badge-outline badge-primary gap-1 items-center rounded-lg"
+      style={{minWidth: "90px"}}
+    >
+      <KeenIcon icon="add-notepad" />
+      Thêm mới
+    </button>
+  </div>
 ));
 
 // Component cho level badge
@@ -121,7 +136,18 @@ const Users = () => {
 
   useEffect(() => {
     filterData();
-  }, [searchTerm, levelFilter, data]); // Chạy khi searchTerm, levelFilter hoặc data thay đổi
+  }, [searchTerm, levelFilter, data, filterData]); // Chạy khi searchTerm, levelFilter, data hoặc filterData thay đổi
+
+  // Debug logging
+  useEffect(() => {
+    console.log('Users component state:', {
+      dataLength: data.length,
+      filteredDataLength: filteredData.length,
+      searchTerm,
+      levelFilter,
+      isLoading
+    });
+  }, [data.length, filteredData.length, searchTerm, levelFilter, isLoading]);
 
   // Table columns với useMemo để tối ưu performance
   const columns = useMemo<ColumnDef<IUserData>[]>(
@@ -255,24 +281,43 @@ const Users = () => {
               value={levelFilter}
               onChange={updateLevelFilter}
             />
-            <ActionButtons onAddNew={addNewUserHandler} />
+            <ActionButtons 
+              onAddNew={addNewUserHandler} 
+              onRefresh={fetchUsers}
+              isLoading={isLoading}
+            />
           </div>
         </div>
 
         {/* DataGrid */}
         <div className="card-body">
-          <DataGrid
-            columns={columns}
-            data={data}
-            rowSelect={true}
-            paginationSize={20}
-            paginationSizes={[5, 10, 20, 50, 100]}
-            initialSorting={[{ id: 'fullname', desc: false }]}
-            saveState={true}
-            saveStateId="Users-grid"
-            onRowsSelectChange={handleRowsSelectChange}
-            onPaginationChange={handlePaginationChange}
-          />
+          {isLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="text-gray-500">Đang tải dữ liệu...</div>
+            </div>
+          ) : filteredData.length === 0 ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="text-center">
+                <div className="text-gray-500 mb-2">Không có dữ liệu người dùng</div>
+                <div className="text-sm text-gray-400">
+                  {searchTerm || levelFilter !== 'Tất cả' ? 'Thử tìm kiếm với từ khóa khác' : 'Hãy thêm người dùng mới'}
+                </div>
+              </div>
+            </div>
+          ) : (
+            <DataGrid
+              columns={columns}
+              data={filteredData}
+              rowSelect={true}
+              paginationSize={20}
+              paginationSizes={[5, 10, 20, 50, 100]}
+              initialSorting={[{ id: 'fullname', desc: false }]}
+              saveState={true}
+              saveStateId="Users-grid"
+              onRowsSelectChange={handleRowsSelectChange}
+              onPaginationChange={handlePaginationChange}
+            />
+          )}
         </div>
       </div>
 
