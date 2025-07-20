@@ -83,6 +83,7 @@ import { AuthenticationAccountDeactivatedPage } from '@/pages/authentication/acc
 import { AuthenticationGetStartedPage } from '@/pages/authentication/get-started/AuthenticationGetStartedPage';
 import { toast } from 'react-toastify';
 import { UsersPage } from '@/pages/dashboards/users/UsersPage';
+import { HomesPage } from '@/pages/dashboards/homes/HomesPage';
 import { CheckUserMailPage } from '@/pages/account/home/user-profile/CheckUserMailPage';
 
 const AppRouting = (): ReactElement => {
@@ -170,7 +171,7 @@ const AppRouting = (): ReactElement => {
           </Route>
 
           <Route element={<RequireAuth allowedLelves={['Root', 'Admin']} />}>
-            <Route path="/homes" element={<Demo1Layout />} />
+            <Route path="/homes" element={<HomesPage />} />
           </Route>
           
           <Route path="/account/home/user-profile" element={<AccountUserProfilePage />} />
