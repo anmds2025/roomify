@@ -19,4 +19,5 @@ export interface UserModel {
   isDeleted: boolean;
   token: string;
   avatar?: string;
+  image_QR?: string;
 }

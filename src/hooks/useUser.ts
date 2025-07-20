@@ -1,4 +1,4 @@
-import { changePasswordApi, deleteUserApi, getUserApi, sendMailCheckPasswordApi, sendMailNewPasswordApi, updateUserApi, UpdateUserPayload } from '@/api/user';
+import { changePasswordApi, deleteUserApi, getCurrentUserApi, getUserApi, sendMailCheckPasswordApi, sendMailNewPasswordApi, UpdateProfilePayload, updateProfileUserApi, updateUserApi, UpdateUserPayload } from '@/api/user';
 import { useAuthContext } from '@/auth';
 import { useState, useCallback } from 'react';
 import { toast } from 'react-toastify';
@@ -23,6 +23,29 @@ export const useUser = () => {
             else
             {
                 toast.error("Lỗi")
+            }
+           
+        } catch (error: any) {
+            setError(error.message || 'Failed to fetch Users');
+            toast.error("Failed to fetch data!");
+        } finally {
+            setIsLoading(false);
+        }
+    }, [currentUser]);
+
+    const getCurrentUser = useCallback(async () => {
+        setIsLoading(true);
+        setError(null);
+
+        try {
+            if(currentUser)
+            {
+                const data = await getCurrentUserApi(currentUser);
+                return data;
+            }
+            else
+            {
+                toast.error("Không thể lấy thông tin người dùng")
             }
            
         } catch (error: any) {
@@ -65,6 +88,27 @@ export const useUser = () => {
             {
                 const response = await updateUserApi(data, currentUser);
                 setSuccessMessage('User created successfully');
+                toast.success('Cập nhật tài khoản thành công');
+                return response;
+            }
+        } catch (error: any) {
+            setError(error.message || 'Failed to create user');
+            toast.error('Cập nhật tài khoản thấy bại');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const updateProfileUser = async (data: UpdateProfilePayload) => {
+        setIsLoading(true);
+        setError(null);
+        setSuccessMessage(null);
+    
+        try {
+            if(currentUser)
+            {
+                const response = await updateProfileUserApi(data, currentUser);
+                setSuccessMessage('Update profile successfully');
                 toast.success('Cập nhật tài khoản thành công');
                 return response;
             }
@@ -198,6 +242,8 @@ export const useUser = () => {
         changePassword,
         sendMailCheckPassword,
         sendMailNewPassword,
-        updateUserProfile
+        updateUserProfile,
+        updateProfileUser,
+        getCurrentUser
     };
 };

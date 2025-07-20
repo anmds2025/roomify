@@ -2,7 +2,6 @@ export interface IDataResponseUser {
   objects : IUserData[]
 }
 
-
 interface IUserData {
   _id: { $oid: string };
   phone: string;
@@ -11,6 +10,8 @@ interface IUserData {
   address: string;
   nameLogin: string;
   level: string;
+  avatar: string;
+  image_QR: string;
   timeUpdate: { $date: number }; 
   cccd_code: string;
   cccd_address: string;

@@ -12,6 +12,7 @@ import { userFields } from '@/config/userFields';
 interface ModalUpdateProfileProps {
   open: boolean;
   onClose: () => void;
+  onDone: () => void;
   user: UserModel;
 }
 
@@ -36,12 +37,13 @@ interface FormErrors {
 }
 
 const ModalUpdateProfile = forwardRef<HTMLDivElement, ModalUpdateProfileProps>(
-  ({ open, onClose, user }, ref) => {
-    const { updateUser } = useUser();
+  ({ open, onClose, user, onDone }, ref) => {
+    const { updateProfileUser } = useUser();
     const { setCurrentUser } = useAuthContext();
     const { uploadImage, deleteImage, getAvatarUrl, extractPublicId } = useCloudinary();
     
     const fileInputRef = useRef<HTMLInputElement | null>(null);
+    const fileQrInputRef = useRef<HTMLInputElement | null>(null);
 
     // Form state
     const [formData, setFormData] = useState<FormData>({
@@ -54,9 +56,12 @@ const ModalUpdateProfile = forwardRef<HTMLDivElement, ModalUpdateProfileProps>(
       cccd_day: '',
     });
 
-    // Image state
-    const [imageFile, setImageFile] = useState<File | null>(null);
-    const [imageFileStr, setImageFileStr] = useState<string | null>(null);
+    // Avatar state
+    const [avatarFile, setAvatarFile] = useState<File | null>(null);
+    const [avatarFileStr, setAvatarFileStr] = useState<string | null>(user?.avatar || "");
+
+    const [imageQRFile, setImageQRFile] = useState<File | null>(null);
+    const [imageQRFileStr, setImageQRFileStr] = useState<string | null>(user?.image_QR || "");
 
     // Error state
     const [errors, setErrors] = useState<FormErrors>({
@@ -81,7 +86,8 @@ const ModalUpdateProfile = forwardRef<HTMLDivElement, ModalUpdateProfileProps>(
           cccd_address: user?.cccd_address || '',
           cccd_day: user?.cccd_day || '',
         });
-        setImageFileStr('');
+        setAvatarFileStr(user?.avatar || "");
+        setImageQRFileStr(user?.image_QR || "");
       }
     }, [user]);
 
@@ -96,8 +102,8 @@ const ModalUpdateProfile = forwardRef<HTMLDivElement, ModalUpdateProfileProps>(
         cccd_address: user?.cccd_address || '',
         cccd_day: user?.cccd_day || '',
       });
-      setImageFile(null);
-      setImageFileStr(null);
+      setAvatarFile(null);
+      setImageQRFile(null);
       setErrors({
         fullname: false,
         phone: false,
@@ -113,6 +119,11 @@ const ModalUpdateProfile = forwardRef<HTMLDivElement, ModalUpdateProfileProps>(
       resetForm();
       onClose();
     }, [resetForm, onClose]);
+
+    const handleDone = useCallback(() => {
+      resetForm();
+      onDone();
+    }, [resetForm, onDone]);
 
     // Validation
     const validateForm = useCallback((): boolean => {
@@ -153,8 +164,16 @@ const ModalUpdateProfile = forwardRef<HTMLDivElement, ModalUpdateProfileProps>(
     const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
       if (file) {
-        setImageFileStr(URL.createObjectURL(file));
-        setImageFile(file);
+        setAvatarFileStr(URL.createObjectURL(file));
+        setAvatarFile(file);
+      }
+    }, []);
+
+    const handleFileQRChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (file) {
+        setImageQRFileStr(URL.createObjectURL(file));
+        setImageQRFile(file);
       }
     }, []);
 
@@ -162,27 +181,33 @@ const ModalUpdateProfile = forwardRef<HTMLDivElement, ModalUpdateProfileProps>(
       fileInputRef.current?.click();
     }, []);
 
+    const handleBoxClickQR = useCallback(() => {
+      fileQrInputRef.current?.click();
+    }, []);
+
     // Handle form submission
     const handleUpdate = useCallback(async () => {
       if (!validateForm()) return;
       let avatarUrl = user.avatar || '';
-      let imgPublicId = null;
+      let avatarPublicId = null;
+      let imageQRUrl = user.image_QR || '';
+      let imageQRPublicId = null;
+
 
       try {
 
         // Upload ảnh lên Cloudinary nếu có file được chọn
-        if (imageFile) {
-          toast.info("Đang upload ảnh...");
-          
+        if (avatarFile) {
+          toast.info("Đang upload avatar...");
           try {
             const uploadResult = await uploadImage(
-              imageFile,
+              avatarFile,
               'avatars', // folder trên Cloudinary
               ['user_avatar'] // tags
             );
             
             avatarUrl = uploadResult.secure_url;
-            imgPublicId = uploadResult.public_id;
+            avatarPublicId = uploadResult.public_id;
 
             toast.success("Upload ảnh thành công!");
             
@@ -194,44 +219,62 @@ const ModalUpdateProfile = forwardRef<HTMLDivElement, ModalUpdateProfileProps>(
               }
             }
           } catch (uploadError) {
-            console.error('Failed to upload image:', uploadError);
-            if (imgPublicId) {
-              await deleteImage(imgPublicId);
+            console.error('Failed to upload avatar:', uploadError);
+            if (avatarPublicId) {
+              await deleteImage(avatarPublicId);
             }
-            toast.error("Lỗi upload ảnh, nhưng thông tin khác đã được cập nhật");
+            toast.error("Lỗi upload avatar, nhưng thông tin khác đã được cập nhật");
+          }
+        }
+
+        if (imageQRFile) {
+          toast.info("Đang upload image QR...");
+          try {
+            const uploadResult = await uploadImage(
+              imageQRFile,
+              'image_qr', // folder trên Cloudinary
+              ['user_image_qr'] // tags
+            );
+            
+            imageQRUrl = uploadResult.secure_url;
+            imageQRPublicId = uploadResult.public_id;
+
+            toast.success("Upload ảnh thành công!");
+            
+            // Xóa ảnh cũ nếu có (không phải ảnh mặc định)
+            if (user.image_QR && !user.image_QR.includes('blank.png') && !user.image_QR.includes('user-default.png')) {
+              const oldPublicId = extractPublicId(user.image_QR);
+              if (oldPublicId) {
+                await deleteImage(oldPublicId);
+              }
+            }
+          } catch (uploadError) {
+            console.error('Failed to upload image qr:', uploadError);
+            if (imageQRPublicId) {
+              await deleteImage(imageQRPublicId);
+            }
+            toast.error("Lỗi upload image qr, nhưng thông tin khác đã được cập nhật");
           }
         }
 
         const payload = {
           pk: user._id.$oid,
           phone: formData.phone,
-          email: formData.email,
           fullname: formData.fullname,
           address: formData.address,
-          level: user.level,
-          typeLogin: 'profile_update',
-          avatar: avatarUrl, // Thêm avatar vào payload
+          cccd_code: formData.cccd_code,
+          cccd_address: formData.cccd_address,
+          cccd_day: formData.cccd_day,
+          avatar: avatarUrl,
+          image_QR: imageQRUrl
         };
 
-        await updateUser(payload);
-
-        // Update current user in context
-        if (setCurrentUser) {
-          const updatedUser = {
-            ...user,
-            ...formData,
-            avatar: avatarUrl,
-          };
-          setCurrentUser(updatedUser);
-        }
-
-        toast.success("Cập nhật thông tin thành công");
-        handleClose();
+        await updateProfileUser(payload);
+        handleDone();
       } catch (error) {
         console.error('Failed to update Profile', error);
-        toast.error("Lỗi cập nhật thông tin");
       }
-    }, [validateForm, user, formData, imageFile, updateUser, setCurrentUser, handleClose, uploadImage, deleteImage, extractPublicId]);
+    }, [validateForm, user, formData, imageQRFile, avatarFile, updateProfileUser, setCurrentUser, handleClose, uploadImage, deleteImage, extractPublicId]);
 
     // Format date for input
     const formatDateForInput = useCallback((isoString: string) => {
@@ -241,8 +284,8 @@ const ModalUpdateProfile = forwardRef<HTMLDivElement, ModalUpdateProfileProps>(
 
     // Memoized avatar URL
     const avatarUrl = useMemo(() => {
-      return imageFileStr || toAbsoluteUrl('media/avatars/blank.png');
-    }, [imageFileStr]);
+      return avatarFileStr || toAbsoluteUrl('media/avatars/blank.png');
+    }, [avatarFileStr]);
 
     return (
       <Dialog open={open} onOpenChange={handleClose}>
@@ -272,6 +315,34 @@ const ModalUpdateProfile = forwardRef<HTMLDivElement, ModalUpdateProfileProps>(
                   />
                   <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-full opacity-0 hover:opacity-100 transition-opacity">
                     <KeenIcon icon="camera" className="w-6 h-6 text-white" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-center">
+              <div className="image-input size-20 cursor-pointer" onClick={handleBoxClickQR}>
+                <div className="image-input-placeholder rounded-lg border-2 border-dashed border-gray-300 hover:border-primary transition-colors relative overflow-hidden">
+                  {imageQRFileStr ? (
+                    <img
+                      src={imageQRFileStr}
+                      alt="QR code"
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <div className="flex items-center justify-center h-full w-full text-gray-400">
+                      Tải mã QR
+                    </div>
+                  )}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    ref={fileQrInputRef}
+                    className="hidden"
+                    onChange={handleFileQRChange}
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 hover:opacity-100 transition-opacity">
+                    <KeenIcon icon="upload" className="w-6 h-6 text-white" />
                   </div>
                 </div>
               </div>
