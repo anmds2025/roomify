@@ -36,13 +36,18 @@ export const useUserManagement = () => {
     setIsLoading(true);
     try {
       const usersResponse = await getUsers();
+      console.log('fetchUsers response:', usersResponse);
+      
       const filteredUsers = (usersResponse || []).filter(
         (user) => user.email !== currentUserEmail && user.level !== 'Root'
       );
+      
+      console.log('filteredUsers:', filteredUsers);
 
       setData(filteredUsers);
       setFilteredData(filteredUsers);
     } catch (error) {
+      console.error('fetchUsers error:', error);
       enqueueSnackbar('Failed to fetch users', { variant: 'error' });
     } finally {
       setIsLoading(false);
@@ -51,10 +56,12 @@ export const useUserManagement = () => {
 
   // Filter data
   const filterData = useCallback(() => {
+    console.log('Filtering data:', { searchTerm, levelFilter, dataLength: data.length });
+    
     const filtered = data.filter((user) => {
       const matchesSearch =
-        user.fullname.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchTerm.toLowerCase());
+        user.fullname?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.email?.toLowerCase().includes(searchTerm.toLowerCase());
 
       const matchesLevel =
         levelFilter === 'Tất cả' || user.level === levelFilter;
@@ -62,8 +69,9 @@ export const useUserManagement = () => {
       return matchesSearch && matchesLevel;
     });
 
+    console.log('Filtered result:', { filteredLength: filtered.length, filtered });
     setFilteredData(filtered);
-  }, [searchTerm, levelFilter, data.length]);
+  }, [searchTerm, levelFilter, data]);
 
   // Update search term
   const updateSearchTerm = useCallback((term: string) => {

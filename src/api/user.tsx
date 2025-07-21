@@ -45,6 +45,8 @@ export const getUserApi = async (user : UserModel): Promise<IUserData[]> => {
     token: user?.token,
   });
 
+  console.log('User API request:', { url: GET_ALL_USER_URL, formData });
+
   const response = await axios.post<IDataResponseUser>(
     GET_ALL_USER_URL,
     formData,
@@ -55,7 +57,8 @@ export const getUserApi = async (user : UserModel): Promise<IUserData[]> => {
     }
   );
 
-  return response.data.objects;
+  console.log('User API response:', response.data);
+  return response.data.objects || [];
 };
 
 export const getCurrentUserApi = async (user : UserModel): Promise<IUserData> => {

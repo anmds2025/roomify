@@ -11,7 +11,7 @@ export const MENU_SIDEBAR: MenuConfigType = [
       },
       {
         title: 'Danh sách phòng',
-        
+        path: '/rooms'
       },
       {
         title: 'Danh sách người thuê',

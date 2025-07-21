@@ -18,6 +18,7 @@ export const useUser = () => {
             if(currentUser)
             {
                 const data = await getUserApi(currentUser);
+                console.log('useUser getUsers result:', data);
                 return data;
             }
             else
@@ -26,6 +27,7 @@ export const useUser = () => {
             }
            
         } catch (error: any) {
+            console.error('useUser getUsers error:', error);
             setError(error.message || 'Failed to fetch Users');
             toast.error("Failed to fetch data!");
         } finally {
