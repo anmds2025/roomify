@@ -42,13 +42,13 @@ const DataGrid = <TData extends object>(props: TDataGridProps<TData>) => {
     saveState: false,
     saveStateId: '',
     cellsBorder: true,
-    loadingText: 'Loading...', // Default value for loadingText
+    loadingText: 'Đang tải...', // Default value for loadingText
     rowSelect: false, // Default value for rowSelect
-    emptyState: 'No data available', // Default value for emptyInfo
+    emptyState: 'Bạn chưa có data nào', // Default value for emptyInfo
     paginationInfo: '{from} - {to} of {count}', // Default value for paginationInfo
     paginationSizes: [5, 10, 25, 50, 100], // Default pagination sizes
-    paginationSizesLabel: 'Show',
-    paginationSizesDesc: 'per page',
+    paginationSizesLabel: 'Hiện thị',
+    paginationSizesDesc: 'mỗi trang',
     paginationSize: 5, // Default pagination size
     paginationMoreLimit: 5, // Default limit for "load more"
     paginationMore: false, // Default for paginationMore

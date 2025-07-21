@@ -9,6 +9,7 @@ import { toast } from 'react-toastify';
 import { IHomeData } from '@/pages/dashboards/light-sidebar/blocks/homes/HomesData';
 import { useHome } from '@/hooks/useHome';
 import { useCloudinary } from '@/utils/Cloudinary';
+import { useAuthContext } from '@/auth';
 
 interface ModalUpdateHomeProps {
   open: boolean;
@@ -121,7 +122,7 @@ const ModalUpdateHome = forwardRef<HTMLDivElement, ModalUpdateHomeProps>(
     const { updateHome } = useHome();
     const { uploadImage, deleteImage, extractPublicId } = useCloudinary();
     const qrFileInputRef = useRef<HTMLInputElement | null>(null);
-
+    const { currentUser } = useAuthContext();
     // Form state
     const [formData, setFormData] = useState({
       home_name: '',
@@ -167,7 +168,15 @@ const ModalUpdateHome = forwardRef<HTMLDivElement, ModalUpdateHomeProps>(
           addressBank: home?.addressBank || '',
           imageQR: home?.imageQR || '',
         });
-        setQrImageFileStr('');
+        if(home.imageQR)
+        {
+          setQrImageFileStr(home?.imageQR);
+        }
+        else
+        {
+          setQrImageFileStr(currentUser?.image_QR || "")
+        }
+        
       }
     }, [home]);
 

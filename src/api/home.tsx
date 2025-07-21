@@ -29,6 +29,7 @@ export interface UpdateHomePayload {
 export const getHomesApi = async (user: UserModel): Promise<IHomeData[]> => {
   const formData = createFormData({
     token: user?.token,
+    user_pk: user?._id.$oid
   });
 
   const response = await axios.post<IDataResponseHome>(

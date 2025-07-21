@@ -7,7 +7,7 @@ export const useUser = () => {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
-    const { currentUser } = useAuthContext();
+    const { currentUser, setCurrentUser } = useAuthContext();
 
     // Fetch all user
     const getUsers = useCallback(async () => {
@@ -40,23 +40,21 @@ export const useUser = () => {
         setError(null);
 
         try {
-            if(currentUser)
-            {
-                const data = await getCurrentUserApi(currentUser);
-                return data;
+            if (currentUser && currentUser.token) {
+                const userData = await getCurrentUserApi(currentUser);
+                const mergedUser = { ...userData, token: currentUser.token };
+                setCurrentUser(mergedUser);
+                return mergedUser;
+            } else {
+                toast.error("Không thể lấy thông tin người dùng (thiếu token)");
             }
-            else
-            {
-                toast.error("Không thể lấy thông tin người dùng")
-            }
-           
         } catch (error: any) {
-            setError(error.message || 'Failed to fetch Users');
-            toast.error("Failed to fetch data!");
+            setError(error.message || 'Failed to fetch user data');
+            toast.error("Không thể tải dữ liệu người dùng!");
         } finally {
             setIsLoading(false);
         }
-    }, [currentUser]);
+    }, [currentUser, setCurrentUser]);
 
     // Create a new user
     const createUser = useCallback(async (data: UpdateUserPayload) => {

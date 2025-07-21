@@ -11,6 +11,7 @@ import {
 } from 'react';
 
 import { type AuthModel, type UserModel } from '@/auth';
+import { toast } from 'react-toastify';
 
 export const GET_USER_BY_ACCESSTOKEN_URL = `/user-admin`;
 export const LOGIN_URL = `/user/login`;
@@ -87,8 +88,9 @@ const AuthProvider = ({ children }: PropsWithChildren) => {
         localStorage.setItem('user', JSON.stringify(user));
         setCurrentUser(user);
         localStorage.setItem('isLogin', 'true');
-      } catch (error) {
-        console.error('Login error:', error);
+      } catch (error : any) {
+          const message = error?.response.data.Error || 'The login details are incorrect';
+          toast.error(message);
       }
     } catch (error) {
       setCurrentUser(undefined);
