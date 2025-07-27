@@ -35,7 +35,7 @@ const DropdownUser = ({ menuTtemRef = undefined }: { menuTtemRef?: React.RefObje
         <div className="flex items-center gap-2">
           <img
             className="size-9 rounded-full border-2 border-success"
-            src={"https://my-bucket-kiai-image.s3.ap-southeast-1.amazonaws.com/uploads/user-default.png"}
+            src={currentUser?.avatar ?? "https://my-bucket-kiai-image.s3.ap-southeast-1.amazonaws.com/uploads/user-default.png"}
             alt=""
           />
           <div className="flex flex-col gap-1.5">

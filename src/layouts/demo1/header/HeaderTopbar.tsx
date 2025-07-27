@@ -144,7 +144,7 @@ const HeaderTopbar = () => {
             <div className="btn btn-icon rounded-full">
               <img
                 className="size-9 rounded-full border-2 border-success shrink-0"
-                src={"https://my-bucket-kiai-image.s3.ap-southeast-1.amazonaws.com/uploads/user-default.png"}
+                src={currentUser?.avatar ?? "https://my-bucket-kiai-image.s3.ap-southeast-1.amazonaws.com/uploads/user-default.png"}
                 alt=""
               />
             </div>
