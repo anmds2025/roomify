@@ -287,14 +287,6 @@ const ModalUpdateRoom = forwardRef<HTMLDivElement, ModalUpdateRoomProps>(
                     inputMode="numeric"
                     placeholder="VD: 25"
                   />
-                  <FormField
-                    label="Địa chỉ"
-                    value={formData.address}
-                    onChange={(value) => handleFieldChange('address', value)}
-                    error={errors.address}
-                    required={true}
-                    placeholder="VD: 123 Đường ABC, Quận 1, TP.HCM"
-                  />
                 </div>
               </div>
 

@@ -103,6 +103,10 @@ export const useRoomManagement = () => {
     openEditModalHandler(emptyRoom);
   }, [openEditModalHandler, emptyRoom]);
 
+  const fnFilterCustom = (dataFiltered: IRoomData[]) => {
+    setFilteredData(dataFiltered);
+  };
+
   return {
     // State
     data,
@@ -129,5 +133,6 @@ export const useRoomManagement = () => {
     openEditModalHandler,
     closeEditModalHandler,
     addNewRoomHandler,
+    fnFilterCustom
   };
 }; 
