@@ -126,8 +126,8 @@ const ModalUpdateHome = forwardRef<HTMLDivElement, ModalUpdateHomeProps>(
     // Form state
     const [formData, setFormData] = useState({
       home_name: '',
-      phone: '',
-      address: '',
+      phone: currentUser?.phone || '',
+      address: currentUser?.address || '',
       electricity_price: '',
       water_price: '',
       service_price: '',
@@ -155,8 +155,8 @@ const ModalUpdateHome = forwardRef<HTMLDivElement, ModalUpdateHomeProps>(
       if (home) {
         setFormData({
           home_name: home?.home_name || '',
-          phone: home?.user_phone || '',
-          address: home?.address || '',
+          phone: home?.user_phone || currentUser?.phone || '',
+          address: home?.address || currentUser?.address || '',
           electricity_price: home?.electricity_price || '',
           water_price: home?.water_price || '',
           service_price: home?.service_price || '',
@@ -184,8 +184,8 @@ const ModalUpdateHome = forwardRef<HTMLDivElement, ModalUpdateHomeProps>(
     const resetForm = useCallback(() => {
       setFormData({
         home_name: '',
-        phone: '',
-        address: '',
+        phone: currentUser?.phone || '',
+        address: currentUser?.address || '',
         electricity_price: '',
         water_price: '',
         service_price: '',

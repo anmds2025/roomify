@@ -14,7 +14,7 @@ export interface UpdateRoomPayload {
   room_name: string;
   price: number;
   size: number;
-  address: string;
+  // address: string;
   note?: string;
   token: string;
 }
