@@ -129,7 +129,7 @@ const ModalUpdateRoom = forwardRef<HTMLDivElement, ModalUpdateRoomProps>(
       room_name: '',
       price: '',
       size: '',
-      address: '',
+      // address: '',
       note: '',
       home_pk: ''
     });
@@ -139,7 +139,7 @@ const ModalUpdateRoom = forwardRef<HTMLDivElement, ModalUpdateRoomProps>(
       room_name: false,
       price: false,
       size: false,
-      address: false,
+      // address: false,
       home_pk: false
     });
 
@@ -150,7 +150,7 @@ const ModalUpdateRoom = forwardRef<HTMLDivElement, ModalUpdateRoomProps>(
           room_name: room.room_name || '',
           price: room.price?.toString() || '',
           size: room.size?.toString() || '',
-          address: room.address || '',
+          // address: room.address || '',
           note: room.note || '',
           home_pk: room.home_pk || ''
         });
@@ -163,7 +163,7 @@ const ModalUpdateRoom = forwardRef<HTMLDivElement, ModalUpdateRoomProps>(
         room_name: '',
         price: '',
         size: '',
-        address: '',
+        // address: '',
         note: '',
         home_pk: ''
       });
@@ -171,7 +171,7 @@ const ModalUpdateRoom = forwardRef<HTMLDivElement, ModalUpdateRoomProps>(
         room_name: false,
         price: false,
         size: false,
-        address: false,
+        // address: false,
         home_pk: false
       });
     }, []);
@@ -195,7 +195,7 @@ const ModalUpdateRoom = forwardRef<HTMLDivElement, ModalUpdateRoomProps>(
         room_name: !formData.room_name.trim(),
         price: !formData.price.trim() || parseInt(formData.price) <= 0,
         size: !formData.size.trim() || parseInt(formData.size) <= 0,
-        address: !formData.address.trim(),
+        // address: !formData.address.trim(),
         home_pk: !formData.home_pk.trim()
       };
 
@@ -216,7 +216,7 @@ const ModalUpdateRoom = forwardRef<HTMLDivElement, ModalUpdateRoomProps>(
           room_name: formData.room_name.trim(),
           price: parseInt(formData.price),
           size: parseInt(formData.size),
-          address: formData.address.trim(),
+          // address: formData.address.trim(),
           note: formData.note.trim(),
           token: '',
           home_pk: formData.home_pk.trim()
