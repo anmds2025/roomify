@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import React, { useEffect, useMemo, useCallback, Fragment } from 'react';
+import React, { useEffect, useMemo, useCallback, Fragment, useState } from 'react';
 import { useSnackbar } from 'notistack';
 import { ColumnDef, PaginationState } from '@tanstack/react-table';
 import { DataGrid, KeenIcon, TDataGridSelectedRowIds } from '@/components';
@@ -8,6 +8,8 @@ import moment from 'moment';
 import { ModalConfirmDelete } from '@/partials/modals/confirm/ModalConfirmDelete';
 import { ModalUpdateRoom } from '@/partials/modals/room/ModalUpdateRoom';
 import { useRoomManagement } from '@/hooks/useRoomManagement';
+import { useHomeManagement } from '@/hooks/useHomeManagement';
+import { IOption } from '@/auth';
 
 // Component cho search input
 const SearchInput = React.memo(({ value, onChange, placeholder }: {
@@ -77,6 +79,7 @@ const StatusBadge = React.memo(({ status }: { status: string }) => {
 
 const Rooms = () => {
   const { enqueueSnackbar } = useSnackbar();
+  const [homeOptions, setHomeOptions] = useState<IOption[]>([]);
   const {
     // State
     data,
@@ -105,9 +108,23 @@ const Rooms = () => {
     addNewRoomHandler,
   } = useRoomManagement();
 
+  const homeManagement = useHomeManagement();
+
   useEffect(() => {
     fetchRooms();
+    homeManagement.fetchHomes();
   }, []); // Chỉ chạy 1 lần khi component mount
+
+  useEffect(() => {
+    const options = homeManagement.data.map((item) => {
+      return {
+        label: item.home_name,
+        value: item._id?.$oid
+      } as IOption
+    });
+
+    setHomeOptions(options);
+  }, [homeManagement.data]);
 
   useEffect(() => {
     filterData();
@@ -311,6 +328,7 @@ const Rooms = () => {
         onClose={closeEditModalHandler} 
         room={roomUpdate} 
         fetchRooms={fetchRooms}
+        homeOptions={homeOptions}
       />
     </Fragment>
   );
