@@ -1,14 +1,16 @@
 /* eslint-disable prettier/prettier */
-import React, { useEffect, useMemo, useCallback, Fragment } from 'react';
+import React, { useEffect, useMemo, useCallback, Fragment, useState } from 'react';
 import { useSnackbar } from 'notistack';
-import { ColumnDef, PaginationState } from '@tanstack/react-table';
+import { Column, ColumnDef, PaginationState } from '@tanstack/react-table';
 import { DataGrid, KeenIcon, TDataGridSelectedRowIds } from '@/components';
 import { IRoomData } from './RoomsData';
 import moment from 'moment';
 import { ModalConfirmDelete } from '@/partials/modals/confirm/ModalConfirmDelete';
 import { ModalUpdateRoom } from '@/partials/modals/room/ModalUpdateRoom';
 import { useRoomManagement } from '@/hooks/useRoomManagement';
-
+import { useHomeManagement } from '@/hooks/useHomeManagement';
+import { IOption } from '@/auth';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 // Component cho search input
 const SearchInput = React.memo(({ value, onChange, placeholder }: {
   value: string;
@@ -77,6 +79,7 @@ const StatusBadge = React.memo(({ status }: { status: string }) => {
 
 const Rooms = () => {
   const { enqueueSnackbar } = useSnackbar();
+  const [homeOptions, setHomeOptions] = useState<IOption[]>([]);
   const {
     // State
     data,
@@ -103,11 +106,26 @@ const Rooms = () => {
     openEditModalHandler,
     closeEditModalHandler,
     addNewRoomHandler,
+    fnFilterCustom
   } = useRoomManagement();
+
+  const homeManagement = useHomeManagement();
 
   useEffect(() => {
     fetchRooms();
+    homeManagement.fetchHomes();
   }, []); // Chỉ chạy 1 lần khi component mount
+
+  useEffect(() => {
+    const options = homeManagement.data.map((item) => {
+      return {
+        label: item.home_name,
+        value: item._id?.$oid
+      } as IOption
+    });
+
+    setHomeOptions(options);
+  }, [homeManagement.data]);
 
   useEffect(() => {
     filterData();
@@ -127,23 +145,40 @@ const Rooms = () => {
         }
       },
       {
-        accessorFn: (row) => row.user_name,
-        id: 'user_name',
-        header: () => 'Chủ phòng',
+        id: 'home_name',
+        accessorFn: (row) => row.home_name,
+        header: () => 'Tòa nhà',
         enableSorting: true,
-        cell: (info) => info.getValue(),
+        enableColumnFilter: true,
+        enableHiding: false,
+        cell: (info) => info.getValue() || '-',
         meta: {
-          className: 'min-w-[150px]',
+          className: 'min-w-[200px]',
+        },
+        filterFn: (row, colId, filterValue) => {
+          const value = row.getValue(colId);
+
+          return String(value)?.toLowerCase().includes(filterValue.toLowerCase());
         }
       },
+      // {
+      //   accessorFn: (row) => row.user_name,
+      //   id: 'user_name',
+      //   header: () => 'Chủ phòng',
+      //   enableSorting: true,
+      //   cell: (info) => info.getValue(),
+      //   meta: {
+      //     className: 'min-w-[150px]',
+      //   }
+      // },
       {
         accessorFn: (row) => row.price,
         id: 'price',
-        header: () => 'Giá thuê',
+        header: () => 'Giá thuê(đ)',
         enableSorting: true,
         cell: (info) => {
           const value = info.getValue() as number;
-          return value ? `${value.toLocaleString()} VNĐ` : '-';
+          return value ? `${value.toLocaleString()}` : '-';
         },
         meta: {
           className: 'min-w-[120px]',
@@ -152,24 +187,14 @@ const Rooms = () => {
       {
         accessorFn: (row) => row.size,
         id: 'size',
-        header: () => 'Diện tích',
+        header: () => 'Diện tích(m²)',
         enableSorting: true,
         cell: (info) => {
           const value = info.getValue() as number;
-          return value ? `${value} m²` : '-';
+          return value ? `${value}` : '-';
         },
         meta: {
           className: 'min-w-[100px]',
-        }
-      },
-      {
-        accessorFn: (row) => row.address,
-        id: 'address',
-        header: () => 'Địa chỉ',
-        enableSorting: true,
-        cell: (info) => info.getValue() || '-',
-        meta: {
-          className: 'min-w-[200px]',
         }
       },
       {
@@ -231,6 +256,16 @@ const Rooms = () => {
     [openEditModalHandler, openDeleteModalHandler]
   );
 
+  const filterByHome = (value: string) => {
+    if(value === 'all') return fnFilterCustom(data);
+
+    const results = [...data].filter(item => {
+      return item.home_pk === value
+    }); 
+
+    fnFilterCustom(results);
+  }
+
   // Handlers
   const handleRowsSelectChange = useCallback((selectedRowIds: TDataGridSelectedRowIds) => {
     enqueueSnackbar(
@@ -252,6 +287,22 @@ const Rooms = () => {
         {/* Header */}
         <div className="card-header flex justify-end">
           <div className='flex gap-4'>
+            <div className='max-h-[32px] min-w-48'>
+              <Select onValueChange={(value) => filterByHome(value)}>
+                <SelectTrigger className="max-h-[32px]">
+                  <SelectValue placeholder='Chọn tòa nhà' />
+                </SelectTrigger>
+                <SelectContent className="bg-white">
+                  <SelectItem key={'null'} value='all'>Tất cả</SelectItem>
+                  {homeOptions?.map((option: IOption) => (
+                    <SelectItem key={option.value} value={option.value.toString()}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          
             <SearchInput
               value={searchTerm}
               onChange={updateSearchTerm}
@@ -311,6 +362,7 @@ const Rooms = () => {
         onClose={closeEditModalHandler} 
         room={roomUpdate} 
         fetchRooms={fetchRooms}
+        homeOptions={homeOptions}
       />
     </Fragment>
   );

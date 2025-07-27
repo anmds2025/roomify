@@ -7,13 +7,76 @@ import { KeenIcon } from '@/components';
 import { toast } from 'react-toastify';
 import { IRoomData } from '@/pages/dashboards/light-sidebar/blocks/rooms/RoomsData';
 import { useRoom } from '@/hooks/useRoom';
+import { Select, SelectItem, SelectContent, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { IOption } from '@/auth';
 
 interface ModalUpdateRoomProps {
   open: boolean;
   onClose: () => void;
   room: IRoomData;
   fetchRooms: () => void;
+  homeOptions: IOption[];
 }
+
+interface RenderFieldProps {
+  type: string;
+  value: any;
+  onChange: (value: any) => void;
+  label: string;
+  error?: boolean;
+  disabled?: boolean;
+  options?: Array<{ value: string; label: string }>;
+  inputMode?: "search" | "text" | "email" | "tel" | "url" | "none" | "numeric" | "decimal" | undefined;
+}
+
+function renderField({ type, value, onChange, label, error, disabled, options, inputMode }: RenderFieldProps) {
+  if (type === 'select') {
+    return (
+      <Select value={value} onValueChange={onChange} disabled={disabled}>
+        <SelectTrigger className={error ? 'border-red-500 focus-visible:ring-red-500' : ''}>
+          <SelectValue placeholder={`Chọn ${label.toLowerCase()}`} />
+        </SelectTrigger>
+        <SelectContent className="bg-white">
+          {options?.map((option: { value: string; label: string }) => (
+            <SelectItem key={option.value} value={option.value}>
+              {option.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    );
+  }
+  if (type === 'textarea') {
+    return (
+      <Textarea
+        value={value}
+        placeholder={`Nhập ${label.toLowerCase()}`}
+        onChange={e => onChange(e.target.value)}
+        disabled={disabled}
+        className={error ? 'border-red-500 focus-visible:ring-red-500' : ''}
+      />
+    );
+  }
+  // Default: Input
+  return (
+    <Input
+      type={type}
+      value={value}
+      placeholder={`Nhập ${label.toLowerCase()}`}
+      onChange={e => {
+        if (type === 'tel') {
+          onChange(e.target.value.replace(/[^0-9]/g, ''));
+        } else {
+          onChange(e.target.value);
+        }
+      }}
+      disabled={disabled}
+      className={error ? 'border-red-500 focus-visible:ring-red-500' : ''}
+      inputMode={inputMode}
+    />
+  );
+}
+
 
 // Component cho form field với shadcn UI
 const FormField = React.memo(({ 
@@ -22,6 +85,7 @@ const FormField = React.memo(({
   onChange, 
   type = "text", 
   error = false, 
+  options,
   disabled = false,
   required = false,
   inputMode,
@@ -32,6 +96,7 @@ const FormField = React.memo(({
   onChange: (value: string) => void;
   type?: string;
   error?: boolean;
+  options?: { value: string; label: string }[];
   disabled?: boolean;
   required?: boolean;
   inputMode?: "search" | "text" | "email" | "tel" | "url" | "none" | "numeric" | "decimal" | undefined;
@@ -43,32 +108,7 @@ const FormField = React.memo(({
       {required && <span className="text-red-500">*</span>}
     </Label>
     
-    {type === 'textarea' ? (
-      <Textarea
-        value={value}
-        placeholder={placeholder || `Nhập ${label.toLowerCase()}`}
-        onChange={e => onChange(e.target.value)}
-        disabled={disabled}
-        className={error ? 'border-red-500 focus-visible:ring-red-500' : ''}
-      />
-    ) : (
-      <Input
-        type={type}
-        value={value}
-        placeholder={placeholder || `Nhập ${label.toLowerCase()}`}
-        onChange={e => {
-          if (type === 'number') {
-            onChange(e.target.value.replace(/[^0-9]/g, ''));
-          } else {
-            onChange(e.target.value);
-          }
-        }}
-        disabled={disabled}
-        className={error ? 'border-red-500 focus-visible:ring-red-500' : ''}
-        inputMode={inputMode}
-      />
-    )}
-    
+    {renderField({ type, value, onChange, label, error, disabled, options, inputMode })}
     {error && (
       <div className="flex items-center gap-1 mt-2 text-sm font-medium text-red-600">
         <KeenIcon icon="warning" className="w-4 h-4" />
@@ -81,7 +121,7 @@ const FormField = React.memo(({
 FormField.displayName = 'FormField';
 
 const ModalUpdateRoom = forwardRef<HTMLDivElement, ModalUpdateRoomProps>(
-  ({ open, onClose, room, fetchRooms }, ref) => {
+  ({ open, onClose, room, fetchRooms, homeOptions }, ref) => {
     const { updateRoom } = useRoom();
 
     // Form state
@@ -90,7 +130,8 @@ const ModalUpdateRoom = forwardRef<HTMLDivElement, ModalUpdateRoomProps>(
       price: '',
       size: '',
       address: '',
-      note: ''
+      note: '',
+      home_pk: ''
     });
 
     // Error state
@@ -99,6 +140,7 @@ const ModalUpdateRoom = forwardRef<HTMLDivElement, ModalUpdateRoomProps>(
       price: false,
       size: false,
       address: false,
+      home_pk: false
     });
 
     // Initialize form data when room changes
@@ -109,7 +151,8 @@ const ModalUpdateRoom = forwardRef<HTMLDivElement, ModalUpdateRoomProps>(
           price: room.price?.toString() || '',
           size: room.size?.toString() || '',
           address: room.address || '',
-          note: room.note || ''
+          note: room.note || '',
+          home_pk: room.home_pk || ''
         });
       }
     }, [room]);
@@ -121,13 +164,15 @@ const ModalUpdateRoom = forwardRef<HTMLDivElement, ModalUpdateRoomProps>(
         price: '',
         size: '',
         address: '',
-        note: ''
+        note: '',
+        home_pk: ''
       });
       setErrors({
         room_name: false,
         price: false,
         size: false,
         address: false,
+        home_pk: false
       });
     }, []);
 
@@ -151,6 +196,7 @@ const ModalUpdateRoom = forwardRef<HTMLDivElement, ModalUpdateRoomProps>(
         price: !formData.price.trim() || parseInt(formData.price) <= 0,
         size: !formData.size.trim() || parseInt(formData.size) <= 0,
         address: !formData.address.trim(),
+        home_pk: !formData.home_pk.trim()
       };
 
       setErrors(newErrors);
@@ -172,7 +218,8 @@ const ModalUpdateRoom = forwardRef<HTMLDivElement, ModalUpdateRoomProps>(
           size: parseInt(formData.size),
           address: formData.address.trim(),
           note: formData.note.trim(),
-          token: ''
+          token: '',
+          home_pk: formData.home_pk.trim()
         };
 
         await updateRoom(payload);
@@ -203,6 +250,16 @@ const ModalUpdateRoom = forwardRef<HTMLDivElement, ModalUpdateRoomProps>(
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <FormField
+                    label="Tòa nhà"
+                    value={formData.home_pk}
+                    onChange={(value) => handleFieldChange('home_pk', value)}
+                    error={errors.home_pk}
+                    required={true}
+                    placeholder="VD: 123 Đường ABC, Quận 1, TP.HCM"
+                    type="select"
+                    options={homeOptions as []}
+                  />
+                  <FormField
                     label="Tên phòng"
                     value={formData.room_name}
                     onChange={(value) => handleFieldChange('room_name', value)}
@@ -229,14 +286,6 @@ const ModalUpdateRoom = forwardRef<HTMLDivElement, ModalUpdateRoomProps>(
                     required={true}
                     inputMode="numeric"
                     placeholder="VD: 25"
-                  />
-                  <FormField
-                    label="Địa chỉ"
-                    value={formData.address}
-                    onChange={(value) => handleFieldChange('address', value)}
-                    error={errors.address}
-                    required={true}
-                    placeholder="VD: 123 Đường ABC, Quận 1, TP.HCM"
                   />
                 </div>
               </div>

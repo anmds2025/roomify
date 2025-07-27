@@ -21,3 +21,8 @@ export interface UserModel {
   avatar?: string;
   image_QR?: string;
 }
+
+export interface IOption {
+  label: string;
+  value: string|number;
+}
