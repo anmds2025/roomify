@@ -64,7 +64,7 @@ const TenantCard = React.memo(({
         <div className="flex items-center gap-1">
           <button 
             onClick={() => onEdit(tenant)}
-            className="btn btn-sm btn-icon btn-light hover:btn-primary transition-colors"
+            className="btn btn-sm btn-icon btn-light transition-colors"
             title="Chỉnh sửa thông tin"
             aria-label={`Chỉnh sửa thông tin ${tenant.name}`}
           >
