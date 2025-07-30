@@ -53,7 +53,7 @@ const ModalConfirmDelete = forwardRef<HTMLDivElement, ModalConfirmDeleteProps>(
     }, [onClose, isLoading]);
 
     return (
-      <Modal open={open} onClose={handleClose}>
+      <Modal open={open} onClose={handleClose} zIndex={1500}>
         <ModalContent className="max-w-[500px] top-[20%]">
           <ModalHeader className="py-4 px-5">
             <div className="text-[#1A2B49] text-lg font-semibold flex items-center gap-2">
