@@ -12,11 +12,7 @@ export const MENU_SIDEBAR: MenuConfigType = [
       {
         title: 'Danh sách phòng',
         path: '/rooms'
-      },
-      {
-        title: 'Danh sách người thuê',
-        
-      },
+      }
     ]
   },
   {
@@ -27,10 +23,6 @@ export const MENU_SIDEBAR: MenuConfigType = [
         title: 'Danh sách người dùng',
         path: '/users'
       },
-      // {
-      //   title: 'Phân quyền tài khoản',
-      //   path: '/role'
-      // }
     ]
   }
 ];

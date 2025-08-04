@@ -18,7 +18,6 @@ export const useUser = () => {
             if(currentUser)
             {
                 const data = await getUserApi(currentUser);
-                console.log('useUser getUsers result:', data);
                 return data;
             }
             else

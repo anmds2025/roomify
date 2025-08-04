@@ -32,6 +32,7 @@ export interface IRoomData {
   imageDir?: string;
   imagePaths?: string[];
   temporary_residence?: string;
+  contract_path: string;
   timeCreate?: {
     $date: string;
   };

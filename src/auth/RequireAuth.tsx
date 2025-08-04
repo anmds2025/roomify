@@ -9,11 +9,9 @@ interface RequireAuthProps {
 const RequireAuth = ({ allowedLelves }: RequireAuthProps) => {
   const { isLoading, currentUser } = useAuthContext();
   const location = useLocation();
-
   if (isLoading) {
     return <ScreenLoader />;
   }
-  
   if (!currentUser) {
     return <Navigate to="/auth/login" state={{ from: location }} replace />;
   }

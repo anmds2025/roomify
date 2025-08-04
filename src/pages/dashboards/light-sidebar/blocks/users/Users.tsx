@@ -138,17 +138,6 @@ const Users = () => {
     filterData();
   }, [searchTerm, levelFilter, data, filterData]); // Chạy khi searchTerm, levelFilter, data hoặc filterData thay đổi
 
-  // Debug logging
-  useEffect(() => {
-    console.log('Users component state:', {
-      dataLength: data.length,
-      filteredDataLength: filteredData.length,
-      searchTerm,
-      levelFilter,
-      isLoading
-    });
-  }, [data.length, filteredData.length, searchTerm, levelFilter, isLoading]);
-
   // Table columns với useMemo để tối ưu performance
   const columns = useMemo<ColumnDef<IUserData>[]>(
     () => [

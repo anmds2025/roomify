@@ -69,6 +69,8 @@ export const TenantFormModal: React.FC<TenantFormModalProps> = ({
     cccd_code: '',
     cccd_day: '',
     cccd_address: '',
+    birthday: '',
+    num_car: ''
   });
 
   const [errors, setErrors] = useState<Record<string, boolean>>({});
@@ -87,6 +89,8 @@ export const TenantFormModal: React.FC<TenantFormModalProps> = ({
         cccd_code: tenant.cccd_code || '',
         cccd_day: tenant.cccd_day || '',
         cccd_address: tenant.cccd_address || '',
+        birthday: tenant.birthday || '',
+        num_car: tenant.num_car || ''
       });
     } else {
       setFormData({
@@ -97,6 +101,8 @@ export const TenantFormModal: React.FC<TenantFormModalProps> = ({
         cccd_code: '',
         cccd_day: '',
         cccd_address: '',
+        birthday: '',
+        num_car: ''
       });
     }
     setErrors({});
@@ -124,6 +130,7 @@ export const TenantFormModal: React.FC<TenantFormModalProps> = ({
     if (!formData.name.trim()) newErrors.name = true;
     if (!formData.phone.trim()) newErrors.phone = true;
     if (!formData.cccd_code.trim()) newErrors.cccd_code = true;
+    if (!formData.birthday.trim()) newErrors.birthday = true;
 
     // Format validation
     if (formData.phone.trim() && !phoneRegex.test(formData.phone.trim())) {
@@ -169,6 +176,8 @@ export const TenantFormModal: React.FC<TenantFormModalProps> = ({
     cccd_code: '',
     cccd_day: '',
     cccd_address: '',
+    birthday: '',
+    num_car: ''
   }), [room?._id?.$oid]);
 
   const handleClose = useCallback(() => {
@@ -242,6 +251,28 @@ export const TenantFormModal: React.FC<TenantFormModalProps> = ({
               />
             </div>
 
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <InputField
+                label="Ngày sinh"
+                name="birthday"
+                type="date"
+                required
+                value={formData.birthday}
+                onChange={handleInputChange}
+                error={errors.birthday}
+                disabled={isSubmitting}
+              />
+
+              <InputField
+                label="Biển số xe"
+                name="num_car"
+                value={formData.num_car}
+                onChange={handleInputChange}
+                placeholder="Nhập biển số xe"
+                disabled={isSubmitting}
+              />
+            </div>
+
             <InputField
               label="Email"
               name="email"
@@ -253,7 +284,7 @@ export const TenantFormModal: React.FC<TenantFormModalProps> = ({
               disabled={isSubmitting}
             />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div style={{marginTop: '8px'}} className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <InputField
                 label="Số CCCD"
                 name="cccd_code"

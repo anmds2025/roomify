@@ -126,8 +126,8 @@ const ModalUpdateHome = forwardRef<HTMLDivElement, ModalUpdateHomeProps>(
     // Form state
     const [formData, setFormData] = useState({
       home_name: '',
-      phone: currentUser?.phone || '',
-      address: currentUser?.address || '',
+      phone: '',
+      address: '',
       electricity_price: '',
       water_price: '',
       service_price: '',
@@ -155,8 +155,8 @@ const ModalUpdateHome = forwardRef<HTMLDivElement, ModalUpdateHomeProps>(
       if (home) {
         setFormData({
           home_name: home?.home_name || '',
-          phone: home?.user_phone || currentUser?.phone || '',
-          address: home?.address || currentUser?.address || '',
+          phone: home?.user_phone || '',
+          address: home?.address || '',
           electricity_price: home?.electricity_price || '',
           water_price: home?.water_price || '',
           service_price: home?.service_price || '',
@@ -184,8 +184,8 @@ const ModalUpdateHome = forwardRef<HTMLDivElement, ModalUpdateHomeProps>(
     const resetForm = useCallback(() => {
       setFormData({
         home_name: '',
-        phone: currentUser?.phone || '',
-        address: currentUser?.address || '',
+        phone: '',
+        address: '',
         electricity_price: '',
         water_price: '',
         service_price: '',
@@ -324,9 +324,8 @@ const ModalUpdateHome = forwardRef<HTMLDivElement, ModalUpdateHomeProps>(
 
     // Type water options
     const typeWaterOptions = useMemo(() => [
-      { value: 'theo đồng hồ', label: 'Theo đồng hồ' },
-      { value: 'theo đầu người', label: 'Theo đầu người' },
-      { value: 'cố định', label: 'Cố định' }
+      { value: 'meter', label: 'Theo đồng hồ' },
+      { value: 'month', label: 'Theo đầu người' }
     ], []);
 
     // Memoized QR URL
@@ -393,13 +392,27 @@ const ModalUpdateHome = forwardRef<HTMLDivElement, ModalUpdateHomeProps>(
                       onChange={(value) => handleFieldChange('electricity_price', value)}
                       type="number"
                       inputMode="numeric"
+                      required={true}
                     />
                     <FormField
-                      label="Giá nước (VNĐ/m³)"
+                      label="Loại tính nước"
+                      value={formData.typeWater}
+                      onChange={(value) => handleFieldChange('typeWater', value)}
+                      type="select"
+                      options={typeWaterOptions}
+                      required={true}
+                    />
+                    <FormField
+                      label={
+                        formData.typeWater === 'month'
+                          ? 'Giá nước (VNĐ/người)'
+                          : 'Giá nước (VNĐ/m³)'
+                      }
                       value={formData.water_price}
                       onChange={(value) => handleFieldChange('water_price', value)}
                       type="number"
                       inputMode="numeric"
+                      required={true}
                     />
                     <FormField
                       label="Phí dịch vụ (VNĐ)"
@@ -407,6 +420,7 @@ const ModalUpdateHome = forwardRef<HTMLDivElement, ModalUpdateHomeProps>(
                       onChange={(value) => handleFieldChange('service_price', value)}
                       type="number"
                       inputMode="numeric"
+                      required={true}
                     />
                     <FormField
                       label="Phí rác (VNĐ)"
@@ -421,13 +435,6 @@ const ModalUpdateHome = forwardRef<HTMLDivElement, ModalUpdateHomeProps>(
                       onChange={(value) => handleFieldChange('car_price', value)}
                       type="number"
                       inputMode="numeric"
-                    />
-                    <FormField
-                      label="Loại tính nước"
-                      value={formData.typeWater}
-                      onChange={(value) => handleFieldChange('typeWater', value)}
-                      type="select"
-                      options={typeWaterOptions}
                     />
                   </div>
                 </div>
@@ -445,16 +452,19 @@ const ModalUpdateHome = forwardRef<HTMLDivElement, ModalUpdateHomeProps>(
                       label="Số tài khoản"
                       value={formData.numBank}
                       onChange={(value) => handleFieldChange('numBank', value)}
+                      required={true}
                     />
                     <FormField
                       label="Tên ngân hàng"
                       value={formData.nameBank}
                       onChange={(value) => handleFieldChange('nameBank', value)}
+                      required={true}
                     />
                     <FormField
                       label="Chi nhánh ngân hàng"
                       value={formData.addressBank}
                       onChange={(value) => handleFieldChange('addressBank', value)}
+                      required={true}
                     />
                     <div className="space-y-2">
                       <Label className="text-sm font-medium text-gray-700">

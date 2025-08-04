@@ -22,6 +22,8 @@ import { TenantManagementDrawer } from '@/components/TenantManagementDrawer';
 import { TenantFormModal } from '@/components/TenantFormModal';
 import { ITenantData, ITenantFormData } from '@/types/tenant';
 import { useTenant } from '@/hooks/useTenant';
+import { ModalCreateContract } from '@/partials/modals/room/ModalCreateContract';
+import { IHomeData } from '../homes';
 // Component cho search input
 const SearchInput = React.memo(({ value, onChange, placeholder }: {
   value: string;
@@ -69,7 +71,7 @@ const ActionButtons = React.memo(({ onAddNew, onRefresh, isLoading }: {
 // Component cho status badge
 const StatusBadge = React.memo(({ status }: { status: string }) => {
   const getStatusStyles = (status: string) => {
-    const baseClass = 'capitalize px-2 py-1 rounded-2xl font-[400] text-sm inline-block w-[90px] text-center';
+    const baseClass = 'capitalize px-2 py-1 rounded-2xl font-[400] text-sm inline-block w-[120px] text-center';
     
     switch (status) {
       case 'Đang trống':
@@ -91,6 +93,7 @@ const StatusBadge = React.memo(({ status }: { status: string }) => {
 const Rooms = () => {
   const { enqueueSnackbar } = useSnackbar();
   const [homeOptions, setHomeOptions] = useState<IOption[]>([]);
+  const [homeData, setHomeData] = useState<IHomeData[]>([]);
   const {
     // State
     data,
@@ -99,10 +102,13 @@ const Rooms = () => {
     pagination,
     isLoading,
     roomUpdate,
+    homeSelect,
     roomId,
     openDeleteModal,
     openEditModal,
+    openCreateContractModal,
     emptyRoom,
+    emptyHome,
     
     // Actions
     fetchRooms,
@@ -115,7 +121,9 @@ const Rooms = () => {
     closeDeleteModalHandler,
     deleteRoomHandler,
     openEditModalHandler,
+    openCreateContractModalHandler,
     closeEditModalHandler,
+    closeCreateContractModalHandler,
     addNewRoomHandler,
     fnFilterCustom
   } = useRoomManagement();
@@ -140,7 +148,7 @@ const Rooms = () => {
   useEffect(() => {
     fetchRooms();
     homeManagement.fetchHomes();
-  }, []); // Chỉ chạy 1 lần khi component mount
+  }, []); 
 
   useEffect(() => {
     const options = homeManagement.data.map((item) => {
@@ -149,7 +157,7 @@ const Rooms = () => {
         value: item._id?.$oid
       } as IOption
     });
-
+    setHomeData(homeManagement.data)
     setHomeOptions(options);
   }, [homeManagement.data]);
 
@@ -163,22 +171,49 @@ const Rooms = () => {
     setDrawerOpen(true);
     setIsLoadingTenants(true);
 
+    fetchTenants(room._id?.$oid!)
+  }, [tenantAPI, enqueueSnackbar]);
+
+  const fetchTenants = useCallback(async (roomId: string) => {
     try {
-      const response = await tenantAPI.fetchTenants(room._id?.$oid!);
-      setTenants(response.objects || []);
+      setIsLoadingTenants(true);
+      const response = await tenantAPI.fetchTenants(roomId);
+      const data = response.objects || [];
+      setTenants(data);
+      return data;
     } catch (error) {
       console.error('Error fetching tenants:', error);
       enqueueSnackbar('Lỗi khi tải danh sách người thuê', { variant: 'error' });
       setTenants([]);
+      return [];
     } finally {
       setIsLoadingTenants(false);
     }
-  }, [tenantAPI, enqueueSnackbar]);
-
-  const handleViewContracts = useCallback((room: IRoomData) => {
-    enqueueSnackbar(`Xem hợp đồng cho ${room.room_name} (Chưa implemented)`, { variant: 'info' });
   }, [enqueueSnackbar]);
 
+  const handleViewContracts = useCallback(
+    async (room: IRoomData) => {
+      const fetchedTenants = await fetchTenants(room._id?.$oid!);
+
+      const home = homeData.find(h => h._id?.$oid === room.home_pk);
+      if (!home) {
+        enqueueSnackbar(`Có lỗi xảy ra`, { variant: 'error' });
+        return;
+      }
+
+      if (fetchedTenants.length === 0) {
+        enqueueSnackbar(`Bạn chưa có người thuê, vui lòng tạo!`, { variant: 'error' });
+        return;
+      }
+
+      if (room.contract_path) {
+        window.open(`${import.meta.env.VITE_APP_SERVER_URL}${room.contract_path}`, '_blank');
+      } else {
+        openCreateContractModalHandler(room, home);
+      }
+    },
+    [homeData, fetchTenants, enqueueSnackbar, openCreateContractModalHandler]
+  );
   const handleAddTenant = useCallback(() => {
     setEditingTenant(null);
     setFormModalOpen(true);
@@ -376,7 +411,7 @@ const Rooms = () => {
                 className="flex items-center gap-2 cursor-pointer bg-white"
               >
                 <KeenIcon icon="document" className="text-base" />
-                <span>Hợp đồng</span>
+                <span>{row.original.contract_path ? "Xem hợp đồng" : "Tạo hợp đồng"}</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem 
@@ -511,6 +546,15 @@ const Rooms = () => {
         room={roomUpdate} 
         fetchRooms={fetchRooms}
         homeOptions={homeOptions}
+      />
+
+      <ModalCreateContract 
+        open={openCreateContractModal} 
+        onClose={closeCreateContractModalHandler} 
+        room={roomUpdate} 
+        home={homeSelect}
+        fetchRooms={fetchRooms}
+        userData={tenants}
       />
 
       {/* Tenant Management Drawer */}

@@ -3,6 +3,7 @@ import { IRoomData } from '@/pages/dashboards/light-sidebar/blocks/rooms/RoomsDa
 import { useRoom } from './useRoom';
 import { useAuthContext } from '@/auth';
 import { useSnackbar } from 'notistack';
+import { IHomeData } from '@/pages/dashboards/light-sidebar/blocks/homes';
 
 export const useRoomManagement = () => {
   const { enqueueSnackbar } = useSnackbar();
@@ -18,12 +19,15 @@ export const useRoomManagement = () => {
   
   // Modal states
   const [roomUpdate, setRoomUpdate] = useState<IRoomData>({} as IRoomData);
+  const [homeSelect, setHomeSelect] = useState<IHomeData>({} as IHomeData);
   const [roomId, setRoomId] = useState<string>('');
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [openEditModal, setOpenEditModal] = useState(false);
+  const [openCreateContractModal, setOpenCreateContractModal] = useState(false);
   
   // Tạo emptyRoom một lần duy nhất để tránh re-render
   const emptyRoom = useMemo(() => ({} as IRoomData), []);
+  const emptyHome = useMemo(() => ({} as IHomeData), []);
 
   // Fetch rooms
   const fetchRooms = useCallback(async () => {
@@ -99,6 +103,20 @@ export const useRoomManagement = () => {
     setOpenEditModal(false);
   }, [emptyRoom]);
 
+  const openCreateContractModalHandler = useCallback((room: IRoomData, home: IHomeData) => {
+    setRoomId(room._id?.$oid || "");
+    setRoomUpdate(room);
+    setHomeSelect(home);
+    setOpenCreateContractModal(true);
+  }, []);
+
+  const closeCreateContractModalHandler = useCallback(() => {
+    setRoomId("");
+    setRoomUpdate(emptyRoom);
+    setHomeSelect(emptyHome)
+    setOpenCreateContractModal(false);
+  }, [emptyRoom]);
+
   const addNewRoomHandler = useCallback(() => {
     openEditModalHandler(emptyRoom);
   }, [openEditModalHandler, emptyRoom]);
@@ -115,10 +133,13 @@ export const useRoomManagement = () => {
     pagination,
     isLoading,
     roomUpdate,
+    homeSelect,
     roomId,
     openDeleteModal,
     openEditModal,
+    openCreateContractModal,
     emptyRoom,
+    emptyHome,
     
     // Actions
     fetchRooms,
@@ -132,6 +153,8 @@ export const useRoomManagement = () => {
     deleteRoomHandler,
     openEditModalHandler,
     closeEditModalHandler,
+    openCreateContractModalHandler,
+    closeCreateContractModalHandler,
     addNewRoomHandler,
     fnFilterCustom
   };

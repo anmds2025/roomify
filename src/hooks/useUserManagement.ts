@@ -36,13 +36,9 @@ export const useUserManagement = () => {
     setIsLoading(true);
     try {
       const usersResponse = await getUsers();
-      console.log('fetchUsers response:', usersResponse);
-      
       const filteredUsers = (usersResponse || []).filter(
         (user) => user.email !== currentUserEmail && user.level !== 'Root'
       );
-      
-      console.log('filteredUsers:', filteredUsers);
 
       setData(filteredUsers);
       setFilteredData(filteredUsers);
@@ -56,8 +52,6 @@ export const useUserManagement = () => {
 
   // Filter data
   const filterData = useCallback(() => {
-    console.log('Filtering data:', { searchTerm, levelFilter, dataLength: data.length });
-    
     const filtered = data.filter((user) => {
       const matchesSearch =
         user.fullname?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -68,8 +62,6 @@ export const useUserManagement = () => {
 
       return matchesSearch && matchesLevel;
     });
-
-    console.log('Filtered result:', { filteredLength: filtered.length, filtered });
     setFilteredData(filtered);
   }, [searchTerm, levelFilter, data]);
 

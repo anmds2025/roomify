@@ -9,6 +9,8 @@ export interface ITenantData {
   cccd_code: string;
   cccd_address: string;
   cccd_day: string;
+  birthday: string;
+  num_car: string;
   room_pk: string;
   home_pk?: string;
   timeUpdate?: {
@@ -31,6 +33,8 @@ export interface ITenantFormData {
   name: string;
   phone: string;
   email: string;
+  birthday: string;
+  num_car: string;
   cccd_code: string;
   cccd_day: string;
   cccd_address: string;
