@@ -203,22 +203,45 @@ const ModalCreateContract = forwardRef<HTMLDivElement, ModalCreateContractProps>
     const isEdit: Boolean = useCallback(() => Boolean(room._id?.$oid), [room])();
 
     function convertNumberToVietnameseText(number: number): string {
-      const formatter = new Intl.NumberFormat('vi-VN', {
-        style: 'currency',
-        currency: 'VND',
-        maximumFractionDigits: 0,
-      });
+      const numberWords = ['không', 'một', 'hai', 'ba', 'bốn', 'năm', 'sáu', 'bảy', 'tám', 'chín'];
 
-      const text = formatter.format(number); // VD: "4.500.000 ₫"
+      const getWord = (num: number) => numberWords[num];
 
-      const parts = text.replace(/[₫\s]/g, '').split('.');
-      const [trieu, tramNghin] = parts.map(Number);
+      const millions = Math.floor(number / 1_000_000);
+      const thousands = Math.floor((number % 1_000_000) / 1_000);
 
       let result = '';
-      if (trieu) result += `${trieu} triệu`;
-      if (tramNghin) result += `${result ? ', ' : ''}${tramNghin} trăm ngàn`;
 
-      return result.charAt(0).toUpperCase() + result.slice(1) + ' đồng';
+      if (millions) {
+        result += `${getWord(millions)} triệu`;
+      }
+
+      if (thousands) {
+        result += `${result ? ' ' : ''}${getWord(Math.floor(thousands / 100))} trăm`;
+
+        const tens = Math.floor((thousands % 100) / 10);
+        const units = thousands % 10;
+
+        if (tens > 1) {
+          result += ` ${getWord(tens)} mươi`;
+          if (units === 1) result += ' mốt';
+          else if (units === 5) result += ' lăm';
+          else if (units > 0) result += ` ${getWord(units)}`;
+        } else if (tens === 1) {
+          result += ' mười';
+          if (units === 5) result += ' lăm';
+          else if (units > 0) result += ` ${getWord(units)}`;
+        } else if (units > 0) {
+          result += ` linh ${getWord(units)}`;
+        }
+
+        result += ' ngàn';
+      }
+
+      if (!result) result = 'không đồng';
+      else result += ' đồng';
+
+      return result.charAt(0).toUpperCase() + result.slice(1);
     }
     
     const handleClose = useCallback(() => {
