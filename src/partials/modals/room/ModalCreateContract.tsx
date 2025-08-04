@@ -332,6 +332,7 @@ const ModalCreateContract = forwardRef<HTMLDivElement, ModalCreateContractProps>
         setLoading(true);
         try {
           await createContract(payload, userData); 
+          toast.success('Tạo hợp đồng thành công!');
           handleClose();
           fetchRooms();
         } catch (error) {
