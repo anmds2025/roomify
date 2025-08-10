@@ -20,6 +20,7 @@ export interface UserModel {
   token: string;
   avatar?: string;
   image_QR?: string;
+  image_signature?: string;
 }
 
 export interface IOption {

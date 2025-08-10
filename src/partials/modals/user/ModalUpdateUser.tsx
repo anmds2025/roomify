@@ -248,7 +248,7 @@ const ModalUpdateUser = forwardRef<HTMLDivElement, ModalUpdateUserProps>(
       <Dialog open={open} onOpenChange={handleClose}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white">
           <DialogHeader>
-            <DialogTitle className="text-lg font-semibold text-gray-900">
+            <DialogTitle className="text-lg font-semibold text-gray-900 p-2">
               {isEdit ? 'Cập nhật thông tin người dùng' : 'Thêm mới người dùng'}
             </DialogTitle>
           </DialogHeader>
@@ -322,7 +322,7 @@ const ModalUpdateUser = forwardRef<HTMLDivElement, ModalUpdateUserProps>(
           </div>
 
           {/* Action Buttons */}
-          <div className="flex justify-end gap-3 pt-6 border-t border-gray-200">
+          <div className="flex justify-end gap-3 p-4 border-t border-gray-200">
             <button
               onClick={handleClose}
               className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors"

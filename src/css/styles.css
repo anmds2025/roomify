@@ -2,6 +2,7 @@
 @import "tailwindcss/base";
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
+@import "./signature-canvas.css";
 
 /* Demos */
 @import "demos/demo1";

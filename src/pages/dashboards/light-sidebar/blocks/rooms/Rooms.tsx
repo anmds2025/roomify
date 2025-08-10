@@ -1,6 +1,7 @@
 /* eslint-disable prettier/prettier */
 import React, { useEffect, useMemo, useCallback, Fragment, useState } from 'react';
 import { useSnackbar } from 'notistack';
+import { useNavigate } from 'react-router-dom';
 import { Column, ColumnDef, PaginationState } from '@tanstack/react-table';
 import { DataGrid, KeenIcon, TDataGridSelectedRowIds } from '@/components';
 import { IRoomData } from './RoomsData';
@@ -24,6 +25,7 @@ import { ITenantData, ITenantFormData } from '@/types/tenant';
 import { useTenant } from '@/hooks/useTenant';
 import { ModalCreateContract } from '@/partials/modals/room/ModalCreateContract';
 import { IHomeData } from '../homes';
+
 // Component cho search input
 const SearchInput = React.memo(({ value, onChange, placeholder }: {
   value: string;
@@ -92,6 +94,7 @@ const StatusBadge = React.memo(({ status }: { status: string }) => {
 
 const Rooms = () => {
   const { enqueueSnackbar } = useSnackbar();
+  const navigate = useNavigate();
   const [homeOptions, setHomeOptions] = useState<IOption[]>([]);
   const [homeData, setHomeData] = useState<IHomeData[]>([]);
   const {
@@ -144,6 +147,8 @@ const Rooms = () => {
   // Delete tenant confirmation state
   const [deleteTenantModalOpen, setDeleteTenantModalOpen] = useState(false);
   const [tenantToDelete, setTenantToDelete] = useState<ITenantData | null>(null);
+
+
 
   useEffect(() => {
     fetchRooms();
@@ -295,6 +300,45 @@ const Rooms = () => {
     }
   }, [selectedRoom, refreshTenantList, enqueueSnackbar]);
 
+  // Contract signing handlers
+  const handleCopyContractLink = useCallback((room: IRoomData) => {
+    // Use contract_pk if available, otherwise show error
+    if (!room.contract_pk) {
+      enqueueSnackbar('Phòng này chưa có hợp đồng. Vui lòng tạo hợp đồng trước!', { variant: 'error' });
+      return;
+    }
+    
+    const roomId = room.pk || room._id?.$oid;
+    if (!roomId) {
+      enqueueSnackbar('Không thể xác định thông tin phòng', { variant: 'error' });
+      return;
+    }
+    
+    const contractUrl = `${window.location.origin}/contract-signing/${room.contract_pk}/${roomId}`;
+    
+    navigator.clipboard.writeText(contractUrl).then(() => {
+      enqueueSnackbar('Đã sao chép link ký hợp đồng!', { variant: 'success' });
+    }).catch(() => {
+      enqueueSnackbar('Không thể sao chép link', { variant: 'error' });
+    });
+  }, [enqueueSnackbar]);
+
+  const handleGoToContractPage = useCallback((room: IRoomData) => {
+    // Use contract_pk if available, otherwise show error
+    if (!room.contract_pk) {
+      enqueueSnackbar('Phòng này chưa có hợp đồng. Vui lòng tạo hợp đồng trước!', { variant: 'error' });
+      return;
+    }
+    
+    const roomId = room.pk || room._id?.$oid;
+    if (!roomId) {
+      enqueueSnackbar('Không thể xác định thông tin phòng', { variant: 'error' });
+      return;
+    }
+    
+    navigate(`/contract-signing/${room.contract_pk}/${roomId}`);
+  }, [navigate]);
+
   // Table columns với useMemo để tối ưu performance
   const columns = useMemo<ColumnDef<IRoomData>[]>(
     () => [
@@ -415,6 +459,21 @@ const Rooms = () => {
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem 
+                onClick={() => handleCopyContractLink(row.original)}
+                className="flex items-center gap-2 cursor-pointer bg-white"
+              >
+                <KeenIcon icon="copy" className="text-base" />
+                <span>Sao chép link ký hợp đồng</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => handleGoToContractPage(row.original)}
+                className="flex items-center gap-2 cursor-pointer bg-white"
+              >
+                <KeenIcon icon="pencil" className="text-base" />
+                <span>Đi tới trang ký hợp đồng</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem 
                 onClick={() => openEditModalHandler(row.original)}
                 className="flex items-center gap-2 cursor-pointer bg-white"
               >
@@ -436,7 +495,7 @@ const Rooms = () => {
         }
       }
     ],
-    [openEditModalHandler, openDeleteModalHandler, handleViewTenants, handleViewContracts]
+    [openEditModalHandler, openDeleteModalHandler, handleViewTenants, handleViewContracts, handleCopyContractLink, handleGoToContractPage]
   );
 
   const filterByHome = (value: string) => {
@@ -587,6 +646,8 @@ const Rooms = () => {
         title="Xóa người thuê"
         message={`Bạn có chắc chắn muốn xóa "${tenantToDelete?.name}" khỏi phòng này?`}
       />
+
+
     </Fragment>
   );
 };

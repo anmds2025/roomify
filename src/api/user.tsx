@@ -36,6 +36,7 @@ export interface UpdateProfilePayload {
   cccd_day: string;
   avatar: string;
   image_QR: string;
+  image_signature?: string;
 }
 
 

@@ -235,7 +235,7 @@ const ModalUpdateRoom = forwardRef<HTMLDivElement, ModalUpdateRoomProps>(
       <Dialog open={open} onOpenChange={handleClose}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white">
           <DialogHeader>
-            <DialogTitle className="text-lg font-semibold text-gray-900">
+            <DialogTitle className="text-lg font-semibold text-gray-900 p-2">
               {isEdit ? 'Cập nhật thông tin phòng' : 'Thêm mới phòng'}
             </DialogTitle>
           </DialogHeader>

@@ -337,7 +337,7 @@ const ModalUpdateHome = forwardRef<HTMLDivElement, ModalUpdateHomeProps>(
       <Dialog open={open} onOpenChange={handleClose}>
         <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto bg-white">
           <DialogHeader className='sticky top-0 bg-white'>
-            <DialogTitle className="text-lg font-semibold text-gray-900">
+            <DialogTitle className="text-lg font-semibold text-gray-900 p-2">
               {isEdit ? 'Cập nhật thông tin tòa nhà' : 'Thêm mới tòa nhà'}
             </DialogTitle>
           </DialogHeader>
@@ -521,7 +521,7 @@ const ModalUpdateHome = forwardRef<HTMLDivElement, ModalUpdateHomeProps>(
           </div>
 
           {/* Action Buttons */}
-          <div className="flex justify-end gap-3 pt-6 border-t border-gray-200 sticky bottom-0 bg-white">
+          <div className="flex justify-end gap-3 p-4 border-t border-gray-200 sticky bottom-0 bg-white">
             <button
               onClick={handleClose}
               className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors"
