@@ -85,6 +85,7 @@ import { toast } from 'react-toastify';
 import { UsersPage } from '@/pages/dashboards/users/UsersPage';
 import { HomesPage } from '@/pages/dashboards/homes/HomesPage';
 import { RoomPage } from '@/pages/dashboards/rooms/RoomPage';
+import { ContractSigningPage } from '@/pages/contract-signing/ContractSigningPage';
 import { CheckUserMailPage } from '@/pages/account/home/user-profile/CheckUserMailPage';
 
 const AppRouting = (): ReactElement => {
@@ -178,8 +179,8 @@ const AppRouting = (): ReactElement => {
           <Route element={<RequireAuth allowedLelves={['Root', 'Admin']} />}>
             <Route path="/rooms" element={<RoomPage />} />
           </Route>
-          
-          <Route path="/account/home/user-profile" element={<AccountUserProfilePage />} />
+
+                    <Route path="/account/home/user-profile" element={<AccountUserProfilePage />} />
           <Route path="/profile" element={<AccountUserProfilePage />} />
           
           {/* <Route element={<RequireAuth allowedRoles={[]} />}>
@@ -284,8 +285,12 @@ const AppRouting = (): ReactElement => {
             path="/auth/account-deactivated"
             element={<AuthenticationAccountDeactivatedPage />}
           />
-          <Route path="/authentication/get-started" element={<AuthenticationGetStartedPage />} /></Route>
+          <Route path="/authentication/get-started" element={<AuthenticationGetStartedPage />} />        </Route>
       </Route>
+      
+      {/* Public contract signing page for customers - no auth required */}
+              <Route path="/contract-signing/:contractId/:roomId" element={<ContractSigningPage />} />
+      
       <Route path="error/*" element={<ErrorsRouting />} />
       <Route path="auth/*" element={<AuthPage />} />
       <Route path="/reset-password" element={<CheckUserMailPage />} />

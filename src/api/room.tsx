@@ -1,6 +1,6 @@
-import { IRoomData, IDataResponseRoom } from '@/pages/dashboards/light-sidebar/blocks/rooms/RoomsData';
 import axios from 'axios';
-import { createFormData, getStoredUser } from '.';
+import { getStoredUser, createFormData } from '.';
+import { IRoomData, IDataResponseRoom } from '@/pages/dashboards/light-sidebar/blocks/rooms/RoomsData';
 import { UserModel } from '@/auth';
 import { ITenantData } from '@/types/tenant';
 
@@ -10,6 +10,12 @@ const GET_ROOMS_URL = `${API_URL}/room/getMyRoom`;
 const UPDATE_ROOM_URL = `${API_URL}/room/update`;
 const DELETE_ROOM_URL = `${API_URL}/room/delete`;
 const CREATE_CONTRACT_URL = `${API_URL}/contract/create`;
+
+export interface RoomResponse {
+  success: boolean;
+  data?: IRoomData;
+  message?: string;
+}
 
 export interface UpdateRoomPayload {
   pk?: string;
@@ -60,9 +66,73 @@ export interface CreateContractPayload {
   otherServices: string;
   note: string;
   typeWater: string;
-
-  
 }
+
+/**
+ * Fetch room data by contract ID
+ * @param contractId - The contract ID to find the room for
+ * @returns Promise<IRoomData | null>
+ */
+export const fetchRoomByContractId = async (contractId: string): Promise<IRoomData | null> => {
+  try {
+    const user = getStoredUser();
+    if (!user?.token) {
+      throw new Error('User not authenticated');
+    }
+
+    const response = await axios.get<RoomResponse>(
+      `${API_URL}/room/by-contract/${contractId}`,
+      {
+        headers: {
+          'Authorization': `Bearer ${user.token}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    if (response.data.success && response.data.data) {
+      return response.data.data;
+    }
+
+    return null;
+  } catch (error) {
+    console.error('Failed to fetch room by contract ID:', error);
+    return null;
+  }
+};
+
+/**
+ * Fetch room data by room ID
+ * @param roomId - The room ID
+ * @returns Promise<IRoomData | null>
+ */
+export const fetchRoomById = async (roomId: string): Promise<IRoomData | null> => {
+  try {
+    const user = getStoredUser();
+    if (!user?.token) {
+      throw new Error('User not authenticated');
+    }
+
+    const response = await axios.get<RoomResponse>(
+      `${API_URL}/room/${roomId}`,
+      {
+        headers: {
+          'Authorization': `Bearer ${user.token}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    if (response.data.success && response.data.data) {
+      return response.data.data;
+    }
+
+    return null;
+  } catch (error) {
+    console.error('Failed to fetch room by ID:', error);
+    return null;
+  }
+};
 
 export const getRoomsApi = async (user: UserModel): Promise<IRoomData[]> => {
   try {
@@ -70,7 +140,7 @@ export const getRoomsApi = async (user: UserModel): Promise<IRoomData[]> => {
       user_pk: user._id?.$oid || '',
       token: user.token || ''
     });
-    
+
     const response = await axios.post<IDataResponseRoom>(GET_ROOMS_URL, formData);
     
     // Kiểm tra response structure
