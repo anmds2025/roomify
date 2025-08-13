@@ -137,10 +137,6 @@ export const TenantFormModal: React.FC<TenantFormModalProps> = ({
       newErrors.phone = true;
     }
 
-    if (formData.email.trim() && !emailRegex.test(formData.email.trim())) {
-      newErrors.email = true;
-    }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   }, [formData]);
@@ -148,9 +144,7 @@ export const TenantFormModal: React.FC<TenantFormModalProps> = ({
   // Handle form submission - optimized error handling
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (isSubmitting || !validateForm()) return;
-
     setIsSubmitting(true);
     try {
       await onSubmit(formData);
@@ -300,6 +294,7 @@ export const TenantFormModal: React.FC<TenantFormModalProps> = ({
                 label="Ngày cấp CCCD"
                 name="cccd_day"
                 type="date"
+                required
                 value={formData.cccd_day}
                 onChange={handleInputChange}
                 error={errors.cccd_day}
@@ -310,6 +305,7 @@ export const TenantFormModal: React.FC<TenantFormModalProps> = ({
             <InputField
               label="Nơi cấp CCCD"
               name="cccd_address"
+              required
               value={formData.cccd_address}
               onChange={handleInputChange}
               placeholder="Nhập nơi cấp CCCD"
