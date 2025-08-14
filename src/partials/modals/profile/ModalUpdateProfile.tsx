@@ -399,9 +399,8 @@ const ModalUpdateProfile = forwardRef<HTMLDivElement, ModalUpdateProfileProps>(
             image_signature: signatureUrl
           };
           setCurrentUser(updatedUser);
-          
           handleDone();
-          toast.success('Cập nhật thông tin thành công!');
+          setShowSignatureEditor(false)
         }
       } catch (error) {
         console.error('Failed to update Profile', error);

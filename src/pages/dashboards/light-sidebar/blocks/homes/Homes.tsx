@@ -134,7 +134,7 @@ const Homes = () => {
         id: 'water_price',
         header: () => 'Giá nước',
         enableSorting: true,
-        cell: (info) => info.getValue() ? `${info.getValue()} VNĐ/m³` : '-',
+        cell: (info) => info.getValue() ? `${info.getValue()} ${info.row.original.typeWater == 'month' ? 'VNĐ/người`' : 'VNĐ/m³`'}` : '-',
         meta: {
           className: 'min-w-[120px]',
         }

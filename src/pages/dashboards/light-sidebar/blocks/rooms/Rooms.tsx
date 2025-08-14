@@ -147,8 +147,7 @@ const Rooms = () => {
   // Delete tenant confirmation state
   const [deleteTenantModalOpen, setDeleteTenantModalOpen] = useState(false);
   const [tenantToDelete, setTenantToDelete] = useState<ITenantData | null>(null);
-
-
+  const [selectedHome, setSelectedHome] = useState<string>('all');
 
   useEffect(() => {
     fetchRooms();
@@ -523,6 +522,12 @@ const Rooms = () => {
     updatePagination(newPagination);
   }, []);
 
+  const fetchRoomsWithExtra = async () => {
+    setSelectedHome('all')
+    await fetchRooms(); // gọi fetchRooms cũ
+    await homeManagement.fetchHomes(); // gọi hàm bổ sung
+  };
+
   return (
     <Fragment>
       <div className="card card-grid h-full min-w-full">
@@ -530,12 +535,15 @@ const Rooms = () => {
         <div className="card-header flex justify-end">
           <div className='flex gap-4'>
             <div className='max-h-[32px] min-w-48'>
-              <Select onValueChange={(value) => filterByHome(value)}>
+              <Select
+                value={selectedHome}
+                onValueChange={(value) => filterByHome(value)}
+              >
                 <SelectTrigger className="max-h-[32px]">
-                  <SelectValue placeholder='Chọn tòa nhà' />
+                  <SelectValue placeholder="Tất cả" />
                 </SelectTrigger>
                 <SelectContent className="bg-white">
-                  <SelectItem key={'null'} value='all'>Tất cả</SelectItem>
+                  <SelectItem key={'null'} value="all">Tất cả</SelectItem>
                   {homeOptions?.map((option: IOption) => (
                     <SelectItem key={option.value} value={option.value.toString()}>
                       {option.label}
@@ -603,7 +611,7 @@ const Rooms = () => {
         open={openEditModal} 
         onClose={closeEditModalHandler} 
         room={roomUpdate} 
-        fetchRooms={fetchRooms}
+        fetchRooms={fetchRoomsWithExtra}
         homeOptions={homeOptions}
       />
 
