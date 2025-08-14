@@ -48,6 +48,11 @@ const InputField = React.memo(({
       disabled={disabled}
       className={`input ${error ? 'input-error' : ''}`}
     />
+    {error && (
+      <div className="text-danger text-xs mt-1">
+        {`${label} là bắt buộc`}
+      </div>
+    )}
   </div>
 ));
 
@@ -123,20 +128,15 @@ export const TenantFormModal: React.FC<TenantFormModalProps> = ({
   // Validate form - optimized with constants
   const validateForm = useCallback((): boolean => {
     const newErrors: Record<string, boolean> = {};
-    const phoneRegex = /^(0|\+84)[3-9]\d{8}$/;
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
+    
     // Required field validation
     if (!formData.name.trim()) newErrors.name = true;
     if (!formData.phone.trim()) newErrors.phone = true;
     if (!formData.cccd_code.trim()) newErrors.cccd_code = true;
-    if (!formData.birthday.trim()) newErrors.birthday = true;
-
-    // Format validation
-    if (formData.phone.trim() && !phoneRegex.test(formData.phone.trim())) {
-      newErrors.phone = true;
-    }
-
+    if (!formData.cccd_address.trim()) newErrors.cccd_address = true;
+    if (!formData.cccd_day.trim()) newErrors.cccd_day = true; 
+    if (!formData.birthday.trim()) newErrors.birthday = true
+    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   }, [formData]);
