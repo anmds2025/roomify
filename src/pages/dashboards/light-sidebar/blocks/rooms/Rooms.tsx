@@ -26,6 +26,10 @@ import { useTenant } from '@/hooks/useTenant';
 import { ModalCreateContract } from '@/partials/modals/room/ModalCreateContract';
 import { IHomeData } from '../homes';
 
+import { MoneySlipManagementDrawer } from '@/components/MoneySlipManagementDrawer';
+import { IMoneySlipData, IMoneySlipFormData } from '@/types/moneySlip';
+import { MoneySlipFormModal } from '@/components/MoneySlipFormModal';
+import { useMoneySlip } from '@/hooks/useMoneySlip';
 // Component cho search input
 const SearchInput = React.memo(({ value, onChange, placeholder }: {
   value: string;
@@ -133,12 +137,14 @@ const Rooms = () => {
 
   const homeManagement = useHomeManagement();
   const tenantAPI = useTenant();
+  const moneySlipAPI = useMoneySlip();
 
   // Tenant management state
   const [selectedRoom, setSelectedRoom] = useState<IRoomData | null>(null);
   const [tenants, setTenants] = useState<ITenantData[]>([]);
   const [isLoadingTenants, setIsLoadingTenants] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [drawerMoneySlipOpen, setDrawerMoneySlipOpen] = useState(false);
 
   // Tenant form state
   const [formModalOpen, setFormModalOpen] = useState(false);
@@ -148,6 +154,10 @@ const Rooms = () => {
   const [deleteTenantModalOpen, setDeleteTenantModalOpen] = useState(false);
   const [tenantToDelete, setTenantToDelete] = useState<ITenantData | null>(null);
   const [selectedHome, setSelectedHome] = useState<string>('all');
+
+  const [moneySlips, setMoneySlips] = useState<IMoneySlipData[]>([]);
+  const [isLoadingMoneySlips, setIsLoadingMoneySlips] = useState(false);
+  const [formModalMoneySlipOpen, setFormModalMoneySlipOpen] = useState(false);
 
   useEffect(() => {
     fetchRooms();
@@ -178,6 +188,14 @@ const Rooms = () => {
     fetchTenants(room._id?.$oid!)
   }, [tenantAPI, enqueueSnackbar]);
 
+  const handleViewMoneySlip = useCallback(async (room: IRoomData) => {
+    setSelectedRoom(room);
+    setDrawerMoneySlipOpen(true);
+    setIsLoadingMoneySlips(true);
+    fetchTenants(room._id?.$oid!)
+    fetchMoneySlips(room._id?.$oid!)
+  }, [moneySlipAPI, enqueueSnackbar]);
+
   const fetchTenants = useCallback(async (roomId: string) => {
     try {
       setIsLoadingTenants(true);
@@ -192,6 +210,23 @@ const Rooms = () => {
       return [];
     } finally {
       setIsLoadingTenants(false);
+    }
+  }, [enqueueSnackbar]);
+
+  const fetchMoneySlips = useCallback(async (roomId: string) => {
+    try {
+      setIsLoadingMoneySlips(true);
+      const response = await moneySlipAPI.fetchMoneySlips(roomId);
+      const data = response.objects || [];
+      setMoneySlips(data);
+      return data;
+    } catch (error) {
+      console.error('Error fetching money slip:', error);
+      enqueueSnackbar('Lỗi khi tải danh sách phiếu thu', { variant: 'error' });
+      setMoneySlips([]);
+      return [];
+    } finally {
+      setIsLoadingMoneySlips(false);
     }
   }, [enqueueSnackbar]);
 
@@ -218,6 +253,11 @@ const Rooms = () => {
     },
     [homeData, fetchTenants, enqueueSnackbar, openCreateContractModalHandler]
   );
+
+  const handleAddMoneySlip = useCallback(() => {
+    setFormModalMoneySlipOpen(true);
+  }, []);
+
   const handleAddTenant = useCallback(() => {
     setEditingTenant(null);
     setFormModalOpen(true);
@@ -232,6 +272,15 @@ const Rooms = () => {
       console.error('Error refreshing tenant list:', error);
     }
   }, [tenantAPI]);
+
+  const refreshMoneySlipList = useCallback(async (roomId: string) => {
+    try {
+      const response = await moneySlipAPI.fetchMoneySlips(roomId);
+      setMoneySlips(response.objects || []);
+    } catch (error) {
+      console.error('Error refreshing money slip list:', error);
+    }
+  }, [moneySlipAPI]);
 
   const handleEditTenant = useCallback((tenant: ITenantData) => {
     setEditingTenant(tenant);
@@ -261,6 +310,22 @@ const Rooms = () => {
       throw error;
     }
   }, [selectedRoom, editingTenant, tenantAPI, enqueueSnackbar, refreshTenantList]);
+
+  const handleMoneySlipFormSubmit = useCallback(async (formData: IMoneySlipFormData) => {
+    if (!selectedRoom) return;
+    try {
+     
+      await moneySlipAPI.createMoneySlip(selectedRoom._id?.$oid!, formData);
+      await refreshTenantList(selectedRoom._id?.$oid!);
+      
+      setFormModalOpen(false);
+      setEditingTenant(null);
+    } catch (error) {
+      console.error('Error saving tenant:', error);
+      enqueueSnackbar('Lỗi khi thêm phiếu thu tiền phòng', { variant: 'error' });
+      throw error;
+    }
+  }, [selectedRoom, moneySlipAPI, enqueueSnackbar, refreshTenantList]);
 
   const handleDeleteTenant = useCallback((tenant: ITenantData) => {
     setTenantToDelete(tenant);
@@ -298,6 +363,19 @@ const Rooms = () => {
       setIsLoadingTenants(false);
     }
   }, [selectedRoom, refreshTenantList, enqueueSnackbar]);
+
+  const handleRefreshMonenSlips = useCallback(async () => {
+    if (!selectedRoom) return;
+    setIsLoadingTenants(true);
+    try {
+      await refreshMoneySlipList(selectedRoom._id?.$oid!);
+    } catch (error) {
+      console.error('Error refreshing money slip:', error);
+      enqueueSnackbar('Lỗi khi tải danh sách phiếu thu', { variant: 'error' });
+    } finally {
+      setIsLoadingTenants(false);
+    }
+  }, [selectedRoom, refreshMoneySlipList, enqueueSnackbar]);
 
   // Contract signing handlers
   const handleCopyContractLink = useCallback((room: IRoomData) => {
@@ -450,6 +528,13 @@ const Rooms = () => {
                 <span>Người thuê</span>
               </DropdownMenuItem>
               <DropdownMenuItem 
+                onClick={() => handleViewMoneySlip(row.original)}
+                className="flex items-center gap-2 cursor-pointer bg-white"
+              >
+                <KeenIcon icon="dollar" className="text-base" />
+                <span>Phiếu thu tiền</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem 
                 onClick={() => handleViewContracts(row.original)}
                 className="flex items-center gap-2 cursor-pointer bg-white"
               >
@@ -528,6 +613,8 @@ const Rooms = () => {
     await homeManagement.fetchHomes(); // gọi hàm bổ sung
   };
 
+  console.log('homeData', homeData, selectedHome)
+
   return (
     <Fragment>
       <div className="card card-grid h-full min-w-full">
@@ -537,7 +624,7 @@ const Rooms = () => {
             <div className='max-h-[32px] min-w-48'>
               <Select
                 value={selectedHome}
-                onValueChange={(value) => filterByHome(value)}
+                onValueChange={(value) => {filterByHome(value), setSelectedHome(value)}}
               >
                 <SelectTrigger className="max-h-[32px]">
                   <SelectValue placeholder="Tất cả" />
@@ -644,6 +731,28 @@ const Rooms = () => {
         onSubmit={handleTenantFormSubmit}
         tenant={editingTenant}
         room={selectedRoom}
+      />
+
+      {/* Tenant Management Drawer */}
+      <MoneySlipManagementDrawer
+        open={drawerMoneySlipOpen}
+        onClose={() => setDrawerMoneySlipOpen(false)}
+        room={selectedRoom}
+        moneySlips={moneySlips}
+        isLoading={isLoadingMoneySlips}
+        onAddMoneySlip={handleAddMoneySlip}
+        onRefresh={handleRefreshMonenSlips}
+      />
+
+      
+      <MoneySlipFormModal
+        onCreate={() => setDrawerMoneySlipOpen(false)}
+        open={formModalMoneySlipOpen}
+        onClose={() => setFormModalMoneySlipOpen(false)}
+        onSubmit={handleMoneySlipFormSubmit}
+        room={selectedRoom || {} as IRoomData}
+        userData={tenants}
+        home={homeData.find(item => item._id?.$oid === selectedRoom?.home_pk) || {} as IHomeData}
       />
 
       {/* Delete Tenant Confirmation Modal */}

@@ -27,6 +27,7 @@ export interface IRoomData {
   size: number;
   type?: string;
   note?: string;
+  deposit: number;
   address: string;
   imageQR?: string;
   imageDir?: string;

@@ -107,6 +107,7 @@ export const useUser = () => {
             if(currentUser)
             {
                 const response = await updateProfileUserApi(data, currentUser);
+                console.log("hả hả nè", response)
                 setSuccessMessage('Update profile successfully');
                 toast.success('Cập nhật tài khoản thành công');
                 return response;

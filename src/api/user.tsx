@@ -96,23 +96,33 @@ export const updateUserApi = async (payload: UpdateUserPayload, user : UserModel
   return response.data.success;
 };
 
-export const updateProfileUserApi = async (payload: UpdateProfilePayload, user : UserModel): Promise<boolean> => {
-  const extendedPayload = {
-    ...payload,
-     token: user?.token,
-  };
-  const formData = createFormData(extendedPayload);
+export const updateProfileUserApi = async (
+  payload: UpdateProfilePayload,
+  user: UserModel
+): Promise<string> => {
+  try {
+    const extendedPayload = {
+      ...payload,
+      token: user?.token,
+    };
 
-  const response = await axios.post<{ success: boolean }>(
-    UPDATE_PROFILE_URL,
-    formData,
-    {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    }
-  );
-  return response.data.success;
+    const formData = createFormData(extendedPayload);
+
+    const response = await axios.post<{ Success: string }>(
+      UPDATE_PROFILE_URL,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+
+    return response.data.Success; // đúng key viết hoa
+  } catch (error) {
+    console.error("API error:", error);
+    throw new Error("API error");
+  }
 };
 
 export const deleteUserApi = async (
