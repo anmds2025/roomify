@@ -23,6 +23,8 @@ export interface UpdateRoomPayload {
   price: number;
   size: number;
   // address: string;
+  type_collect_water: string;
+  type_collect_electricity: string;
   note?: string;
   token: string;
 }

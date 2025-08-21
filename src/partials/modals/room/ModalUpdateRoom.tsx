@@ -129,9 +129,10 @@ const ModalUpdateRoom = forwardRef<HTMLDivElement, ModalUpdateRoomProps>(
       room_name: '',
       price: '',
       size: '',
-      // address: '',
       note: '',
-      home_pk: ''
+      home_pk: '',
+      type_collect_water: '',
+      type_collect_electricity: ''
     });
 
     // Error state
@@ -140,7 +141,9 @@ const ModalUpdateRoom = forwardRef<HTMLDivElement, ModalUpdateRoomProps>(
       price: false,
       size: false,
       // address: false,
-      home_pk: false
+      home_pk: false,
+      type_collect_water: false,
+      type_collect_electricity: false
     });
 
     // Initialize form data when room changes
@@ -152,7 +155,9 @@ const ModalUpdateRoom = forwardRef<HTMLDivElement, ModalUpdateRoomProps>(
           size: room.size?.toString() || '',
           // address: room.address || '',
           note: room.note || '',
-          home_pk: room.home_pk || ''
+          home_pk: room.home_pk || '',
+          type_collect_water: room.type_collect_water || '',
+          type_collect_electricity: room.type_collect_electricity || ''
         });
       }
     }, [room]);
@@ -165,14 +170,18 @@ const ModalUpdateRoom = forwardRef<HTMLDivElement, ModalUpdateRoomProps>(
         size: '',
         // address: '',
         note: '',
-        home_pk: ''
+        home_pk: '',
+        type_collect_water: '',
+        type_collect_electricity: ''
       });
       setErrors({
         room_name: false,
         price: false,
         size: false,
         // address: false,
-        home_pk: false
+        home_pk: false,
+        type_collect_water: false,
+        type_collect_electricity: false
       });
     }, []);
 
@@ -196,7 +205,9 @@ const ModalUpdateRoom = forwardRef<HTMLDivElement, ModalUpdateRoomProps>(
         price: !formData.price.trim() || parseInt(formData.price) <= 0,
         size: !formData.size.trim() || parseInt(formData.size) <= 0,
         // address: !formData.address.trim(),
-        home_pk: !formData.home_pk.trim()
+        home_pk: !formData.home_pk.trim(),
+        type_collect_water: !formData.type_collect_water.trim(),
+        type_collect_electricity: !formData.type_collect_electricity.trim()
       };
 
       setErrors(newErrors);
@@ -219,7 +230,9 @@ const ModalUpdateRoom = forwardRef<HTMLDivElement, ModalUpdateRoomProps>(
           // address: formData.address.trim(),
           note: formData.note.trim(),
           token: '',
-          home_pk: formData.home_pk.trim()
+          home_pk: formData.home_pk.trim(),
+          type_collect_water: formData.type_collect_water,
+          type_collect_electricity: formData.type_collect_electricity
         };
 
         await updateRoom(payload);
@@ -286,6 +299,30 @@ const ModalUpdateRoom = forwardRef<HTMLDivElement, ModalUpdateRoomProps>(
                     required={true}
                     inputMode="numeric"
                     placeholder="VD: 25"
+                  />
+                  <FormField
+                    label="Loại thu tiền nước"
+                    value={formData.type_collect_water}
+                    onChange={(value) => handleFieldChange('type_collect_water', value)}
+                    error={errors.type_collect_water}
+                    required={true}
+                    type="select"
+                    options={[
+                      { label: "Đầu tháng", value: "dau_thang" },
+                      { label: "Cuối tháng", value: "cuoi_thang" }
+                    ]}
+                  />
+                  <FormField
+                    label="Loại thu tiền điện"
+                    value={formData.type_collect_electricity}
+                    onChange={(value) => handleFieldChange('type_collect_electricity', value)}
+                    error={errors.type_collect_electricity}
+                    required={true}
+                    type="select"
+                    options={[
+                      { label: "Đầu tháng", value: "dau_thang" },
+                      { label: "Cuối tháng", value: "cuoi_thang" }
+                    ]}
                   />
                 </div>
               </div>

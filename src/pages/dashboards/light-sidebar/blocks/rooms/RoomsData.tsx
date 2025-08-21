@@ -44,6 +44,9 @@ export interface IRoomData {
   status: string;
   latitude?: string;
   longitude?: string;
+  type_collect_water?: string;
+  type_collect_electricity?: string;
+
   isDeleted?: boolean;
 }
 
