@@ -707,7 +707,7 @@ const Rooms = () => {
         onClose={closeCreateContractModalHandler} 
         room={roomUpdate} 
         home={homeSelect}
-        fetchRooms={fetchRooms}
+        fetchRooms={fetchRoomsWithExtra}
         userData={tenants}
       />
 

@@ -24,6 +24,7 @@ export interface UpdateHomePayload {
   car_price?: string;
   typeWater?: string;
   imageQR?: string;
+  num_room?: string;
 }
 
 export const getHomesApi = async (user: UserModel): Promise<IHomeData[]> => {

@@ -150,6 +150,8 @@ const ModalUpdateHome = forwardRef<HTMLDivElement, ModalUpdateHomeProps>(
       phone: false,
     });
 
+    const [numRoom, setNumRoom] = useState<string>('0');
+
     // Initialize form data when home changes
     useEffect(() => {
       if (home) {
@@ -304,6 +306,7 @@ const ModalUpdateHome = forwardRef<HTMLDivElement, ModalUpdateHomeProps>(
           nameBank: formData.nameBank,
           addressBank: formData.addressBank,
           imageQR: qrImageUrl,
+          num_room: numRoom
         };
 
         await updateHome(payload);
@@ -332,7 +335,7 @@ const ModalUpdateHome = forwardRef<HTMLDivElement, ModalUpdateHomeProps>(
     const qrImageUrl = useMemo(() => {
       return qrImageFileStr || home?.imageQR || '';
     }, [qrImageFileStr, home?.imageQR]);
-
+    
     return (
       <Dialog open={open} onOpenChange={handleClose}>
         <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto bg-white">
@@ -374,6 +377,15 @@ const ModalUpdateHome = forwardRef<HTMLDivElement, ModalUpdateHomeProps>(
                       onChange={(value) => handleFieldChange('address', value)}
                       type="textarea"
                     />
+                    {!home._id?.$oid && (
+                      <FormField
+                        label="Số phòng"
+                        value={numRoom}
+                        onChange={(value) => setNumRoom((value))}
+                        type="number"
+                      />
+                    )}
+                    
                   </div>
                 </div>
               </div>
