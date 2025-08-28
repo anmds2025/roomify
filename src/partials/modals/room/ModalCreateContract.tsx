@@ -372,6 +372,7 @@ const ModalCreateContract = forwardRef<HTMLDivElement, ModalCreateContractProps>
       <>
         <Dialog open={open} onOpenChange={handleClose}>
           <LoadingOverlay
+            title='Đang tạo hợp đồng, vui lòng chờ...'
             visible={loading}
             maxSeconds={60}
             onTimeout={() => {

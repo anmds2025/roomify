@@ -16,6 +16,16 @@ export const MENU_SIDEBAR: MenuConfigType = [
     ]
   },
   {
+    title: 'Quản lý tài chính',
+    icon: 'chart-line-up',
+    children: [
+      {
+        title: 'Tổng quan tài chính',
+        path: '/finance'
+      }
+    ]
+  },
+  {
     title: 'Quản lý người dùng',
     icon: 'users',
     children: [

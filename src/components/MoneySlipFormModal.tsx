@@ -246,7 +246,7 @@ export const MoneySlipFormModal: React.FC<MoneySlipFormModalProps> = ({
 
     setIsSubmitting(true);
     try {
-      toast.success('Đang tạo hợp đồng, bạn vui lòng chờ');
+      toast.success('Đang tạo phiếu thu, bạn vui lòng chờ');
       setLoading(true);
       onClose();
       onCreate()
@@ -306,6 +306,7 @@ export const MoneySlipFormModal: React.FC<MoneySlipFormModalProps> = ({
   return (
     <>
       <LoadingOverlay
+        title='Đang tạo phiếu thu, vui lòng chờ...'
         visible={loading}
         maxSeconds={60}
         onTimeout={() => {

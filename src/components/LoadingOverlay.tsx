@@ -2,12 +2,13 @@
 import React, { useEffect, useState } from 'react';
 
 interface LoadingOverlayProps {
+  title: string;
   visible: boolean;
   maxSeconds?: number;
   onTimeout?: () => void;
 }
 
-const LoadingOverlay: React.FC<LoadingOverlayProps> = ({ visible, maxSeconds = 60, onTimeout }) => {
+const LoadingOverlay: React.FC<LoadingOverlayProps> = ({ title, visible, maxSeconds = 60, onTimeout }) => {
   const [show, setShow] = useState(visible);
 
   useEffect(() => {
@@ -31,7 +32,7 @@ const LoadingOverlay: React.FC<LoadingOverlayProps> = ({ visible, maxSeconds = 6
   return (
     <div className={`fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center`}>
       <div className="text-white text-lg font-semibold animate-pulse">
-        Đang tạo hợp đồng, vui lòng chờ...
+        {title}
       </div>
     </div>
   );
