@@ -15,7 +15,7 @@ interface MoneySlipManagementDrawerProps {
   isLoading: boolean;
   onAddMoneySlip: () => void;
   // onEditMoneySlip: (moneySlip: IMoneySlipData) => void;
-  // onDeleteMoneySlip: (moneySlip: IMoneySlipData) => void;
+  onDeleteMoneySlip: (moneySlip: IMoneySlipData) => void;
   onRefresh: () => void;
 }
 
@@ -39,8 +39,10 @@ interface MoneySlipManagementDrawerProps {
 
 const MoneySlipCard = React.memo(({ 
   moneySlip, 
+  onDelete
 }: {
   moneySlip: IMoneySlipData;
+  onDelete: (moneySlip: IMoneySlipData) => void;
 }) => (
   <div className="card border border-gray-200 hover:shadow-md transition-shadow">
     <div className="card-body p-4">
@@ -69,10 +71,9 @@ const MoneySlipCard = React.memo(({
             <KeenIcon icon="eye" className="text-sm" />
           </button>
           <button 
-            // onClick={() => onDelete(tenant)}
+            onClick={() => onDelete(moneySlip)}
             className="btn btn-sm btn-icon btn-danger hover:bg-danger-dark transition-colors"
-            title="Xóa người thuê"
-            // aria-label={`Xóa người thuê ${tenant.name}`}
+            title="Xóa phiếu thu"
           >
             <KeenIcon icon="trash" className="text-sm" />
           </button>
@@ -83,6 +84,10 @@ const MoneySlipCard = React.memo(({
         <div className="flex justify-between text-xs">
           <span className="text-gray-500">Phòng:</span>
           <span className="font-medium">{moneySlip.room_name || ''}</span>
+        </div>
+        <div className="flex justify-between text-xs">
+          <span className="text-gray-500">Tháng thu:</span>
+          <span className="font-medium">{moneySlip.month || ''}</span>
         </div>
         <div className="flex justify-between text-xs">
           <span className="text-gray-500">Người thuê:</span>
@@ -114,6 +119,7 @@ export const MoneySlipManagementDrawer: React.FC<MoneySlipManagementDrawerProps>
   moneySlips,
   isLoading,
   onAddMoneySlip,
+  onDeleteMoneySlip,
   onRefresh,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -243,6 +249,7 @@ export const MoneySlipManagementDrawer: React.FC<MoneySlipManagementDrawerProps>
                   <MoneySlipCard
                     key={moneySlip._id?.$oid || moneySlip.pk}
                     moneySlip={moneySlip}
+                    onDelete={onDeleteMoneySlip}
                   />
                 ))}
               </div>

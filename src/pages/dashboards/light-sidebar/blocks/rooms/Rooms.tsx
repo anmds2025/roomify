@@ -153,6 +153,8 @@ const Rooms = () => {
   // Delete tenant confirmation state
   const [deleteTenantModalOpen, setDeleteTenantModalOpen] = useState(false);
   const [tenantToDelete, setTenantToDelete] = useState<ITenantData | null>(null);
+  const [deleteMoneySlipModalOpen, setDeleteMoneySlipModalOpen] = useState(false);
+  const [moneySlipToDelete, setMoneySlipToDelete] = useState<IMoneySlipData | null>(null);
   const [selectedHome, setSelectedHome] = useState<string>('all');
 
   const [moneySlips, setMoneySlips] = useState<IMoneySlipData[]>([]);
@@ -331,6 +333,29 @@ const Rooms = () => {
     setTenantToDelete(tenant);
     setDeleteTenantModalOpen(true);
   }, []);
+
+  const handleDeleteMoneySlip = useCallback((moneySlip: IMoneySlipData) => {
+    setMoneySlipToDelete(moneySlip);
+    setDeleteMoneySlipModalOpen(true);
+  }, []);
+
+  const handleConfirmDeleteMoneySlip = useCallback(async () => {
+    if (!moneySlipToDelete || !selectedRoom) return;
+
+    try {
+      await moneySlipAPI.removeMoneySlip(moneySlipToDelete._id?.$oid!);
+      enqueueSnackbar('Xóa phiếu thu thành công', { variant: 'success' });
+      
+      // Refresh money slip list
+      await refreshMoneySlipList(selectedRoom._id?.$oid!);
+    } catch (error) {
+      console.error('Error deleting money slip:', error);
+      enqueueSnackbar('Lỗi khi xóa phiếu thu', { variant: 'error' });
+    } finally {
+      setDeleteMoneySlipModalOpen(false);
+      setMoneySlipToDelete(null);
+    }
+  }, [moneySlipToDelete, selectedRoom, moneySlipAPI, enqueueSnackbar, refreshMoneySlipList]);
 
   const handleConfirmDeleteTenant = useCallback(async () => {
     if (!tenantToDelete || !selectedRoom) return;
@@ -741,6 +766,7 @@ const Rooms = () => {
         moneySlips={moneySlips}
         isLoading={isLoadingMoneySlips}
         onAddMoneySlip={handleAddMoneySlip}
+        onDeleteMoneySlip={handleDeleteMoneySlip}
         onRefresh={handleRefreshMonenSlips}
       />
 
@@ -762,6 +788,14 @@ const Rooms = () => {
         onConfirm={handleConfirmDeleteTenant}
         title="Xóa người thuê"
         message={`Bạn có chắc chắn muốn xóa "${tenantToDelete?.name}" khỏi phòng này?`}
+      />
+
+      <ModalConfirmDelete
+        open={deleteMoneySlipModalOpen}
+        onClose={() => setDeleteMoneySlipModalOpen(false)}
+        onConfirm={handleConfirmDeleteMoneySlip}
+        title="Xóa phiếu thu"
+        message={`Bạn có chắc chắn muốn xóa phiếu thu này không?`}
       />
 
 
