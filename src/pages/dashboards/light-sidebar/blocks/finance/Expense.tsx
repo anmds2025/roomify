@@ -344,8 +344,8 @@ const Expense = () => {
         open={openDeleteModal}
         onClose={closeDeleteModalHandler}
         onConfirm={deleteExpenseHandler}
-        title="Xóa"
-        message="Bạn có muốn xoá tài khoản này. Khi xác nhận thì sẽ không thể quay lại"
+        title="Xóa chi phí"
+        message="Bạn có muốn chi phí này không. Khi xác nhận thì sẽ không thể quay lại"
       />
       
       <ModalUpdateExpense
