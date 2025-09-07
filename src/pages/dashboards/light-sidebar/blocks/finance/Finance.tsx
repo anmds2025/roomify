@@ -348,7 +348,6 @@ const Finance = () => {
       .map((v, i) => v - expenseByMonth[i])
       .filter((_, index) => data.revenue[index] > 0 || expenseByMonth[index] > 0);
 
-    console.log('haha nè', monthsWithData)
     return {
       series: [
         { name: 'Doanh thu', data: revenueWithData },
