@@ -241,11 +241,11 @@ const Finance = () => {
   }, [moneyData, selectedBuildingId, homes]);
 
   const totals = useMemo(() => {
+    const totalExpense = expenseData.reduce((sum, exp) => sum + (exp.total || 0), 0);
     if (moneyData.length > 0 && 'totals' in data) {
       // Use direct totals from API data
       const apiTotals = (data as any).totals;
       const totalRevenue = apiTotals.totalRevenue;
-      const totalExpense = expenseData.reduce((sum, exp) => sum + (exp.total || 0), 0);
       const profit = totalRevenue - totalExpense;
       
       return {
@@ -263,7 +263,6 @@ const Finance = () => {
     
     // Fallback to calculated totals
     const totalRevenue = data.revenue.reduce((a, b) => a + b, 0);
-    const totalExpense = data.expense.reduce((a, b) => a + b, 0);
     const profit = totalRevenue - totalExpense;
     const room = data.revenueRoom.reduce((a, b) => a + b, 0);
     const elec = data.revenueElectricity.reduce((a, b) => a + b, 0);
@@ -288,7 +287,9 @@ const Finance = () => {
       }, 0)
     );
 
-    const monthsWithData = months.filter((_, index) => data.revenue[index] > 0 || data.expense[index] > 0);
+    const monthsWithData = months.filter(
+      (_, index) => data.revenue[index] > 0 || expenseByMonth[index] > 0
+    );
     const revenueWithData = data.revenue.filter((value, index) => data.revenue[index] > 0 || data.expense[index] > 0);
     const expenseWithData = expenseByMonth.filter(
       (_, index) => data.revenue[index] > 0 || expenseByMonth[index] > 0
@@ -320,7 +321,7 @@ const Finance = () => {
       },
       tooltip: { enabled: true, y: { formatter: (v: number) => `${v.toLocaleString('vi-VN')} VND` } }
     };
-  }, [data, expenseData]);
+  }, [data, expenseData, viewMode]);
 
   const yearlyOptions: ApexOptions = useMemo(() => {
     // Filter out months with no data for better chart display
@@ -336,7 +337,9 @@ const Finance = () => {
       }, 0)
     );
 
-    const monthsWithData = months.filter((_, index) => data.revenue[index] > 0 || data.expense[index] > 0);
+    const monthsWithData = months.filter(
+      (_, index) => data.revenue[index] > 0 || expenseByMonth[index] > 0
+    );
     const revenueWithData = data.revenue.filter((value, index) => data.revenue[index] > 0 || data.expense[index] > 0);
     const expenseWithData = expenseByMonth.filter(
       (_, index) => data.revenue[index] > 0 || expenseByMonth[index] > 0
@@ -345,6 +348,7 @@ const Finance = () => {
       .map((v, i) => v - expenseByMonth[i])
       .filter((_, index) => data.revenue[index] > 0 || expenseByMonth[index] > 0);
 
+    console.log('haha nè', monthsWithData)
     return {
       series: [
         { name: 'Doanh thu', data: revenueWithData },
@@ -380,7 +384,7 @@ const Finance = () => {
       },
       tooltip: { enabled: true, y: { formatter: (v: number) => `${v.toLocaleString('vi-VN')} VND` } }
     };
-  }, [data, expenseData]);
+  }, [data, expenseData, viewMode]);
 
   // Generate month options for the last 12 months
   const generateMonthOptions = () => {
