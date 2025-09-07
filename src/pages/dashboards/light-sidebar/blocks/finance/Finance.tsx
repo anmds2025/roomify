@@ -6,6 +6,8 @@ import { useMoney } from '@/hooks/useMoney';
 import { useHome } from '@/hooks/useHome';
 import { MoneyData, TYPE_MONEY } from '@/types/money';
 import { IHomeData } from '@/pages/dashboards/light-sidebar/blocks/homes/HomesData';
+import { IExpenseData } from '@/api/expense';
+import { useExpense } from '@/hooks/useExpense';
 
 type ViewMode = 'month' | 'year';
 
@@ -17,13 +19,16 @@ const Finance = () => {
   const [selectedBuildingId, setSelectedBuildingId] = useState<string>('');
   const [viewMode, setViewMode] = useState<ViewMode>('month');
   const [moneyData, setMoneyData] = useState<MoneyData[]>([]);
+  const [expenseData, setExpenseData] = useState<IExpenseData[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState<string>('All');
   const [homes, setHomes] = useState<IHomeData[]>([]);
   const [homesLoading, setHomesLoading] = useState(false);
 
   const { getMoneyListData } = useMoney();
+  const { getFilterExpenses } = useExpense();
   const { getHomes } = useHome();
+  
 
   // Get current month in format "M/YYYY" to match API format
   const getCurrentMonth = () => {
@@ -70,6 +75,25 @@ const Finance = () => {
     }
   };
 
+  const fetchExpenseData = async () => {
+    try {
+      setLoading(true);
+      const payload = {
+        home_pk: selectedBuildingId || 'all',
+        month: selectedMonth || getCurrentMonth(),
+      };
+
+      const response = await getFilterExpenses(payload);
+      setExpenseData(response.objects || []);
+    } catch (error) {
+      console.error('Error fetching expense data:', error);
+      // Fallback to mock data if API fails
+      setExpenseData([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Fetch homes when component mounts
   useEffect(() => {
     fetchHomes();
@@ -78,6 +102,7 @@ const Finance = () => {
   // Fetch money data when dependencies change
   useEffect(() => {
     fetchMoneyData();
+    fetchExpenseData()
   }, [selectedBuildingId, selectedMonth]);
 
   // Process API data to generate chart data
@@ -220,7 +245,7 @@ const Finance = () => {
       // Use direct totals from API data
       const apiTotals = (data as any).totals;
       const totalRevenue = apiTotals.totalRevenue;
-      const totalExpense = 0; // No expense data yet
+      const totalExpense = expenseData.reduce((sum, exp) => sum + (exp.total || 0), 0);
       const profit = totalRevenue - totalExpense;
       
       return {
@@ -247,13 +272,27 @@ const Finance = () => {
     const other = data.revenueOther.reduce((a, b) => a + b, 0);
     
     return { totalRevenue, totalExpense, profit, cashFlow: profit, room, elec, water, park, other };
-  }, [data, moneyData]);
+  }, [data, moneyData, expenseData]);
 
   const monthlyOptions: ApexOptions = useMemo(() => {
     // Filter out months with no data for better chart display
+    const expenseByMonth = months.map((_, monthIndex) =>
+      expenseData.reduce((sum, exp) => {
+        if (exp.month) {
+          const [m, y] = exp.month.split('/').map(Number);
+          if (m - 1 === monthIndex) {
+            return sum + Number(exp.total || 0);
+          }
+        }
+        return sum;
+      }, 0)
+    );
+
     const monthsWithData = months.filter((_, index) => data.revenue[index] > 0 || data.expense[index] > 0);
     const revenueWithData = data.revenue.filter((value, index) => data.revenue[index] > 0 || data.expense[index] > 0);
-    const expenseWithData = data.expense.filter((value, index) => data.revenue[index] > 0 || data.expense[index] > 0);
+    const expenseWithData = expenseByMonth.filter(
+      (_, index) => data.revenue[index] > 0 || expenseByMonth[index] > 0
+    );
 
     return {
       series: [
@@ -281,16 +320,30 @@ const Finance = () => {
       },
       tooltip: { enabled: true, y: { formatter: (v: number) => `${v.toLocaleString('vi-VN')} VND` } }
     };
-  }, [data]);
+  }, [data, expenseData]);
 
   const yearlyOptions: ApexOptions = useMemo(() => {
     // Filter out months with no data for better chart display
+    const expenseByMonth = months.map((_, monthIndex) =>
+      expenseData.reduce((sum, exp) => {
+        if (exp.month) {
+          const [m, y] = exp.month.split('/').map(Number);
+          if (m - 1 === monthIndex) {
+            return sum + (Number(exp.total) || 0);
+          }
+        }
+        return sum;
+      }, 0)
+    );
+
     const monthsWithData = months.filter((_, index) => data.revenue[index] > 0 || data.expense[index] > 0);
     const revenueWithData = data.revenue.filter((value, index) => data.revenue[index] > 0 || data.expense[index] > 0);
-    const expenseWithData = data.expense.filter((value, index) => data.revenue[index] > 0 || data.expense[index] > 0);
+    const expenseWithData = expenseByMonth.filter(
+      (_, index) => data.revenue[index] > 0 || expenseByMonth[index] > 0
+    );
     const profitWithData = data.revenue
-      .map((v, i) => v - data.expense[i])
-      .filter((_, index) => data.revenue[index] > 0 || data.expense[index] > 0);
+      .map((v, i) => v - expenseByMonth[i])
+      .filter((_, index) => data.revenue[index] > 0 || expenseByMonth[index] > 0);
 
     return {
       series: [
@@ -327,7 +380,7 @@ const Finance = () => {
       },
       tooltip: { enabled: true, y: { formatter: (v: number) => `${v.toLocaleString('vi-VN')} VND` } }
     };
-  }, [data]);
+  }, [data, expenseData]);
 
   // Generate month options for the last 12 months
   const generateMonthOptions = () => {

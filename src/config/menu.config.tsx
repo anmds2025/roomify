@@ -22,6 +22,10 @@ export const MENU_SIDEBAR: MenuConfigType = [
       {
         title: 'Tổng quan tài chính',
         path: '/finance'
+      },
+      {
+        title: 'Quản lý chi phí',
+        path: '/expense'
       }
     ]
   },
