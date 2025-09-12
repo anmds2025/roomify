@@ -389,7 +389,7 @@ const ModalCreateContract = forwardRef<HTMLDivElement, ModalCreateContractProps>
               <div className="space-y-6">
                 {/* Thông tin cơ bản */}
                 <div>
-                  <div className="flex items-center gap-2 mb-4 font-semibold text-gray-800 text-lg">
+                  <div className="flex items-center gap-2 mb-4 font-semibold text-gray-800 text-lg dark:text-black">
                     <KeenIcon icon="home" className="w-4 h-4 text-blue-400" />
                     Thông tin bên thuê
                   </div>
@@ -417,7 +417,7 @@ const ModalCreateContract = forwardRef<HTMLDivElement, ModalCreateContractProps>
 
                 {/* Thông tin bổ sung */}
                 <div>
-                  <div className="flex items-center gap-2 mb-4 font-semibold text-gray-800 text-lg">
+                  <div className="flex items-center gap-2 mb-4 font-semibold text-gray-800 text-lg dark:text-black">
                     <KeenIcon icon="notepad" className="w-4 h-4 text-green-400" />
                     Thông tin hợp đồng
                   </div>

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getStoredUser } from '.';
+import { createFormData, getStoredUser } from '.';
 
 // Base API URL
 const API_URL = import.meta.env.VITE_APP_API_URL;
@@ -11,6 +11,19 @@ export interface SignContractPayload {
   image_b?: string;
   token: string;
 }
+
+export interface DeleteContractPayload {
+  pk: string;
+  token: string;
+}
+
+const ENDPOINTS = {
+  DELETE_CONTRACT: `${API_URL}/contract/delete`,
+} as const;
+
+const FORM_DATA_HEADERS = {
+  'Content-Type': 'multipart/form-data',
+} as const;
 
 export const signContractApi = async (payload: SignContractPayload): Promise<boolean> => {
   const formData = new FormData();
@@ -54,3 +67,17 @@ export const signContract = async (contractId: string, signatureImageUrl: string
 
   return await signContractApi(payload);
 }; 
+
+// Delete user client
+export const deleteContract = async (payload: DeleteContractPayload): Promise<any> => {
+  try {
+    const formData = createFormData(payload);
+    const response = await axios.post(ENDPOINTS.DELETE_CONTRACT, formData, {
+      headers: FORM_DATA_HEADERS,
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting data:', error);
+    throw error;
+  }
+};

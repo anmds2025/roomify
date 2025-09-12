@@ -338,9 +338,9 @@ const ModalUpdateHome = forwardRef<HTMLDivElement, ModalUpdateHomeProps>(
     
     return (
       <Dialog open={open} onOpenChange={handleClose}>
-        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto bg-white">
-          <DialogHeader className='sticky top-0 bg-white'>
-            <DialogTitle className="text-lg font-semibold text-gray-900 p-2">
+         <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-900">
+          <DialogHeader className="sticky top-0 bg-white dark:bg-gray-900">
+            <DialogTitle className="text-lg font-semibold text-gray-900 dark:text-gray-100 p-2">
               {isEdit ? 'Cập nhật thông tin tòa nhà' : 'Thêm mới tòa nhà'}
             </DialogTitle>
           </DialogHeader>
@@ -350,7 +350,7 @@ const ModalUpdateHome = forwardRef<HTMLDivElement, ModalUpdateHomeProps>(
               {/* Cột 1 - Thông tin cơ bản */}
               <div className="space-y-6">
                 <div>
-                  <div className="flex items-center gap-2 mb-4 font-semibold text-gray-800 text-lg">
+                  <div className="flex items-center gap-2 mb-4 font-semibold text-gray-800 text-lg dark:text-black">
                     <KeenIcon icon="home" className="w-4 h-4 text-blue-400" />
                     Thông tin cơ bản
                   </div>
@@ -393,7 +393,7 @@ const ModalUpdateHome = forwardRef<HTMLDivElement, ModalUpdateHomeProps>(
               {/* Cột 2 - Thông tin giá */}
               <div className="space-y-6">
                 <div>
-                  <div className="flex items-center gap-2 mb-4 font-semibold text-gray-800 text-lg">
+                  <div className="flex items-center gap-2 mb-4 font-semibold text-gray-800 text-lg dark:text-black">
                     <KeenIcon icon="dollar" className="w-4 h-4 text-green-400" />
                     Thông tin giá
                   </div>
@@ -455,7 +455,7 @@ const ModalUpdateHome = forwardRef<HTMLDivElement, ModalUpdateHomeProps>(
               {/* Cột 3 - Thông tin ngân hàng */}
               <div className="space-y-6">
                 <div>
-                  <div className="flex items-center gap-2 mb-4 font-semibold text-gray-800 text-lg">
+                  <div className="flex items-center gap-2 mb-4 font-semibold text-gray-800 text-lg dark:text-black">
                     <KeenIcon icon="bank" className="w-4 h-4 text-purple-400" />
                     Thông tin ngân hàng
                   </div>

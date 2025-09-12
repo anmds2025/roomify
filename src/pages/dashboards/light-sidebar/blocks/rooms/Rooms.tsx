@@ -30,6 +30,7 @@ import { MoneySlipManagementDrawer } from '@/components/MoneySlipManagementDrawe
 import { IMoneySlipData, IMoneySlipFormData } from '@/types/moneySlip';
 import { MoneySlipFormModal } from '@/components/MoneySlipFormModal';
 import { useMoneySlip } from '@/hooks/useMoneySlip';
+import { useContract } from '@/hooks/useContract';
 // Component cho search input
 const SearchInput = React.memo(({ value, onChange, placeholder }: {
   value: string;
@@ -138,6 +139,7 @@ const Rooms = () => {
   const homeManagement = useHomeManagement();
   const tenantAPI = useTenant();
   const moneySlipAPI = useMoneySlip();
+  const contractAPI = useContract();
 
   // Tenant management state
   const [selectedRoom, setSelectedRoom] = useState<IRoomData | null>(null);
@@ -156,6 +158,9 @@ const Rooms = () => {
   const [deleteMoneySlipModalOpen, setDeleteMoneySlipModalOpen] = useState(false);
   const [moneySlipToDelete, setMoneySlipToDelete] = useState<IMoneySlipData | null>(null);
   const [selectedHome, setSelectedHome] = useState<string>('all');
+
+  const [deleteContractModalOpen, setDeleteContractModalOpen] = useState(false);
+  const [contractToDelete, setContractToDelete] = useState<string>('');
 
   const [moneySlips, setMoneySlips] = useState<IMoneySlipData[]>([]);
   const [isLoadingMoneySlips, setIsLoadingMoneySlips] = useState(false);
@@ -247,7 +252,7 @@ const Rooms = () => {
         return;
       }
 
-      if (room.contract_path) {
+      if (room.contract_path && room.contract_pk) {
         window.open(`${import.meta.env.VITE_APP_SERVER_URL}${room.contract_path}`, '_blank');
       } else {
         openCreateContractModalHandler(room, home);
@@ -356,6 +361,27 @@ const Rooms = () => {
       setMoneySlipToDelete(null);
     }
   }, [moneySlipToDelete, selectedRoom, moneySlipAPI, enqueueSnackbar, refreshMoneySlipList]);
+
+  const handleDeleteContract = useCallback((contract_pk: string) => {
+    setContractToDelete(contract_pk);
+    setDeleteContractModalOpen(true);
+  }, []);
+
+  const handleConfirmDeleteContract = useCallback(async () => {
+    console.log('haha nè', contractToDelete)
+    if (!contractToDelete) return;
+    try {
+      await contractAPI.removeContract(contractToDelete);
+      enqueueSnackbar('Xóa phiếu thu hợp đồng', { variant: 'success' });
+      await fetchRooms();
+    } catch (error) {
+      console.error('Error deleting contract:', error);
+      enqueueSnackbar('Lỗi khi xóa phiếu thu', { variant: 'error' });
+    } finally {
+      setDeleteContractModalOpen(false);
+      setContractToDelete('');
+    }
+  }, [contractToDelete, selectedRoom, contractAPI, enqueueSnackbar]);
 
   const handleConfirmDeleteTenant = useCallback(async () => {
     if (!tenantToDelete || !selectedRoom) return;
@@ -564,9 +590,17 @@ const Rooms = () => {
                 className="flex items-center gap-2 cursor-pointer bg-white"
               >
                 <KeenIcon icon="document" className="text-base" />
-                <span>{row.original.contract_path ? "Xem hợp đồng" : "Tạo hợp đồng"}</span>
+                <span>{row.original.contract_pk ? "Xem hợp đồng" : "Tạo hợp đồng"}</span>
               </DropdownMenuItem>
-              <DropdownMenuSeparator />
+              {row.original.contract_pk && (
+                <DropdownMenuItem 
+                  onClick={() => handleDeleteContract(row.original.contract_pk || '')}
+                  className="flex items-center gap-2 cursor-pointer bg-white"
+                >
+                  <KeenIcon icon="document" className="trash" />
+                  <span>{"Xóa hợp đồng"}</span>
+                </DropdownMenuItem>
+              )}
               <DropdownMenuItem 
                 onClick={() => handleCopyContractLink(row.original)}
                 className="flex items-center gap-2 cursor-pointer bg-white"
@@ -581,7 +615,6 @@ const Rooms = () => {
                 <KeenIcon icon="pencil" className="text-base" />
                 <span>Đi tới trang ký hợp đồng</span>
               </DropdownMenuItem>
-              <DropdownMenuSeparator />
               <DropdownMenuItem 
                 onClick={() => openEditModalHandler(row.original)}
                 className="flex items-center gap-2 cursor-pointer bg-white"
@@ -637,8 +670,6 @@ const Rooms = () => {
     await fetchRooms(); // gọi fetchRooms cũ
     await homeManagement.fetchHomes(); // gọi hàm bổ sung
   };
-
-  console.log('homeData', homeData, selectedHome)
 
   return (
     <Fragment>
@@ -796,6 +827,14 @@ const Rooms = () => {
         onConfirm={handleConfirmDeleteMoneySlip}
         title="Xóa phiếu thu"
         message={`Bạn có chắc chắn muốn xóa phiếu thu này không?`}
+      />
+
+      <ModalConfirmDelete
+        open={deleteContractModalOpen}
+        onClose={() => setDeleteContractModalOpen(false)}
+        onConfirm={handleConfirmDeleteContract}
+        title="Xóa hợp đồng"
+        message={`Bạn có chắc chắn muốn xóa hợp đồng này không?`}
       />
 
 

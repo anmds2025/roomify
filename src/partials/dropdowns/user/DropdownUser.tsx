@@ -29,6 +29,13 @@ const DropdownUser = ({ menuTtemRef = undefined }: { menuTtemRef?: React.RefObje
     });
   };
 
+  const handleSignOut = () => {
+    storeSettings({
+      mode: 'light'
+    });
+    logout()
+  };
+
   const buildHeader = () => {
     return (
       <div className="flex items-center justify-between px-5 py-1.5 gap-1.5">
@@ -103,10 +110,28 @@ const DropdownUser = ({ menuTtemRef = undefined }: { menuTtemRef?: React.RefObje
   const buildFooter = () => {
     return (
       <div className="flex flex-col">
+        <div className="menu-item mb-0.5">
+          <div className="menu-link">
+            <span className="menu-icon">
+              <KeenIcon icon="moon" />
+            </span>
+            <span className="menu-title">Dark Mode</span>
+            <label className="switch switch-sm">
+              <input
+                name="theme"
+                type="checkbox"
+                checked={settings.mode === 'dark'}
+                onChange={handleThemeMode}
+                value="1"
+              />
+            </label>
+          </div>
+        </div>
+
         <div className="menu-item px-4 py-1.5">
-          <a onClick={logout} className="btn btn-sm btn-light justify-center">
-          Đăng xuất
-          </a>
+          <div onClick={handleSignOut} className="btn btn-sm btn-light justify-center">
+            Sign Out
+          </div>
         </div>
       </div>
     );

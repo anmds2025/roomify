@@ -69,22 +69,22 @@ const Login = () => {
   return (
     <div className="card max-w-[392px] w-full">
       <form
-        className="card-body flex flex-col gap-5 p-10"
+        className="card-body flex flex-col gap-5 p-10 dark:bg-white"
         onSubmit={formik.handleSubmit}
         noValidate
       >
         <div className="text-center mb-2.5">
-          <div className='flex gap-2 items-center justify-center text-[#1A2B49] text-lg font-bold'>
+          <div className='flex gap-2 items-center justify-center text-[#1A2B49] dark:text-[#1A2B49] text-lg font-bold'>
             ADMIN
           </div>
-          <div className="flex items-center justify-center font-medium mt-6 text-[#1A2B49] text-lg">
+          <div className="flex items-center justify-center font-medium mt-6 text-[#1A2B49] dark:text-[#1A2B49] text-lg">
             Đăng nhập
           </div>
         </div>
 
         <div className="flex flex-col gap-1">
-          <label className="form-label text-gray-900">Tài khoản</label>
-          <label className="input">
+          <label className="form-label text-gray-900 dark:text-[#1A2B49]">Tài khoản</label>
+          <label className="input dark:bg-white">
             <input
               placeholder="Vui lòng nhập tài khoản"
               autoComplete="off"
@@ -105,7 +105,7 @@ const Login = () => {
           <div className="flex items-center justify-between gap-1">
             <label className="form-label text-gray-900">Mật khẩu</label>
           </div>
-          <label className="input">
+          <label className="input dark:bg-white">
             <input
               type={showPassword ? 'text' : 'password'}
               placeholder="Nhập mật khẩu"
@@ -131,13 +131,13 @@ const Login = () => {
         </div>
         
         <div className='w-full flex justify-between'>
-          <label className="checkbox-group">
+          <label className="checkbox-group dark:bg-white">
             <input
-              className="checkbox checkbox-sm"
+              className="checkbox checkbox-sm dark:bg-white"
               type="checkbox"
               {...formik.getFieldProps('remember')}
             />
-            <span className="checkbox-label">Nhớ tài khoản</span>
+            <span className="checkbox-label dark:bg-white">Nhớ tài khoản</span>
           </label>
           <Link
             to={
