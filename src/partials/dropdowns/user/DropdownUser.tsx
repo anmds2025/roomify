@@ -21,12 +21,11 @@ const DropdownUser = ({ menuTtemRef = undefined }: { menuTtemRef?: React.RefObje
   const { currentUser } = useAuthContext();
 
   const handleThemeMode = (event: ChangeEvent<HTMLInputElement>) => {
-    console.log('checked:' + event.target.checked);
     const newMode = event.target.checked ? 'dark' : 'light';
-
     storeSettings({
       mode: newMode
     });
+    window.location.reload();
   };
 
   const handleSignOut = () => {
