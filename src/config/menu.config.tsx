@@ -48,6 +48,16 @@ export const MENU_SIDEBAR: MenuConfigType = [
         path: '/deposit'
       },
     ]
+  },
+  {
+    title: 'Quản lý nội thất',
+    icon: 'bar-chart',
+    children: [
+      {
+        title: 'Danh sách nội thất',
+        path: '/'
+      },
+    ]
   }
 ];
 
