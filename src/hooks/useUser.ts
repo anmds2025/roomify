@@ -13,7 +13,6 @@ export const useUser = () => {
     const getUsers = useCallback(async () => {
         setIsLoading(true);
         setError(null);
-
         try {
             if(currentUser)
             {

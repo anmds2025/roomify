@@ -368,7 +368,6 @@ const Rooms = () => {
   }, []);
 
   const handleConfirmDeleteContract = useCallback(async () => {
-    console.log('haha nè', contractToDelete)
     if (!contractToDelete) return;
     try {
       await contractAPI.removeContract(contractToDelete);

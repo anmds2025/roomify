@@ -38,6 +38,16 @@ export const MENU_SIDEBAR: MenuConfigType = [
         path: '/users'
       },
     ]
+  },
+  {
+    title: 'Quản lý giấy cọc',
+    icon: 'dollar',
+    children: [
+      {
+        title: 'Danh sách giấy cọc',
+        path: '/deposit'
+      },
+    ]
   }
 ];
 
