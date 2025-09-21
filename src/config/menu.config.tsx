@@ -55,7 +55,7 @@ export const MENU_SIDEBAR: MenuConfigType = [
     children: [
       {
         title: 'Danh sách nội thất',
-        path: '/'
+        path: '/interior'
       },
     ]
   }

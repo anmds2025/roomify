@@ -90,6 +90,7 @@ import { ContractSigningPage } from '@/pages/contract-signing/ContractSigningPag
 import { CheckUserMailPage } from '@/pages/account/home/user-profile/CheckUserMailPage';
 import { ExpensePage } from '@/pages/dashboards/finance/ExpensePage';
 import { DepositPage } from '@/pages/dashboards/deposit/DepositPage';
+import { InteriorPage } from '@/pages/dashboards/interior/InteriorPage';
 
 const AppRouting = (): ReactElement => {
   const { setProgressBarLoader } = useLoaders();
@@ -182,6 +183,7 @@ const AppRouting = (): ReactElement => {
 
           <Route element={<RequireAuth allowedLelves={['Root', 'Admin']} />}>
             <Route path="/rooms" element={<RoomPage />} />
+            <Route path="/interior" element={<InteriorPage />} />
           </Route>
 
           <Route element={<RequireAuth allowedLelves={['Root', 'Admin']} />}>
