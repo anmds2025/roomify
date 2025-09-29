@@ -1,4 +1,4 @@
-import React, { forwardRef, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -9,6 +9,7 @@ import { toast } from 'react-toastify';
 import { ModalUpdateExpenseProps } from '@/api/expense';
 import { useExpense } from '@/hooks/useExpense';
 import { IOption, useAuthContext } from '@/auth';
+import { useCloudinary } from '@/utils';
 
 interface RenderFieldProps {
   type: string;
@@ -113,6 +114,8 @@ const ModalUpdateExpense = forwardRef<HTMLDivElement, ModalUpdateExpenseProps>(
   ({ open, onClose, expense, fetchExpense, homeData }, ref) => {
     const { createExpense, updateExpense } = useExpense();
     const { currentUser } = useAuthContext();
+    const { uploadImage, deleteImage, extractPublicId } = useCloudinary();
+    const qrFileInputRef = useRef<HTMLInputElement | null>(null);
     const [homeOptions, setHomeOptions] = useState<IOption[]>([]);
     // Form state
     const [formData, setFormData] = useState({
@@ -120,7 +123,11 @@ const ModalUpdateExpense = forwardRef<HTMLDivElement, ModalUpdateExpenseProps>(
       total: 0,
       month: '',
       home_pk: '',
+      image: ''
     });
+
+    const [qrImageFile, setQrImageFile] = useState<File | null>(null);
+    const [qrImageFileStr, setQrImageFileStr] = useState<string | null>(null);
 
     // Error state
     const [errors, setErrors] = useState({
@@ -138,7 +145,16 @@ const ModalUpdateExpense = forwardRef<HTMLDivElement, ModalUpdateExpenseProps>(
           total: expense?.total || 0,
           month: expense?.month || '',
           home_pk: expense?.home_pk || '',
+          image: expense?.image || '',
         });
+        if(expense.image)
+        {
+          setQrImageFileStr(expense?.image);
+        }
+        else
+        {
+          setQrImageFileStr("")
+        }
       }
     }, [expense]);
 
@@ -158,8 +174,11 @@ const ModalUpdateExpense = forwardRef<HTMLDivElement, ModalUpdateExpenseProps>(
         title: '',
         total: 0,
         month: '',
-        home_pk: ''
+        home_pk: '',
+        image: ''
       });
+      setQrImageFile(null);
+      setQrImageFileStr(null);
       setErrors({
         title: false,
         total: false,
@@ -209,8 +228,40 @@ const ModalUpdateExpense = forwardRef<HTMLDivElement, ModalUpdateExpenseProps>(
     // Handle form submission
     const handleUpdate = useCallback(async () => {
       if (!validateForm()) return;
+      let qrImageUrl = expense?.image || '';
+      let qrPublicId = null;
 
       try {
+        if (qrImageFile) {
+          toast.info("Đang upload ảnh...");
+          
+          try {
+            const uploadResult = await uploadImage(
+              qrImageFile,
+              'expense', // folder trên Cloudinary
+              ['expense_image'] // tags
+            );
+            
+            qrImageUrl = uploadResult.secure_url;
+            qrPublicId = uploadResult.public_id;
+
+            toast.success("Upload ảnh thành công!");
+            
+            // Xóa ảnh cũ nếu có
+            if (expense?.image) {
+              const oldPublicId = extractPublicId(expense.image);
+              if (oldPublicId) {
+                await deleteImage(oldPublicId);
+              }
+            }
+          } catch (uploadError) {
+            console.error('Failed to upload ảnh:', uploadError);
+            if (qrPublicId) {
+              await deleteImage(qrPublicId);
+            }
+            toast.error("Lỗi upload ảnh, nhưng thông tin khác đã được cập nhật");
+          }
+        }
         const payload = {
           pk: expense?._id?.$oid || "",
           user_pk : currentUser?._id.$oid || '',
@@ -218,6 +269,7 @@ const ModalUpdateExpense = forwardRef<HTMLDivElement, ModalUpdateExpenseProps>(
           total: formData.total,
           month: formData.month,
           home_pk: formData.home_pk,
+          image: qrImageUrl
         };
 
         if(isEdit) {
@@ -235,19 +287,35 @@ const ModalUpdateExpense = forwardRef<HTMLDivElement, ModalUpdateExpenseProps>(
         console.error('Failed to update expense', error);
         toast.error("Lỗi cập nhật thông tin");
       }
-    }, [validateForm, expense, formData, updateExpense, handleClose, fetchExpense, isEdit, createExpense]);
+    }, [validateForm, expense, formData, updateExpense, handleClose, fetchExpense, isEdit, createExpense, qrImageFile]);
 
-  const generateMonthOptions = () => {
-    const options = [];
-    const now = new Date();
-    for (let i = 0; i < 12; i++) {
-      const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
-      const value = `${date.getMonth() + 1}/${date.getFullYear()}`; // Match API format
-      const label = `${date.getMonth() + 1}/${date.getFullYear()}`;
-      options.push({ value, label });
-    }
-    return options;
-  };
+    const generateMonthOptions = () => {
+      const options = [];
+      const now = new Date();
+      for (let i = 0; i < 12; i++) {
+        const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const value = `${date.getMonth() + 1}/${date.getFullYear()}`; // Match API format
+        const label = `${date.getMonth() + 1}/${date.getFullYear()}`;
+        options.push({ value, label });
+      }
+      return options;
+    };
+
+    const handleQrBoxClick = useCallback(() => {
+      qrFileInputRef.current?.click();
+    }, []);
+
+    const qrImageUrl = useMemo(() => {
+      return qrImageFileStr || expense?.image || '';
+    }, [qrImageFileStr, expense?.image]);
+
+    const handleQrFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (file) {
+        setQrImageFileStr(URL.createObjectURL(file));
+        setQrImageFile(file);
+      }
+    }, []);
 
     return (
       <Dialog open={open} onOpenChange={handleClose}>
@@ -259,7 +327,7 @@ const ModalUpdateExpense = forwardRef<HTMLDivElement, ModalUpdateExpenseProps>(
           </DialogHeader>
 
           <div className="py-6 px-6">
-             <div className="space-y-6">
+              <div className="space-y-6">
               {/* Cột trái - Thông tin cơ bản */}
               <div className="space-y-8">
                 <div>
@@ -307,6 +375,47 @@ const ModalUpdateExpense = forwardRef<HTMLDivElement, ModalUpdateExpenseProps>(
                         label: t.label,
                       }))}
                     />
+                    <div className="flex items-center gap-4">
+                      <div 
+                        className="image-input size-48 cursor-pointer" 
+                        onClick={handleQrBoxClick}
+                      >
+                        <div className="image-input-placeholder rounded-lg border-2 border-gray-300 hover:border-primary transition-colors">
+                          {qrImageUrl ? (
+                            <img
+                              src={qrImageUrl}
+                              alt="QR Code"
+                              className="h-full w-full object-cover rounded-lg"
+                            />
+                          ) : (
+                            <div className="h-full w-full flex items-center justify-center bg-gray-100 rounded-lg">
+                              <KeenIcon icon="qr-code" className="w-8 h-8 text-gray-400" />
+                            </div>
+                          )}
+                          <input
+                            type="file"
+                            accept="image/*"
+                            ref={qrFileInputRef}
+                            className="hidden"
+                            onChange={handleQrFileChange}
+                          />
+                          <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-lg opacity-0 hover:opacity-100 transition-opacity">
+                            <KeenIcon icon="camera" className="w-6 h-6 text-white" />
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="flex-1">
+                        <p className="text-xs text-gray-500">
+                          Click để upload ảnh cho chi phí
+                        </p>
+                        {qrImageFile && (
+                          <p className="text-xs text-green-600 mt-1">
+                            ✓ Đã chọn file: {qrImageFile.name}
+                          </p>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>

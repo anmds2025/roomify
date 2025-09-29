@@ -17,6 +17,7 @@ export interface IExpenseData {
   title: string;
   total: number;
   month: string;
+  image: string;
   timeUpdate: { $date: number }; 
   timeCreate: { $date: number }; 
 }
@@ -33,6 +34,7 @@ export interface UpdateExpensePayload {
   title: string;
   total: number;
   month: string;
+  image: string;
 }
 
 export interface ModalUpdateExpenseProps {
