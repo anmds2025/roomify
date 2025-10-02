@@ -345,26 +345,28 @@ const ModalUpdateRoom = forwardRef<HTMLDivElement, ModalUpdateRoomProps>(
                   />
                 </div>
               </div>
-
-              <div className="col-span-2">
-                <label className="block font-medium mb-2">Nội thất</label>
-                <div className="grid grid-cols-2 gap-3">
-                  {dataInterior?.map((item: any) => (
-                    <label
-                      key={item?._id.$oid}
-                      className="flex items-center gap-2 cursor-pointer"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={selectedInteriorIds.includes(item?._id.$oid)}
-                        onChange={() => handleCheckboxChange(item?._id.$oid)}
-                        className="h-4 w-4 text-blue-600 border-gray-300 rounded"
-                      />
-                      <span>{item.name}</span>
-                    </label>
-                  ))}
+              {dataInterior.length > 0 && (
+                <div className="col-span-2">
+                  <label className="block font-medium mb-2">Nội thất</label>
+                  <div className="grid grid-cols-2 gap-3">
+                    {dataInterior?.map((item: any) => (
+                      <label
+                        key={item?._id.$oid}
+                        className="flex items-center gap-2 cursor-pointer"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={selectedInteriorIds.includes(item?._id.$oid)}
+                          onChange={() => handleCheckboxChange(item?._id.$oid)}
+                          className="h-4 w-4 text-blue-600 border-gray-300 rounded"
+                        />
+                        <span>{item.name}</span>
+                      </label>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
+              
 
               {/* Thông tin bổ sung */}
               <div>
