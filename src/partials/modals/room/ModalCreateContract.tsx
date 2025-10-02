@@ -404,7 +404,7 @@ const ModalCreateContract = forwardRef<HTMLDivElement, ModalCreateContractProps>
                       error={errors.user_pkB}
                     />
                     <FormField
-                      label="Địa chỉ người thuê"
+                      label="Địa chỉ thường trú"
                       value={formData.address_b}
                       onChange={(value) => handleFieldChange('address_b', value)}
                       error={errors.address_b}

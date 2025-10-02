@@ -9,7 +9,7 @@ import { IRoomData } from '@/pages/dashboards/light-sidebar/blocks/rooms/RoomsDa
 import { useRoom } from '@/hooks/useRoom';
 import { Select, SelectItem, SelectContent, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { IOption } from '@/auth';
-
+import { useInteriorManagement } from '@/hooks/useInteriorManagement';
 interface ModalUpdateRoomProps {
   open: boolean;
   onClose: () => void;
@@ -123,7 +123,11 @@ FormField.displayName = 'FormField';
 const ModalUpdateRoom = forwardRef<HTMLDivElement, ModalUpdateRoomProps>(
   ({ open, onClose, room, fetchRooms, homeOptions }, ref) => {
     const { updateRoom } = useRoom();
-
+    const {
+      data: dataInterior,
+      fetchInteriors
+    } = useInteriorManagement();
+    const [selectedInteriorIds, setSelectedInteriorIds] = useState<string[]>([]);
     // Form state
     const [formData, setFormData] = useState({
       room_name: '',
@@ -146,6 +150,10 @@ const ModalUpdateRoom = forwardRef<HTMLDivElement, ModalUpdateRoomProps>(
       type_collect_electricity: false
     });
 
+    useEffect(() => {
+      fetchInteriors()
+    }, []);
+
     // Initialize form data when room changes
     useEffect(() => {
       if (room) {
@@ -159,6 +167,9 @@ const ModalUpdateRoom = forwardRef<HTMLDivElement, ModalUpdateRoomProps>(
           type_collect_water: room.type_collect_water || '',
           type_collect_electricity: room.type_collect_electricity || ''
         });
+        if (room?.interiors) {
+          setSelectedInteriorIds(room.interiors);
+        }
       }
     }, [room]);
 
@@ -174,6 +185,7 @@ const ModalUpdateRoom = forwardRef<HTMLDivElement, ModalUpdateRoomProps>(
         type_collect_water: '',
         type_collect_electricity: ''
       });
+      setSelectedInteriorIds([])
       setErrors({
         room_name: false,
         price: false,
@@ -186,6 +198,12 @@ const ModalUpdateRoom = forwardRef<HTMLDivElement, ModalUpdateRoomProps>(
     }, []);
 
     const isEdit: Boolean = useCallback(() => Boolean(room._id?.$oid), [room])();
+
+    const handleCheckboxChange = (id: string) => {
+      setSelectedInteriorIds((prev) =>
+        prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+      );
+    };
     
     const handleClose = useCallback(() => {
       resetForm();
@@ -220,7 +238,7 @@ const ModalUpdateRoom = forwardRef<HTMLDivElement, ModalUpdateRoomProps>(
         toast.error('Vui lòng điền đầy đủ thông tin bắt buộc');
         return;
       }
-
+     
       try {
         const payload = {
           pk: room._id?.$oid,
@@ -232,7 +250,8 @@ const ModalUpdateRoom = forwardRef<HTMLDivElement, ModalUpdateRoomProps>(
           token: '',
           home_pk: formData.home_pk.trim(),
           type_collect_water: formData.type_collect_water,
-          type_collect_electricity: formData.type_collect_electricity
+          type_collect_electricity: formData.type_collect_electricity,
+          interiors: selectedInteriorIds
         };
 
         await updateRoom(payload);
@@ -242,12 +261,12 @@ const ModalUpdateRoom = forwardRef<HTMLDivElement, ModalUpdateRoomProps>(
       } catch (error) {
         toast.error('Có lỗi khi cập nhật phòng');
       }
-    }, [formData, room._id?.$oid, updateRoom, handleClose, fetchRooms, validateForm]);
+    }, [formData, room._id?.$oid, updateRoom, handleClose, fetchRooms, validateForm, selectedInteriorIds]);
 
     return (
       <Dialog open={open} onOpenChange={handleClose}>
          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-900">
-            <DialogHeader className="sticky top-0 bg-white dark:bg-gray-900">
+            <DialogHeader className="sticky top-0 bg-white z-1 dark:bg-gray-900">
               <DialogTitle className="text-lg font-semibold text-gray-900 dark:text-gray-100 p-2">
               {isEdit ? 'Cập nhật thông tin phòng' : 'Thêm mới phòng'}
             </DialogTitle>
@@ -324,6 +343,26 @@ const ModalUpdateRoom = forwardRef<HTMLDivElement, ModalUpdateRoomProps>(
                       { label: "Cuối tháng", value: "cuoi_thang" }
                     ]}
                   />
+                </div>
+              </div>
+
+              <div className="col-span-2">
+                <label className="block font-medium mb-2">Nội thất</label>
+                <div className="grid grid-cols-2 gap-3">
+                  {dataInterior?.map((item: any) => (
+                    <label
+                      key={item?._id.$oid}
+                      className="flex items-center gap-2 cursor-pointer"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={selectedInteriorIds.includes(item?._id.$oid)}
+                        onChange={() => handleCheckboxChange(item?._id.$oid)}
+                        className="h-4 w-4 text-blue-600 border-gray-300 rounded"
+                      />
+                      <span>{item.name}</span>
+                    </label>
+                  ))}
                 </div>
               </div>
 

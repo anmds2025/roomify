@@ -27,6 +27,7 @@ export interface UpdateRoomPayload {
   type_collect_electricity: string;
   note?: string;
   token: string;
+  interiors: string[]
 }
 
 export interface CreateContractPayload {
@@ -164,7 +165,8 @@ export const updateRoomApi = async (payload: UpdateRoomPayload, user: UserModel)
   try {
     const formData = createFormData({
       ...payload,
-      token: user.token || ''
+      token: user.token || '',
+      interiors: JSON.stringify(payload.interiors)
     });
 
     const response = await axios.post(UPDATE_ROOM_URL, formData);
