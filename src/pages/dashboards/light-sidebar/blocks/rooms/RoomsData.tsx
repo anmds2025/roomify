@@ -1,3 +1,5 @@
+import { SelectedInterior } from "@/partials/modals/room/ModalUpdateRoom";
+
 export interface IRoomData {
   _id?: {
     $oid: string;
@@ -47,7 +49,7 @@ export interface IRoomData {
   longitude?: string;
   type_collect_water?: string;
   type_collect_electricity?: string;
-  interiors: string[];
+  interiors: SelectedInterior[];
   isDeleted?: boolean;
 }
 

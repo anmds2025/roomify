@@ -10,6 +10,7 @@ import { useRoom } from '@/hooks/useRoom';
 import { Select, SelectItem, SelectContent, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { IOption } from '@/auth';
 import { useInteriorManagement } from '@/hooks/useInteriorManagement';
+import { InteriorData } from '@/api/interior';
 interface ModalUpdateRoomProps {
   open: boolean;
   onClose: () => void;
@@ -117,6 +118,12 @@ const FormField = React.memo(({
     )}
   </div>
 ));
+export interface SelectedInterior {
+  id: string;
+  name: string;
+  price: number;
+  condition: string;
+}
 
 FormField.displayName = 'FormField';
 
@@ -127,7 +134,7 @@ const ModalUpdateRoom = forwardRef<HTMLDivElement, ModalUpdateRoomProps>(
       data: dataInterior,
       fetchInteriors
     } = useInteriorManagement();
-    const [selectedInteriorIds, setSelectedInteriorIds] = useState<string[]>([]);
+    const [selectedInteriors, setSelectedInteriors] = useState<SelectedInterior[]>([]);
     // Form state
     const [formData, setFormData] = useState({
       room_name: '',
@@ -167,8 +174,18 @@ const ModalUpdateRoom = forwardRef<HTMLDivElement, ModalUpdateRoomProps>(
           type_collect_water: room.type_collect_water || '',
           type_collect_electricity: room.type_collect_electricity || ''
         });
-        if (room?.interiors) {
-          setSelectedInteriorIds(room.interiors);
+        if (
+          Array.isArray(room?.interiors) &&
+          room.interiors.every(
+            (item) =>
+              item &&
+              typeof item.id === "string" &&
+              typeof item.name === "string" &&
+              typeof item.price === "number" &&
+              typeof item.condition === "string"
+          )
+        ) {
+          setSelectedInteriors(room.interiors as SelectedInterior[]);
         }
       }
     }, [room]);
@@ -185,7 +202,7 @@ const ModalUpdateRoom = forwardRef<HTMLDivElement, ModalUpdateRoomProps>(
         type_collect_water: '',
         type_collect_electricity: ''
       });
-      setSelectedInteriorIds([])
+      setSelectedInteriors([])
       setErrors({
         room_name: false,
         price: false,
@@ -199,9 +216,37 @@ const ModalUpdateRoom = forwardRef<HTMLDivElement, ModalUpdateRoomProps>(
 
     const isEdit: Boolean = useCallback(() => Boolean(room._id?.$oid), [room])();
 
-    const handleCheckboxChange = (id: string) => {
-      setSelectedInteriorIds((prev) =>
-        prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    const handleCheckboxChange = (item: InteriorData) => {
+      const id = item._id.$oid;
+      setSelectedInteriors((prev) => {
+        const exists = prev.find((i) => i.id === id);
+        if (exists) {
+          // Nếu đã chọn rồi => bỏ chọn (xóa khỏi mảng)
+          return prev.filter((i) => i.id !== id);
+        } else {
+          // Nếu chưa có => thêm vào mảng
+          return [
+            ...prev,
+            {
+              id,
+              name: item.name,
+              price: item.price,
+              condition: "",
+            },
+          ];
+        }
+      });
+    };
+
+    const handleFieldInteriorChange = (
+      id: string,
+      field: "price" | "condition",
+      value: string | number
+    ) => {
+      setSelectedInteriors((prev) =>
+        prev.map((item) =>
+          item.id === id ? { ...item, [field]: value } : item
+        )
       );
     };
     
@@ -251,7 +296,7 @@ const ModalUpdateRoom = forwardRef<HTMLDivElement, ModalUpdateRoomProps>(
           home_pk: formData.home_pk.trim(),
           type_collect_water: formData.type_collect_water,
           type_collect_electricity: formData.type_collect_electricity,
-          interiors: selectedInteriorIds
+          interiors: selectedInteriors
         };
 
         await updateRoom(payload);
@@ -261,7 +306,7 @@ const ModalUpdateRoom = forwardRef<HTMLDivElement, ModalUpdateRoomProps>(
       } catch (error) {
         toast.error('Có lỗi khi cập nhật phòng');
       }
-    }, [formData, room._id?.$oid, updateRoom, handleClose, fetchRooms, validateForm, selectedInteriorIds]);
+    }, [formData, room._id?.$oid, updateRoom, handleClose, fetchRooms, validateForm, selectedInteriors]);
 
     return (
       <Dialog open={open} onOpenChange={handleClose}>
@@ -348,21 +393,53 @@ const ModalUpdateRoom = forwardRef<HTMLDivElement, ModalUpdateRoomProps>(
               {dataInterior.length > 0 && (
                 <div className="col-span-2">
                   <label className="block font-medium mb-2">Nội thất</label>
-                  <div className="grid grid-cols-2 gap-3">
-                    {dataInterior?.map((item: any) => (
-                      <label
-                        key={item?._id.$oid}
-                        className="flex items-center gap-2 cursor-pointer"
-                      >
-                        <input
-                          type="checkbox"
-                          checked={selectedInteriorIds.includes(item?._id.$oid)}
-                          onChange={() => handleCheckboxChange(item?._id.$oid)}
-                          className="h-4 w-4 text-blue-600 border-gray-300 rounded"
-                        />
-                        <span>{item.name}</span>
-                      </label>
-                    ))}
+                  <div className="grid grid-cols-1 gap-3">
+                    {dataInterior.map((item) => {
+                      const id = item._id.$oid;
+                      const selected = selectedInteriors.find((i) => i.id === id);
+
+                      return (
+                        <div key={id} className="flex flex-col gap-1 border p-2 rounded-lg">
+                          <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={!!selected}
+                              onChange={() => handleCheckboxChange(item)}
+                              className="h-4 w-4 text-blue-600 border-gray-300 rounded"
+                            />
+                            <span className="font-medium">{item.name}</span>
+                          </label>
+
+                          {selected && (
+                            <div className="ml-6 mt-1 flex flex-col gap-2">
+                              <div className="flex items-center gap-2">
+                                <label className="w-full text-sm text-gray-600">Giá:</label>
+                                <input
+                                  type="number"
+                                  value={selected.price}
+                                  onChange={(e) =>
+                                    handleFieldInteriorChange(id, "price", Number(e.target.value))
+                                  }
+                                  className="border rounded p-1 w-full text-sm"
+                                />
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <label className="w-full text-sm text-gray-600">Tình trạng:</label>
+                                <input
+                                  type="text"
+                                  value={selected.condition}
+                                  onChange={(e) =>
+                                    handleFieldInteriorChange(id, "condition", e.target.value)
+                                  }
+                                  className="border rounded p-1 w-full text-sm"
+                                  placeholder="VD: Mới, Cũ..."
+                                />
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               )}

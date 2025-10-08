@@ -3,6 +3,7 @@ import { getStoredUser, createFormData } from '.';
 import { IRoomData, IDataResponseRoom } from '@/pages/dashboards/light-sidebar/blocks/rooms/RoomsData';
 import { UserModel } from '@/auth';
 import { ITenantData } from '@/types/tenant';
+import { SelectedInterior } from '@/partials/modals/room/ModalUpdateRoom';
 
 // Base API URL
 const API_URL = import.meta.env.VITE_APP_API_URL;
@@ -27,7 +28,7 @@ export interface UpdateRoomPayload {
   type_collect_electricity: string;
   note?: string;
   token: string;
-  interiors: string[]
+  interiors: SelectedInterior[]
 }
 
 export interface CreateContractPayload {
