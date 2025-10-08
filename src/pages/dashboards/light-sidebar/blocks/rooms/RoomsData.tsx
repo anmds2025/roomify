@@ -35,6 +35,7 @@ export interface IRoomData {
   temporary_residence?: string;
   contract_pk?: string;
   contract_path: string;
+  contract_signed?: boolean;
   timeCreate?: {
     $date: string;
   };

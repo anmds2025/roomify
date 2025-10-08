@@ -9,7 +9,6 @@ export interface SignContractPayload {
   pk: string;
   image_a?: string;
   image_b?: string;
-  token: string;
 }
 
 export interface DeleteContractPayload {
@@ -47,22 +46,11 @@ export const signContractApi = async (payload: SignContractPayload): Promise<boo
 };
 
 export const signContract = async (contractId: string, signatureImageUrl: string): Promise<boolean> => {
-  const user = getStoredUser();
-  if (!user?.token) {
-    throw new Error('User not authenticated');
-  }
-
-  // Lấy chữ ký của current user (chủ trọ)
-  const currentUserSignature = (user as any)?.image_signature;
-  if (!currentUserSignature) {
-    throw new Error('Chủ trọ chưa có chữ ký. Vui lòng thêm chữ ký trong phần cập nhật thông tin cá nhân.');
-  }
 
   const payload: SignContractPayload = {
     pk: contractId,
-    image_a: currentUserSignature, // Chữ ký của chủ trọ
+    image_a: '', // Chữ ký của chủ trọ
     image_b: signatureImageUrl,    // Chữ ký của khách
-    token: user.token
   };
 
   return await signContractApi(payload);

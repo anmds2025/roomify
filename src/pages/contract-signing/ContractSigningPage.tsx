@@ -169,13 +169,11 @@ export const ContractSigningPage: React.FC = () => {
         }
         throw error; // Re-throw other errors to be handled by outer catch
       }
-      
       // Show success screen instead of closing window
       setShowSuccessScreen(true);
-      
-    } catch (error) {
+    } catch (error : any) {
       console.error('Failed to sign contract:', error);
-      enqueueSnackbar('Có lỗi xảy ra khi ký hợp đồng. Vui lòng thử lại.', { variant: 'error' });
+      enqueueSnackbar(error.response.data.Error || 'Có lỗi xảy ra khi ký hợp đồng. Vui lòng thử lại.', { variant: 'error' });
       
       // Clean up uploaded signature if contract signing failed
       if (signatureUrl && signatureUrl.includes('cloudinary')) {

@@ -58,7 +58,7 @@ const ModalUpdateProfile = forwardRef<HTMLDivElement, ModalUpdateProfileProps>(
       cccd_address: '',
       cccd_day: '',
       signature: '',
-    });
+    })
 
     // Avatar state
     const [avatarFile, setAvatarFile] = useState<File | null>(null);

@@ -600,20 +600,25 @@ const Rooms = () => {
                   <span>{"Xóa hợp đồng"}</span>
                 </DropdownMenuItem>
               )}
-              <DropdownMenuItem 
-                onClick={() => handleCopyContractLink(row.original)}
-                className="flex items-center gap-2 cursor-pointer bg-white"
-              >
-                <KeenIcon icon="copy" className="text-base" />
-                <span>Sao chép link ký hợp đồng</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={() => handleGoToContractPage(row.original)}
-                className="flex items-center gap-2 cursor-pointer bg-white"
-              >
-                <KeenIcon icon="pencil" className="text-base" />
-                <span>Đi tới trang ký hợp đồng</span>
-              </DropdownMenuItem>
+              {!row.original.contract_signed && (
+              <>
+                <DropdownMenuItem 
+                  onClick={() => handleCopyContractLink(row.original)}
+                  className="flex items-center gap-2 cursor-pointer bg-white"
+                >
+                  <KeenIcon icon="copy" className="text-base" />
+                  <span>Sao chép link ký hợp đồng</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => handleGoToContractPage(row.original)}
+                  className="flex items-center gap-2 cursor-pointer bg-white"
+                >
+                  <KeenIcon icon="pencil" className="text-base" />
+                  <span>Đi tới trang ký hợp đồng</span>
+                </DropdownMenuItem>
+              </>
+              )}
+              
               <DropdownMenuItem 
                 onClick={() => openEditModalHandler(row.original)}
                 className="flex items-center gap-2 cursor-pointer bg-white"
