@@ -208,7 +208,7 @@ const BulkMoneySlipModal: React.FC<BulkMoneySlipModalProps> = ({ open, onClose, 
               })}
             </div>
             <div className="mt-2 text-sm text-gray-500">
-              Đã chọn {rooms.length} phòng. Bấm "Lưu danh sách" để tạo mảng dữ liệu gửi API.
+              Đã chọn {rooms.length} phòng. Bấm "Tạo hàng loạt" để tạo
             </div>
             <div className="flex justify-end gap-2 mt-4">
               <button className="btn btn-sm btn-light" onClick={onClose}>Hủy</button>
@@ -217,7 +217,7 @@ const BulkMoneySlipModal: React.FC<BulkMoneySlipModalProps> = ({ open, onClose, 
                 onClick={handleUpdate}
                 disabled={!isValid}
               >
-                Lưu danh sách
+                Tạo hàng loạt
               </button>
             </div>
           </ModalBody>
