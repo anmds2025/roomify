@@ -31,6 +31,8 @@ import { IMoneySlipData, IMoneySlipFormData } from '@/types/moneySlip';
 import { MoneySlipFormModal } from '@/components/MoneySlipFormModal';
 import { useMoneySlip } from '@/hooks/useMoneySlip';
 import { useContract } from '@/hooks/useContract';
+import { Modal, ModalBody, ModalContent, ModalHeader } from '@/components/modal';
+import { BulkMoneySlipModal } from '@/components/BulkMoneySlipModal';
 // Component cho search input
 const SearchInput = React.memo(({ value, onChange, placeholder }: {
   value: string;
@@ -165,6 +167,35 @@ const Rooms = () => {
   const [moneySlips, setMoneySlips] = useState<IMoneySlipData[]>([]);
   const [isLoadingMoneySlips, setIsLoadingMoneySlips] = useState(false);
   const [formModalMoneySlipOpen, setFormModalMoneySlipOpen] = useState(false);
+
+  // Bulk money slip state
+  const [selectedRowIdsState, setSelectedRowIdsState] = useState<Set<string>>(new Set());
+  const [bulkModalOpen, setBulkModalOpen] = useState(false);
+  const [bulkForm, setBulkForm] = useState({
+    name: '',
+    waterOld: '',
+    waterNew: '',
+    numPeo: '',
+    debt: '',
+    elecOld: '',
+    elecNew: ''
+  });
+  const [bulkEntries, setBulkEntries] = useState<Record<string, {
+    name: string;
+    waterOld: string;
+    waterNew: string;
+    numPeo: string;
+    debt: string;
+    elecOld: string;
+    elecNew: string;
+  }>>({});
+
+  const selectedRooms = useMemo(() => {
+    if (!selectedRowIdsState || selectedRowIdsState.size === 0) return [] as IRoomData[];
+    return Array.from(selectedRowIdsState)
+      .map((id) => filteredData[Number(id)])
+      .filter(Boolean);
+  }, [selectedRowIdsState, filteredData]);
 
   useEffect(() => {
     fetchRooms();
@@ -656,14 +687,38 @@ const Rooms = () => {
 
   // Handlers
   const handleRowsSelectChange = useCallback((selectedRowIds: TDataGridSelectedRowIds) => {
+    setSelectedRowIdsState(new Set(selectedRowIds));
     enqueueSnackbar(
-      selectedRowIds.size > 0 ? `${selectedRowIds.size} rows selected` : `No rows are selected`,
+      selectedRowIds.size > 0 ? `${selectedRowIds.size} phòng được chọn` : `Không có phòng nào được chọn`,
       { 
         variant: 'solid', 
         state: 'dark'
       }
     );
   }, []);
+
+  const openBulkMoneySlip = useCallback(() => {
+    if (selectedRooms.length === 0) {
+      enqueueSnackbar('Vui lòng chọn ít nhất 1 phòng', { variant: 'error' });
+      return;
+    }
+    // Initialize per-room entries (prefill from room if available)
+    const initial: Record<string, any> = {};
+    selectedRooms.forEach((room) => {
+      const key = (room as any).pk || room._id?.$oid || String(room.room_name);
+      initial[key] = {
+        name: bulkForm.name || '',
+        waterOld: (room as any)?.numWaterOld?.toString?.() || '',
+        waterNew: '',
+        numPeo: (room as any)?.numPeo?.toString?.() || '',
+        debt: '0',
+        elecOld: (room as any)?.numElectricityOld?.toString?.() || '',
+        elecNew: ''
+      };
+    });
+    setBulkEntries(initial);
+    setBulkModalOpen(true);
+  }, [selectedRooms, enqueueSnackbar]);
 
   const handlePaginationChange = useCallback((newPagination: PaginationState) => {
     updatePagination(newPagination);
@@ -710,6 +765,15 @@ const Rooms = () => {
               onRefresh={fetchRooms}
               isLoading={isLoading}
             />
+            <button
+              onClick={openBulkMoneySlip}
+              disabled={selectedRooms.length === 0}
+              className={`btn btn-sm gap-1 items-center rounded-lg ${selectedRooms.length === 0 ? 'btn-light' : 'btn-primary'}`}
+              style={{minWidth: '180px'}}
+            >
+              <KeenIcon icon="dollar" />
+              Tạo phiếu thu hàng loạt
+            </button>
           </div>
         </div>
 
@@ -839,6 +903,17 @@ const Rooms = () => {
         onConfirm={handleConfirmDeleteContract}
         title="Xóa hợp đồng"
         message={`Bạn có chắc chắn muốn xóa hợp đồng này không?`}
+      />
+
+      {/* Bulk Money Slip Modal */}
+      <BulkMoneySlipModal
+        open={bulkModalOpen}
+        onClose={() => setBulkModalOpen(false)}
+        rooms={selectedRooms}
+        onSave={(items) => {
+          console.log('Bulk money slip draft list:', items);
+          enqueueSnackbar(`Đã lưu ${items.length} phiếu thu nháp`, { variant: 'success' });
+        }}
       />
 
 

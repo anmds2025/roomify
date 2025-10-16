@@ -7,6 +7,7 @@ const API_URL = import.meta.env.VITE_APP_API_URL;
 const ENDPOINTS = {
   GET_MONEY_SLIP_LIST: `${API_URL}/moneySlip/gets`,
   UPDATE_MONEY_SLIP: `${API_URL}/moneySlip/create`,
+  CREATE_MONEY_SLIP_MANY: `${API_URL}/moneySlip/createMany`,
   DELETE_MONEY_SLIP: `${API_URL}/moneySlip/delete`,
 } as const;
 
@@ -25,6 +26,25 @@ export interface UpdateMoneySlipPayload extends IMoneySlipFormData {
   pk?: string;
   room_pk: string;
   token: string;
+}
+
+export interface MoneySlipItem {
+  pk: string;
+  elecOld: string;
+  elecNew: string;
+  waterOld?: string;
+  waterNew?: string;
+  numPeo: string;
+  debt: string;
+  nameB: string;
+}
+
+
+export interface CreateMoneySlipPayloadMany {
+  token: string;
+  today: string;
+  monthNumber: string;
+  list_data: MoneySlipItem[];
 }
 
 export interface DeleteMoneySlipPayload {
@@ -51,6 +71,23 @@ export const updateMoneySlip = async (payload: UpdateMoneySlipPayload): Promise<
   try {
     const formData = createFormData(payload);
     const response = await axios.post(ENDPOINTS.UPDATE_MONEY_SLIP, formData, {
+      headers: FORM_DATA_HEADERS,
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error updating data:', error);
+    throw error;
+  }
+};
+
+export const createMoneySlipManyApi = async (payload: CreateMoneySlipPayloadMany): Promise<any> => {
+  try {
+    const formData = new FormData();
+    formData.append("list_data", JSON.stringify(payload.list_data)); // quan trọng
+    formData.append("today", payload.today);
+    formData.append("monthNumber", payload.monthNumber);
+    formData.append("token", payload.token);
+    const response = await axios.post(ENDPOINTS.CREATE_MONEY_SLIP_MANY, formData, {
       headers: FORM_DATA_HEADERS,
     });
     return response.data;

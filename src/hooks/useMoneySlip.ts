@@ -3,7 +3,7 @@ import { useAuthContext } from '@/auth';
 import { ITenantFormData } from '@/types/tenant';
 import { getUserClientList, updateUserClient, deleteUserClient, GetUserClientListPayload, UpdateTenantPayload, DeleteTenantPayload } from '@/api/tenant';
 import { IMoneySlipFormData } from '@/types/moneySlip';
-import { deleteMoneySlip, getMoneySlipList, GetMoneySlipListPayload, updateMoneySlip, UpdateMoneySlipPayload } from '@/api/moneySlip';
+import { createMoneySlipManyApi, CreateMoneySlipPayloadMany, deleteMoneySlip, getMoneySlipList, GetMoneySlipListPayload, MoneySlipItem, updateMoneySlip, UpdateMoneySlipPayload } from '@/api/moneySlip';
 
 const AUTH_ERROR = 'No authentication token available';
 
@@ -33,6 +33,19 @@ export const useMoneySlip = () => {
     return updateMoneySlip(payload);
   }, [currentUser?.token]);
 
+  const createMoneySlipMany = useCallback(async (today: string, monthNumber: string,  list_data: MoneySlipItem[]) => {
+    if (!currentUser?.token) throw new Error(AUTH_ERROR);
+
+    const payload: CreateMoneySlipPayloadMany = {
+      list_data,
+      today,
+      monthNumber,
+      token: currentUser.token,
+    };
+
+    return createMoneySlipManyApi(payload);
+  }, [currentUser?.token]);
+
   const removeMoneySlip = useCallback(async (moneySlipPk: string) => {
     if (!currentUser?.token) throw new Error(AUTH_ERROR);
 
@@ -49,5 +62,6 @@ export const useMoneySlip = () => {
     fetchMoneySlips,
     createMoneySlip,
     removeMoneySlip,
-  }), [fetchMoneySlips, createMoneySlip, removeMoneySlip]);
+    createMoneySlipMany,
+  }), [fetchMoneySlips, createMoneySlip, removeMoneySlip, createMoneySlipMany]);
 }; 
