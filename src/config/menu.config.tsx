@@ -27,6 +27,11 @@ export const MENU_SIDEBAR: MenuConfigType = [
         title: 'Quản lý chi phí',
         path: '/expense'
       }
+      ,
+      {
+        title: 'Phiếu thu tiền',
+        path: '/money-slips'
+      }
     ]
   },
   {
