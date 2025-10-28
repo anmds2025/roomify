@@ -46,7 +46,7 @@ const BulkMoneySlipModal: React.FC<BulkMoneySlipModalProps> = ({ open, onClose, 
         debt: '0',
         elecOld: (room as any)?.numElectricityOld?.toString?.() || '',
         elecNew: '',
-        nameB: (room as any)?.userB_name?.toString?.() || ''
+        nameB: (room as any)?.userB_name?.toString?.() || room.name_user_val || ''
       };
     });
     return map;

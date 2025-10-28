@@ -38,6 +38,7 @@ export interface IRoomData {
   contract_pk?: string;
   contract_path: string;
   contract_signed?: boolean;
+  name_user_val?: string;
   timeCreate?: {
     $date: string;
   };
