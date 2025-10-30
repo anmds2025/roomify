@@ -19,10 +19,8 @@ const getRecentMonthOptions = (pastMonths = 6, futureMonths = 12) => {
   const options: { value: string; label: string }[] = [];
   const now = new Date();
 
-  // Tính mốc bắt đầu: 6 tháng trước
   const start = new Date(now.getFullYear(), now.getMonth() - pastMonths, 1);
-
-  const totalMonths = pastMonths + futureMonths + 1; // +1 để bao gồm tháng hiện tại
+  const totalMonths = pastMonths + futureMonths + 1;
 
   for (let i = 0; i < totalMonths; i++) {
     const d = new Date(start.getFullYear(), start.getMonth() + i, 1);
@@ -30,7 +28,7 @@ const getRecentMonthOptions = (pastMonths = 6, futureMonths = 12) => {
     options.push({ value, label: value });
   }
 
-  return options;
+  return options.reverse(); // 🔁 Đảo ngược để tháng mới nhất lên đầu
 };
 
 const MoneySlipPage = () => {
