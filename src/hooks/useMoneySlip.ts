@@ -10,7 +10,7 @@ const AUTH_ERROR = 'No authentication token available';
 export const useMoneySlip = () => {
   const { currentUser } = useAuthContext();
 
-  const fetchMoneySlips = useCallback(async (roomPk: string) => {
+  const fetchMoneySlips = useCallback(async (roomPk?: string) => {
     if (!currentUser?.token) throw new Error(AUTH_ERROR);
 
     const payload: GetMoneySlipListPayload = {

@@ -96,29 +96,19 @@ const MoneySlipPage = () => {
     try {
       setLoadingSlips(true);
 
-      const results = await Promise.all(
-        rooms.map(async (room) => {
-          try {
-            const res = await fetchMoneySlips(room.pk || '');
-            const objs = (res?.objects || []) as any[];
-            return objs.map((s) => normalizeSlip(s, room));
-          } catch {
-            return [] as NormalizedSlip[];
-          }
-        })
-      );
+      // 🔹 Gọi 1 API duy nhất để lấy toàn bộ slips
+      const res = await fetchMoneySlips(); // không cần truyền room.pk
+      const objs = (res?.objects || []) as any[];
 
-      // flatten + dedupe by __id (last write wins)
-      const flat = results.flat();
+      // 🔹 Loại bỏ trùng theo __id
       const map = new Map<string, NormalizedSlip>();
-      for (const slip of flat) {
+      for (const slip of objs) {
         map.set(slip.__id, slip);
       }
       const unique = Array.from(map.values());
 
-      // Sort by month descending (newest first) if month format "M/YYYY"
+      // 🔹 Sắp xếp theo tháng giảm dần
       unique.sort((a, b) => {
-        // fallback if month missing
         const parseMonth = (m?: string) => {
           if (!m) return new Date(0);
           const [mm, yyyy] = m.split('/');
@@ -134,7 +124,7 @@ const MoneySlipPage = () => {
     } finally {
       setLoadingSlips(false);
     }
-  }, [rooms, fetchMoneySlips]);
+  }, [fetchMoneySlips]);
 
   // initial load homes + rooms
   useEffect(() => {

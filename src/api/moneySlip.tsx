@@ -16,7 +16,7 @@ const FORM_DATA_HEADERS = {
 } as const;
 
 export interface GetMoneySlipListPayload {
-  room_pk: string;
+  room_pk?: string;
   page?: number;
   limit?: number;
   token: string;
