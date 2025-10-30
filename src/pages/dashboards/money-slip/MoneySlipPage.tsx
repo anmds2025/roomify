@@ -15,14 +15,21 @@ const formatCurrency = (value?: string) => {
   return `${num.toLocaleString('vi-VN')} VND`;
 };
 
-const getRecentMonthOptions = (numMonths = 12) => {
+const getRecentMonthOptions = (pastMonths = 6, futureMonths = 12) => {
   const options: { value: string; label: string }[] = [];
   const now = new Date();
-  for (let i = 0; i < numMonths; i++) {
-    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+
+  // Tính mốc bắt đầu: 6 tháng trước
+  const start = new Date(now.getFullYear(), now.getMonth() - pastMonths, 1);
+
+  const totalMonths = pastMonths + futureMonths + 1; // +1 để bao gồm tháng hiện tại
+
+  for (let i = 0; i < totalMonths; i++) {
+    const d = new Date(start.getFullYear(), start.getMonth() + i, 1);
     const value = `${d.getMonth() + 1}/${d.getFullYear()}`;
     options.push({ value, label: value });
   }
+
   return options;
 };
 
