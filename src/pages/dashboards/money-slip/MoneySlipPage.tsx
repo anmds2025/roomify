@@ -31,11 +31,11 @@ const getRecentMonthOptions = (pastMonths = 6, futureMonths = 12) => {
 };
 
 type NormalizedSlip = IMoneySlipData & {
-  __id: string;       // normalized unique id
-  home_pk?: string;   // đảm bảo tồn tại
+  __id: string;
+  home_pk?: string;
   room_name?: string;
-  month?: string;     // trimmed
-  totalPrice?: string; // keep as string but normalized
+  month?: string;
+  totalPrice?: string;
 };
 
 const MoneySlipPage = () => {
@@ -76,70 +76,52 @@ const MoneySlipPage = () => {
     }
   }, [getRooms]);
 
-  // Normalize a slip object
-  const normalizeSlip = (s: any, room: IRoomData): NormalizedSlip => {
-    const id = (s._id?.$oid || s.pk || s.id || Math.random()).toString();
-    const month = String(s.month ?? '').trim();
-    const totalPrice = s.totalPrice !== undefined && s.totalPrice !== null ? String(s.totalPrice) : '0';
-    return {
-      ...s,
-      __id: id,
-      room_name: room.room_name,
-      home_pk: room.home_pk,
-      month,
-      totalPrice,
-    };
-  };
-
-  // Fetch all slips for all rooms, normalize and dedupe by __id
+  // ✅ Gọi 1 API duy nhất để lấy toàn bộ slips
   const fetchAllSlips = useCallback(async () => {
     try {
       setLoadingSlips(true);
 
-      // 🔹 Gọi 1 API duy nhất để lấy toàn bộ slips
-      const res = await fetchMoneySlips(); // không cần truyền room.pk
-      const objs = (res?.objects || []) as any[];
+      // Gọi 1 lần API lấy tất cả phiếu
+      const res = await fetchMoneySlips();
+      const slips = (res?.objects || []) as any[];
 
-      // 🔹 Loại bỏ trùng theo __id
-      const map = new Map<string, NormalizedSlip>();
-      for (const slip of objs) {
-        map.set(slip.__id, slip);
-      }
-      const unique = Array.from(map.values());
+      // Sort theo tháng giảm dần (format "M/YYYY")
+      const parseMonth = (m?: string) => {
+        if (!m) return new Date(0);
+        const [mm, yyyy] = m.split('/');
+        const month = Number(mm) - 1;
+        const year = Number(yyyy);
+        if (Number.isNaN(month) || Number.isNaN(year)) return new Date(0);
+        return new Date(year, month, 1);
+      };
 
-      // 🔹 Sắp xếp theo tháng giảm dần
-      unique.sort((a, b) => {
-        const parseMonth = (m?: string) => {
-          if (!m) return new Date(0);
-          const [mm, yyyy] = m.split('/');
-          const month = Number(mm) - 1;
-          const year = Number(yyyy);
-          if (Number.isNaN(month) || Number.isNaN(year)) return new Date(0);
-          return new Date(year, month, 1);
-        };
-        return +parseMonth(b.month) - +parseMonth(a.month);
-      });
+      const sorted = [...slips].sort(
+        (a, b) => +parseMonth(b.month) - +parseMonth(a.month)
+      );
 
-      setSlips(unique);
+      // Set state
+      setSlips(sorted);
+    } catch (err) {
+      console.error('Error fetching money slips:', err);
+      setSlips([]);
     } finally {
       setLoadingSlips(false);
     }
   }, [fetchMoneySlips]);
 
-  // initial load homes + rooms
+
+  // Initial load
   useEffect(() => {
     fetchAllHomes();
     fetchAllRooms();
   }, [fetchAllHomes, fetchAllRooms]);
 
-  // fetch slips once rooms are loaded
+  // Fetch slips sau khi rooms có dữ liệu (để map được room_name)
   useEffect(() => {
-    if (rooms.length > 0) {
-      fetchAllSlips();
-    }
+    if (rooms.length > 0) fetchAllSlips();
   }, [rooms, fetchAllSlips]);
 
-  // filtered list derived from normalized slips
+  // Filter slips theo tòa nhà + tháng
   const filteredSlips = useMemo(() => {
     let list = slips;
     if (selectedHome) {
@@ -158,10 +140,6 @@ const MoneySlipPage = () => {
       return sum + (Number.isNaN(n) ? 0 : n);
     }, 0);
   }, [filteredSlips]);
-
-  // debug
-  // console.log('SLIPS', slips);
-  // console.log('FILTERED', filteredSlips);
 
   return (
     <Fragment>
@@ -211,7 +189,10 @@ const MoneySlipPage = () => {
                   onClick={fetchAllSlips}
                   disabled={loadingSlips}
                 >
-                  <KeenIcon icon="refresh" className={loadingSlips ? 'animate-spin' : ''} />
+                  <KeenIcon
+                    icon="refresh"
+                    className={loadingSlips ? 'animate-spin' : ''}
+                  />
                   Làm mới
                 </button>
               </div>
@@ -229,7 +210,9 @@ const MoneySlipPage = () => {
                     <div className="card">
                       <div className="card-body flex items-center justify-between">
                         <div>
-                          <div className="text-2xl font-semibold">{formatCurrency(totalForMonth)}</div>
+                          <div className="text-2xl font-semibold">
+                            {formatCurrency(totalForMonth)}
+                          </div>
                           <div className="text-2sm text-gray-500">Tổng tiền phiếu thu</div>
                         </div>
                         <KeenIcon icon="receipt" className="text-primary text-3xl" />
@@ -251,16 +234,21 @@ const MoneySlipPage = () => {
                       <div className="size-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                         <KeenIcon icon="receipt" className="text-2xl text-gray-400" />
                       </div>
-                      <h3 className="text-lg font-medium text-gray-900 mb-2">Không có phiếu thu</h3>
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">
+                        Không có phiếu thu
+                      </h3>
                       <p className="text-gray-600">Chọn tòa nhà và tháng để xem phiếu thu.</p>
                     </div>
                   ) : (
                     <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
                       {filteredSlips.map((s) => (
-                        <div key={s.__id} className="card border border-gray-200 hover:shadow-md transition-shadow">
+                        <div
+                          key={s.__id}
+                          className="card border border-gray-200 hover:shadow-md transition-shadow"
+                        >
                           <div className="card-body p-4">
                             <div className="flex items-start justify-between mb-2">
-                              <div className="font-semibold">{s.room_name}</div>
+                              <div className="font-semibold">{s.room_name || 'Phòng ?'}</div>
                               <a
                                 className="btn btn-sm btn-light"
                                 href={`${import.meta.env.VITE_APP_SERVER_URL}${s.moneySlip_path}`}
@@ -271,8 +259,12 @@ const MoneySlipPage = () => {
                               </a>
                             </div>
                             <div className="text-sm text-gray-600">Tháng: {s.month}</div>
-                            <div className="text-sm text-gray-600">Người thuê: {s.user_nameB}</div>
-                            <div className="text-sm font-medium mt-1">Tổng: {formatCurrency(s.totalPrice)}</div>
+                            <div className="text-sm text-gray-600">
+                              Người thuê: {s.user_nameB}
+                            </div>
+                            <div className="text-sm font-medium mt-1">
+                              Tổng: {formatCurrency(s.totalPrice)}
+                            </div>
                           </div>
                         </div>
                       ))}
