@@ -20,6 +20,7 @@ export interface GetMoneySlipListPayload {
   page?: number;
   limit?: number;
   token: string;
+  user_pk: string;
 }
 
 export interface UpdateMoneySlipPayload extends IMoneySlipFormData {

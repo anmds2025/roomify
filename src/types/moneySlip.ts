@@ -8,6 +8,7 @@ export interface IMoneySlipData {
   user_nameA: string;
   user_nameB: string;
   room_pk: string;
+  home_pk?: string;
   room_name: string;
   month: string;
   price: string;

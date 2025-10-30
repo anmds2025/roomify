@@ -14,6 +14,7 @@ export const useMoneySlip = () => {
     if (!currentUser?.token) throw new Error(AUTH_ERROR);
 
     const payload: GetMoneySlipListPayload = {
+      user_pk: currentUser._id.$oid,
       room_pk: roomPk,
       token: currentUser.token,
     };
