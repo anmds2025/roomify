@@ -7,7 +7,7 @@ import { IHomeData } from '@/pages/dashboards/light-sidebar/blocks/homes';
 
 export const useRoomManagement = () => {
   const { enqueueSnackbar } = useSnackbar();
-  const { getRooms, updateRoom, deleteRoom } = useRoom();
+  const { getRooms, updateRoom, deleteRoom, getRoomsByHome } = useRoom();
   const { currentUser } = useAuthContext();
   
   // State management
@@ -46,6 +46,22 @@ export const useRoomManagement = () => {
     }
   }, [getRooms, enqueueSnackbar]);
 
+  const fetchRoomsByHome = useCallback(async (home_pk: string) => {
+    setIsLoading(true);
+    try {
+      const roomsResponse = await getRoomsByHome(home_pk);
+      const data = roomsResponse || [];
+
+      setData(data);
+      setFilteredData(data);
+    } catch (error) {
+      console.error('Error fetching rooms:', error);
+      enqueueSnackbar('Failed to fetch rooms', { variant: 'error' });
+    } finally {
+      setIsLoading(false);
+    }
+  }, [getRoomsByHome, enqueueSnackbar]);
+
   // Filter data
   const filterData = useCallback(() => {
     const filtered = data.filter((room) => {
@@ -59,6 +75,7 @@ export const useRoomManagement = () => {
 
     setFilteredData(filtered);
   }, [searchTerm, data]);
+  
 
   // Update search term
   const updateSearchTerm = useCallback((term: string) => {
@@ -143,6 +160,7 @@ export const useRoomManagement = () => {
     
     // Actions
     fetchRooms,
+    fetchRoomsByHome,
     filterData,
     updateSearchTerm,
     updatePagination,

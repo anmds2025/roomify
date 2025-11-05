@@ -41,11 +41,11 @@ const BulkMoneySlipModal: React.FC<BulkMoneySlipModalProps> = ({ open, onClose, 
       const pk = (room as any).pk || room._id?.$oid || String(room.room_name);
       map[pk] = {
         waterOld: (room as any)?.numWaterOld?.toString?.() || '',
-        waterNew: '',
+        waterNew: (room as any)?.numWaterNew?.toString?.() || '',
         numPeo: (room as any)?.numPeo?.toString?.() || '',
         debt: '0',
         elecOld: (room as any)?.numElectricityOld?.toString?.() || '',
-        elecNew: '',
+        elecNew: (room as any)?.numElectricityNew?.toString?.() || '',
         nameB: (room as any)?.userB_name?.toString?.() || room.name_user_val || ''
       };
     });

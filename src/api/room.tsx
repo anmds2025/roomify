@@ -9,6 +9,7 @@ import { SelectedInterior } from '@/partials/modals/room/ModalUpdateRoom';
 const API_URL = import.meta.env.VITE_APP_API_URL;
 const GET_ROOMS_URL = `${API_URL}/room/getMyRoom`;
 const UPDATE_ROOM_URL = `${API_URL}/room/update`;
+const UPDATE_DATA_ROOM_URL = `${API_URL}/room/updateData`;
 const DELETE_ROOM_URL = `${API_URL}/room/delete`;
 const CREATE_CONTRACT_URL = `${API_URL}/contract/create`;
 
@@ -31,6 +32,12 @@ export interface UpdateRoomPayload {
   interiors: SelectedInterior[]
 }
 
+export interface UpdateDataRoomPayload {
+  room_pk?: string;
+  type: string;
+  oldData: string;
+  newData: string;
+}
 export interface CreateContractPayload {
   user_pkA: string;
   user_pkB?: string;
@@ -162,6 +169,31 @@ export const getRoomsApi = async (user: UserModel): Promise<IRoomData[]> => {
   }
 };
 
+export const getRoomsByHomeApi = async (user: UserModel, home_pk: string): Promise<IRoomData[]> => {
+  try {
+    const formData = createFormData({
+      user_pk: user._id?.$oid || '',
+      token: user.token || '',
+      home_pk: home_pk
+    });
+
+    const response = await axios.post<IDataResponseRoom>(GET_ROOMS_URL, formData);
+    
+    // Kiểm tra response structure
+    if (response.data && response.data.objects) {
+      return response.data.objects;
+    } else if (Array.isArray(response.data)) {
+      return response.data;
+    } else {
+      console.warn('Unexpected response structure:', response.data);
+      return [];
+    }
+  } catch (error) {
+    console.error('Error fetching rooms:', error);
+    throw error;
+  }
+};
+
 export const updateRoomApi = async (payload: UpdateRoomPayload, user: UserModel): Promise<boolean> => {
   try {
     const formData = createFormData({
@@ -171,6 +203,22 @@ export const updateRoomApi = async (payload: UpdateRoomPayload, user: UserModel)
     });
 
     const response = await axios.post(UPDATE_ROOM_URL, formData);
+    return response.status === 200;
+  } catch (error) {
+    console.error('Error updating room:', error);
+    throw error;
+  }
+}
+
+
+export const updateDataRoomApi = async (payload: UpdateDataRoomPayload, user: UserModel): Promise<boolean> => {
+  try {
+    const formData = createFormData({
+      ...payload,
+      token: user.token || '',
+    });
+
+    const response = await axios.post(UPDATE_DATA_ROOM_URL, formData);
     return response.status === 200;
   } catch (error) {
     console.error('Error updating room:', error);

@@ -92,6 +92,9 @@ import { CheckUserMailPage } from '@/pages/account/home/user-profile/CheckUserMa
 import { ExpensePage } from '@/pages/dashboards/finance/ExpensePage';
 import { DepositPage } from '@/pages/dashboards/deposit/DepositPage';
 import { InteriorPage } from '@/pages/dashboards/interior/InteriorPage';
+import { DataElectricity } from '@/pages/dashboards/light-sidebar/blocks/data/DataElectricity';
+import { DataElectricityPage } from '@/pages/dashboards/data/DataElectricityPage';
+import { DataWaterPage } from '@/pages/dashboards/data/DataWaterPage';
 
 const AppRouting = (): ReactElement => {
   const { setProgressBarLoader } = useLoaders();
@@ -180,6 +183,11 @@ const AppRouting = (): ReactElement => {
           <Route element={<RequireAuth allowedLelves={['Root', 'Admin']} />}>
             <Route path="/homes" element={<HomesPage />} />
             <Route path="/deposit" element={<DepositPage />} />
+          </Route>
+
+          <Route element={<RequireAuth allowedLelves={['Root', 'Admin']} />}>
+            <Route path="/data-electricity" element={<DataElectricityPage />} />
+            <Route path="/data-water" element={<DataWaterPage />} />
           </Route>
 
           <Route element={<RequireAuth allowedLelves={['Root', 'Admin']} />}>

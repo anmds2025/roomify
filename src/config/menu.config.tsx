@@ -16,6 +16,20 @@ export const MENU_SIDEBAR: MenuConfigType = [
     ]
   },
   {
+    title: 'Quản lý điện nước',
+    icon: 'electricity',
+    children: [
+      {
+        title: 'Dữ liệu điện',
+        path: '/data-electricity'
+      },
+      {
+        title: 'Dữ liệu nước',
+        path: '/data-water'
+      },
+    ]
+  },
+  {
     title: 'Quản lý tài chính',
     icon: 'chart-line-up',
     children: [

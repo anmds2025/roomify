@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { getRoomsApi, updateRoomApi, deleteRoomApi, UpdateRoomPayload, CreateContractPayload, createContractApi } from '@/api/room';
+import { getRoomsApi, updateRoomApi, deleteRoomApi, UpdateRoomPayload, CreateContractPayload, createContractApi, getRoomsByHomeApi, UpdateDataRoomPayload, updateDataRoomApi } from '@/api/room';
 import { IRoomData } from '@/pages/dashboards/light-sidebar/blocks/rooms/RoomsData';
 import { useAuthContext } from '@/auth';
 import { ITenantData } from '@/types/tenant';
@@ -14,11 +14,25 @@ export const useRoom = () => {
     return await getRoomsApi(currentUser);
   }, [currentUser]);
 
+  const getRoomsByHome = useCallback(async (home_pk : string): Promise<any> => {
+    if (!currentUser) {
+      throw new Error('User not authenticated');
+    }
+    return await getRoomsByHomeApi(currentUser, home_pk);
+  }, [currentUser]);
+
   const updateRoom = useCallback(async (payload: UpdateRoomPayload): Promise<boolean> => {
     if (!currentUser) {
       throw new Error('User not authenticated');
     }
     return await updateRoomApi(payload, currentUser);
+  }, [currentUser]);
+
+  const updateDataRoom = useCallback(async (payload: UpdateDataRoomPayload): Promise<boolean> => {
+    if (!currentUser) {
+      throw new Error('User not authenticated');
+    }
+    return await updateDataRoomApi(payload, currentUser);
   }, [currentUser]);
 
   const deleteRoom = useCallback(async (pk: string): Promise<boolean> => {
@@ -39,6 +53,8 @@ export const useRoom = () => {
     getRooms,
     updateRoom,
     deleteRoom,
-    createContract
+    createContract,
+    getRoomsByHome,
+    updateDataRoom
   };
 }; 

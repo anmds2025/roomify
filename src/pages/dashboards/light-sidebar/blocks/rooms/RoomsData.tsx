@@ -24,7 +24,9 @@ export interface IRoomData {
   junk_price?: number;
   car_price?: number;
   numWaterOld?: number;
+  numWaterNew?: number;
   numElectricityOld?: number;
+  numElectricityNew?: number;
   price: number;
   size: number;
   type?: string;

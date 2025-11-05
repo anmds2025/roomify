@@ -63,28 +63,6 @@ export const useHomeManagement = () => {
     setPagination(newPagination);
   }, []);
 
-  // Modal handlers
-  // Tạm thời ẩn chức năng delete vì backend chưa có endpoint
-  // const openDeleteModalHandler = useCallback((home: IHomeData) => {
-  //   setHomeId(home?.pk || '');
-  //   setOpenDeleteModal(true);
-  // }, []);
-
-  // const closeDeleteModalHandler = useCallback(() => {
-  //   setOpenDeleteModal(false);
-  // }, []);
-
-  // const deleteHomeHandler = useCallback(async () => {
-  //   try {
-  //     // await deleteHome(homeId);
-  //     closeDeleteModalHandler();
-  //     fetchHomes();
-  //     enqueueSnackbar('Xóa tòa nhà thành công', { variant: 'success' });
-  //   } catch (error) {
-  //     enqueueSnackbar('Có lỗi khi xóa tòa nhà', { variant: 'error' });
-  //   }
-  // }, [homeId, closeDeleteModalHandler, fetchHomes, enqueueSnackbar]);
-
   const openEditModalHandler = useCallback((home: IHomeData) => {
     setHomeId(home._id?.$oid || "");
     setHomeUpdate(home);
