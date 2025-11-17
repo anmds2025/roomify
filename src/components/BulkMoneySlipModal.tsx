@@ -56,6 +56,32 @@ const BulkMoneySlipModal: React.FC<BulkMoneySlipModalProps> = ({ open, onClose, 
   const [entries, setEntries] = useState<Record<string, TBulkMoneySlipEntry>>({});
   const [selectedMonth, setSelectedMonth] = useState(''); 
 
+  const calcTotal = (room: IRoomData, e: TBulkMoneySlipEntry) => {
+    const wOld = Number(e.waterOld) || 0;
+    const wNew = Number(e.waterNew) || 0;
+    const eOld = Number(e.elecOld) || 0;
+    const eNew = Number(e.elecNew) || 0;
+    const numPeo = Number(e.numPeo) || 0;
+    const debt = Number(e.debt) || 0;
+    const priceRoom = Number(room.price) || 0;
+
+    if(eNew == 0 || eNew < eOld) return 0
+    if(room.typeWater != "month" && (wNew == 0 || wNew < wOld)) return 0
+
+    const waterPrice = Number((room as any).water_price) || 0;
+    const elecPrice = Number((room as any).electricity_price) || 0;
+    const servicePrice = Number((room as any).service_price) || 0;
+
+    const waterCost =
+      room.typeWater === "month"
+        ? (waterPrice * numPeo)
+        : (wNew - wOld) * waterPrice;
+
+    const elecCost = (eNew - eOld) * elecPrice;
+
+    return waterCost + elecCost + debt + servicePrice + priceRoom;
+  };
+
   useEffect(() => {
     if (open) {
       setEntries(initialEntries);
@@ -201,6 +227,14 @@ const BulkMoneySlipModal: React.FC<BulkMoneySlipModalProps> = ({ open, onClose, 
                       <div className="form-control md:col-span-3 col-span-2">
                         <label className="label"><span className="label-text">Nợ</span></label>
                         <input className="input input-sm input-bordered" value={entry.debt} onChange={(e) => handleChange(pk, 'debt', e.target.value)}/>
+                      </div>
+                      <div className="form-control md:col-span-3 col-span-2">
+                        <label className="label"><span className="label-text">Tổng tiền ước tính</span></label>
+                        <input
+                          className="input input-sm input-bordered bg-gray-100"
+                          value={calcTotal(room, entry).toLocaleString('vi-VN')}
+                          readOnly
+                        />
                       </div>
                     </div>
                   </div>
