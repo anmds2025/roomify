@@ -401,11 +401,11 @@ const Finance = () => {
   return (
     <div className="grid gap-5 lg:gap-7.5">
       <div className="card">
-        <div className="card-header flex-wrap gap-3">
+        <div className="card-header flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h3 className="card-title">Quản lý tài chính</h3>
-          <div className="flex items-center gap-3 ml-auto">
+          <div className='flex w-full flex-col sm:flex-row gap-2 sm:gap-3 sm:items-center sm:ml-auto'>
             <select
-              className="select select-sm w-40"
+              className="select select-sm w-full sm:w-40"
               value={selectedMonth}
               onChange={(e) => setSelectedMonth(e.target.value)}
             >
@@ -418,7 +418,7 @@ const Finance = () => {
             </select>
 
             <select
-              className="select select-sm w-56"
+              className="select select-sm w-full sm:w-56"
               value={selectedBuildingId}
               onChange={(e) => setSelectedBuildingId(e.target.value)}
               disabled={homesLoading}

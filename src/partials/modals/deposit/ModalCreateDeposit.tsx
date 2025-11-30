@@ -423,129 +423,162 @@ const ModalCreateDeposit = forwardRef<HTMLDivElement, ModalCreateDepositProps>(
         }}
       />
       <Dialog open={open} onOpenChange={handleClose}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-900">
-          <DialogHeader className="sticky top-0 bg-white dark:bg-gray-900">
-            <DialogTitle className="text-lg font-semibold text-gray-900 dark:text-gray-100 p-2">
-              {'Thêm giấy cọc'}
+        <DialogContent className="w-[calc(100vw-2rem)] sm:max-w-3xl lg:max-w-4xl max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-900 p-0 rounded-xl">
+
+          {/* Header */}
+          <DialogHeader className="sticky top-0 z-20 bg-white dark:bg-gray-900 border-b border-gray-200 px-4 py-3 sm:px-6">
+            <DialogTitle className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+              Thêm giấy cọc
             </DialogTitle>
           </DialogHeader>
 
-          <div className="py-6 px-6">
-              <div className="space-y-6">
-              <div className="space-y-8">
-                <div>
-                  <div className="flex items-center gap-2 mb-4 font-semibold text-gray-800 text-lg dark:text-black">
-                    <KeenIcon icon="dollar" className="w-4 h-4 text-blue-400 dark:text-black" />
-                    Thông tin cơ bản
-                  </div>
-                  <div className="space-y-5">
-                    <SelectField
-                      label="Tòa nhà"
-                      name="home_pk"
-                      value={selectedHome || ''}
-                      onChange={(name, value) => {
-                        const selectedHome = homeOptions.find(t => t.value === value);
-                        setSelectedHome(selectedHome?.value.toString() || '')
-                        setErrors(prev => ({ ...prev, [name]: false }));
-                      }}
-                      options={homeOptions.map((t) => ({
-                        value: t.value.toString(),
-                        label: t.label,
-                      }))}
-                      required
-                      error={errors.home_pk}
-                      disabled={homeOptions.length === 0}
-                    />
-                    <SelectField
-                      label="Phòng"
-                      name="room_pk"
-                      value={selectedRoom || ''}
-                      onChange={(name, value) => {
-                        const selectedRoom = roomOptions.find(t => t.value === value);
-                        setSelectedRoom(selectedRoom?.value.toString() || '')
-                        setErrors(prev => ({ ...prev, [name]: false }));
-                      }}
-                      options={roomOptions.map((t) => ({
-                        value: t.value.toString(),
-                        label: t.label,
-                      }))}
-                      required
-                      error={errors.room_pk}
-                      disabled={roomOptions.length === 0}
-                    />
-                    <SelectField
-                      label="Người thuê"
-                      name="tenant_pk"
-                      value={selectedTenant || ''}
-                      onChange={(name, value) => {
-                        const selectedTenant = tenantOptions.find(t => t.value === value);
-                        setSelectedTenant(selectedTenant?.value.toString() || '')
-                        setErrors(prev => ({ ...prev, [name]: false }));  
-                      }}
-                      options={tenantOptions.map((t) => ({
-                        value: t.value.toString(),
-                        label: t.label,
-                      }))}
-                      required
-                      error={errors.tenant_pk}
-                      disabled={tenantOptions.length === 0}
-                    />
-                    <FormField
-                      label="Nơi tạo phiếu"
-                      value={formData.addressCreate}
-                      onChange={(value) => handleFieldChange('addressCreate', value)}
-                      error={errors.addressCreate}
-                      required={true}
-                    />
-                    <FormField
-                      label="Số tiền cọc"
-                      value={formData.deposit.toString()}
-                      onChange={(value) => handleFieldChange('deposit', value)}
-                      type="number"
-                      error={errors.deposit}
-                      required={true}
-                    />
-                    <InputField
-                      label="Giữ phòng đến ngày"
-                      name="keepRoomDate"
-                      type="date"
-                      value={formData.keepRoomDate}
-                      onChange={(name, value) => handleFieldChange(name as keyof typeof formData, value)}
-                      error={errors.keepRoomDate}
-                      required={true}
-                    />
-                    <InputField
-                      label="Giá trị đến ngày"
-                      name="valueDate"
-                      type="date"
-                      value={formData.valueDate}
-                      onChange={(name, value) => handleFieldChange(name as keyof typeof formData, value)}
-                      error={errors.valueDate}
-                      required={true}
-                    />
-                  </div>
+          {/* Body */}
+          <div className="py-6 px-4 sm:px-6">
+            <div className="space-y-8">
+
+              {/* Thông tin cơ bản */}
+              <div>
+                <div className="flex items-center gap-2 mb-3 font-semibold text-gray-800 text-lg dark:text-white">
+                  <KeenIcon icon="dollar" className="w-4 h-4 text-blue-500" />
+                  Thông tin cơ bản
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+                  {/* Tòa nhà */}
+                  <SelectField
+                    label="Tòa nhà"
+                    name="home_pk"
+                    value={selectedHome || ''}
+                    onChange={(name, value) => {
+                      const item = homeOptions.find(t => t.value === value);
+                      setSelectedHome(item?.value.toString() || '');
+                      setErrors(prev => ({ ...prev, [name]: false }));
+                    }}
+                    options={homeOptions.map(t => ({
+                      value: t.value.toString(),
+                      label: t.label,
+                    }))}
+                    required
+                    error={errors.home_pk}
+                    disabled={homeOptions.length === 0}
+                  />
+
+                  {/* Phòng */}
+                  <SelectField
+                    label="Phòng"
+                    name="room_pk"
+                    value={selectedRoom || ''}
+                    onChange={(name, value) => {
+                      const item = roomOptions.find(t => t.value === value);
+                      setSelectedRoom(item?.value.toString() || '');
+                      setErrors(prev => ({ ...prev, [name]: false }));
+                    }}
+                    options={roomOptions.map(t => ({
+                      value: t.value.toString(),
+                      label: t.label,
+                    }))}
+                    required
+                    error={errors.room_pk}
+                    disabled={roomOptions.length === 0}
+                  />
+
+                  {/* Người thuê */}
+                  <SelectField
+                    label="Người thuê"
+                    name="tenant_pk"
+                    value={selectedTenant || ''}
+                    onChange={(name, value) => {
+                      const item = tenantOptions.find(t => t.value === value);
+                      setSelectedTenant(item?.value.toString() || '');
+                      setErrors(prev => ({ ...prev, [name]: false }));
+                    }}
+                    options={tenantOptions.map(t => ({
+                      value: t.value.toString(),
+                      label: t.label,
+                    }))}
+                    required
+                    error={errors.tenant_pk}
+                    disabled={tenantOptions.length === 0}
+                  />
+
+                  {/* Nơi tạo phiếu */}
+                  <FormField
+                    label="Nơi tạo phiếu"
+                    value={formData.addressCreate}
+                    onChange={(value) => handleFieldChange("addressCreate", value)}
+                    error={errors.addressCreate}
+                    required
+                  />
+
+                  {/* Số tiền cọc */}
+                  <FormField
+                    label="Số tiền cọc"
+                    value={formData.deposit.toString()}
+                    onChange={(value) => handleFieldChange("deposit", value)}
+                    type="number"
+                    error={errors.deposit}
+                    required
+                  />
+
+                  {/* Giữ phòng đến ngày */}
+                  <InputField
+                    label="Giữ phòng đến ngày"
+                    name="keepRoomDate"
+                    type="date"
+                    value={formData.keepRoomDate}
+                    onChange={(name, value) =>
+                      handleFieldChange(name as keyof typeof formData, value)
+                    }
+                    error={errors.keepRoomDate}
+                    required
+                  />
+
+                  {/* Giá trị đến ngày */}
+                  <InputField
+                    label="Giá trị đến ngày"
+                    name="valueDate"
+                    type="date"
+                    value={formData.valueDate}
+                    onChange={(name, value) =>
+                      handleFieldChange(name as keyof typeof formData, value)
+                    }
+                    error={errors.valueDate}
+                    required
+                  />
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex justify-end gap-3 p-4 border-t border-gray-200">
+          {/* Footer */}
+          <div className="flex justify-end gap-3 p-4 border-t border-gray-200 bg-white dark:bg-gray-900 rounded-b-xl">
+
             <button
               onClick={handleClose}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors"
+              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 
+                border border-gray-300 dark:border-gray-700 rounded-md 
+                hover:bg-gray-50 dark:hover:bg-gray-700 
+                focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
             >
               Hủy bỏ
             </button>
+
             <button
               onClick={handleCreate}
-              className="px-4 py-2 text-sm font-medium text-white bg-primary border border-transparent rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors"
+              className="px-4 py-2 text-sm font-medium text-white bg-primary rounded-md 
+                hover:bg-primary-dark transition-colors 
+                focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
             >
-              {'Thêm mới'}
+              Thêm mới
             </button>
+
           </div>
+
         </DialogContent>
       </Dialog>
+
+
     </>
   );
 }

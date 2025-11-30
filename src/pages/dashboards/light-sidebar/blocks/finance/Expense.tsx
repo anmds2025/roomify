@@ -19,7 +19,7 @@ const SearchInput = React.memo(({ value, onChange, placeholder }: {
   onChange: (value: string) => void;
   placeholder: string;
 }) => (
-  <div className="input input-sm max-w-48">
+  <div className="input input-sm w-full sm:w-auto sm:max-w-60">
     <KeenIcon icon="magnifier" />
     <input
       type="text"
@@ -54,11 +54,11 @@ const ActionButtons = React.memo(({ onAddNew, onRefresh, isLoading }: {
   onRefresh: () => void;
   isLoading: boolean;
 }) => (
-  <div className="flex gap-2">
+  <div className="flex w-full sm:w-auto flex-col sm:flex-row gap-2">
     <button 
       onClick={onRefresh}
       disabled={isLoading}
-      className="btn btn-sm btn-light gap-1 items-center rounded-lg"
+      className="btn btn-sm btn-light gap-1 items-center rounded-lg w-full sm:w-auto"
       style={{minWidth: "80px"}}
     >
       <KeenIcon icon="refresh" />
@@ -66,7 +66,7 @@ const ActionButtons = React.memo(({ onAddNew, onRefresh, isLoading }: {
     </button>
     <button 
       onClick={onAddNew} 
-      className="btn btn-sm btn-primary badge badge-outline badge-primary gap-1 items-center rounded-lg"
+      className="btn btn-sm btn-primary badge badge-outline badge-primary gap-1 items-center rounded-lg w-full sm:w-auto"
       style={{minWidth: "90px"}}
     >
       <KeenIcon icon="add-notepad" />
@@ -106,13 +106,10 @@ const Expense = () => {
     data,
     filteredData,
     searchTerm,
-    pagination,
     isLoading,
     expenseUpdate,
-    expenseId,
     openDeleteModal,
     openEditModal,
-    emptyExpense,
     
     // Actions
     fetchExpenses,
@@ -159,10 +156,11 @@ const Expense = () => {
         id: 'id',
         header: () => 'STT',
         cell: (info) => {
-          return <div>{info.row.index + 1}</div>;
+          return <div className="text-center">{info.row.index + 1}</div>;
         },
         meta: {
           className: 'min-w-[60px] text-center',
+          cellClassName: 'min-w-[60px] text-center'
         },
       },
       {
@@ -170,9 +168,10 @@ const Expense = () => {
         id: 'title',
         header: () => 'Tiêu đề',
         enableSorting: true,
-        cell: (info) => info.getValue(),
+        cell: (info) => <span className="block truncate max-w-[200px] sm:max-w-none">{String(info.getValue())}</span>,
         meta: {
-          className: 'min-w-[200px]',
+          className: 'min-w-[160px]',
+          cellClassName: 'min-w-[160px]'
         }
       },
       {
@@ -182,7 +181,8 @@ const Expense = () => {
         enableSorting: true,
         cell: (info) => info.getValue(),
         meta: {
-          className: 'min-w-[200px]',
+          className: 'hidden md:table-cell min-w-[120px]',
+          cellClassName: 'hidden md:table-cell min-w-[120px]'
         }
       },
       {
@@ -190,9 +190,10 @@ const Expense = () => {
         id: 'total',
         header: () => 'Số tiền',
         enableSorting: true,
-        cell: (info) => info.getValue(),
+        cell: (info) => <span className="whitespace-nowrap">{info.getValue() as any}</span>,
         meta: {
-          className: 'min-w-[150px]',
+          className: 'min-w-[140px] whitespace-nowrap',
+          cellClassName: 'min-w-[140px] whitespace-nowrap'
         }
       },
       {
@@ -201,11 +202,12 @@ const Expense = () => {
         header: () => 'Ngày cập nhật',
         enableSorting: true,
         cell: (info) => {
-          const date = info.getValue();
+          const date = info.getValue() as any;
           return date ? moment(date).format('DD/MM/YYYY') : '';
         },
         meta: {
-          className: 'min-w-[150px]',
+          className: 'hidden md:table-cell min-w-[150px]',
+          cellClassName: 'hidden md:table-cell min-w-[150px]'
         }
       },
       {
@@ -221,7 +223,8 @@ const Expense = () => {
           </button>
         ),
         meta: {
-          className: 'w-[60px]'
+          className: 'w-[60px]',
+          cellClassName: 'w-[60px]'
         }
       },
       {
@@ -237,7 +240,8 @@ const Expense = () => {
           </button>
         ),
         meta: {
-          className: 'w-[60px]'
+          className: 'w-[60px]',
+          cellClassName: 'w-[60px]'
         }
       }
     ],
@@ -273,14 +277,14 @@ const Expense = () => {
     <Fragment>
       <div className="card card-grid h-full min-w-full">
         {/* Header */}
-        <div className="card-header flex justify-end">
-          <div className='flex gap-4'>
-            <div className='max-h-[32px] min-w-48'>
+        <div className="card-header flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className='flex w-full flex-col sm:flex-row gap-2 sm:gap-4 items-stretch sm:items-center'>
+            <div className='w-full sm:w-auto'>
               <Select
                 value={selectedHome}
                 onValueChange={(value) => {filterByHome(value), setSelectedHome(value)}}
               >
-                <SelectTrigger className="max-h-[32px]">
+                <SelectTrigger className="max-h-[32px] w-full">
                   <SelectValue placeholder="Tất cả" />
                 </SelectTrigger>
                 <SelectContent className="bg-white">
@@ -327,11 +331,12 @@ const Expense = () => {
               columns={columns}
               data={filteredData}
               rowSelect={true}
+              tableSpacing="xs"
               paginationSize={20}
               paginationSizes={[5, 10, 20, 50, 100]}
-              initialSorting={[{ id: 'fullname', desc: false }]}
+              initialSorting={[{ id: 'title', desc: false }]}
               saveState={true}
-              saveStateId="Users-grid"
+              saveStateId="Expense-grid"
               onRowsSelectChange={handleRowsSelectChange}
               onPaginationChange={handlePaginationChange}
             />

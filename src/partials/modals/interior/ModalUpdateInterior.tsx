@@ -211,61 +211,79 @@ const ModalUpdateInterior = forwardRef<HTMLDivElement, ModalUpdateInteriorProps>
 
     return (
       <Dialog open={open} onOpenChange={handleClose}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-900">
-          <DialogHeader className="sticky top-0 bg-white dark:bg-gray-900">
-            <DialogTitle className="text-lg font-semibold text-gray-900 dark:text-gray-100 p-2">
-              {isEdit ? 'Cập nhật thông tin chi phí' : 'Thêm mới chi phí'}
+        <DialogContent className="w-[calc(100vw-2rem)] sm:max-w-3xl lg:max-w-4xl max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-900 p-0 rounded-xl">
+
+          {/* Header */}
+          <DialogHeader className="sticky top-0 z-20 bg-white dark:bg-gray-900 border-b border-gray-200 px-4 py-3 sm:px-6">
+            <DialogTitle className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+              {isEdit ? "Cập nhật thông tin nội thất" : "Thêm mới nội thất"}
             </DialogTitle>
           </DialogHeader>
 
-          <div className="py-6 px-6">
-             <div className="space-y-6">
-              {/* Cột trái - Thông tin cơ bản */}
-              <div className="space-y-8">
-                <div>
-                  <div className="flex items-center gap-2 mb-4 font-semibold text-gray-800 text-lg dark:text-black">
-                    <KeenIcon icon="user" className="w-4 h-4 text-blue-400 dark:text-black" />
-                    Thông tin cơ bản
-                  </div>
-                  <div className="space-y-5">
-                    <FormField
-                      label="Tên nội thất"
-                      value={formData.name}
-                      onChange={(value) => handleFieldChange('name', value)}
-                      error={errors.name}
-                      required={true}
-                    />
-                    <FormField
-                      label="Số tiền"
-                      value={formData.price.toString()}
-                      onChange={(value) => handleFieldChange('price', value)}
-                      type="number"
-                      error={errors.price}
-                      required={true}
-                    />
-                  </div>
+          {/* Body */}
+          <div className="py-6 px-4 sm:px-6">
+            <div className="space-y-8">
+
+              {/* Thông tin cơ bản */}
+              <div>
+                <div className="flex items-center gap-2 mb-3 font-semibold text-gray-800 text-lg dark:text-white">
+                  <KeenIcon icon="user" className="w-4 h-4 text-blue-500" />
+                  Thông tin cơ bản
+                </div>
+
+                <div className="space-y-4">
+
+                  {/* Tên nội thất */}
+                  <FormField
+                    label="Tên nội thất"
+                    value={formData.name}
+                    onChange={(value) => handleFieldChange("name", value)}
+                    error={errors.name}
+                    required
+                  />
+
+                  {/* Số tiền */}
+                  <FormField
+                    label="Số tiền"
+                    value={formData.price.toString()}
+                    onChange={(value) => handleFieldChange("price", value)}
+                    type="number"
+                    error={errors.price}
+                    required
+                  />
+
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex justify-end gap-3 p-4 border-t border-gray-200">
+          {/* Footer */}
+          <div className="flex justify-end gap-3 p-4 border-t border-gray-200 bg-white dark:bg-gray-900 rounded-b-xl">
+
             <button
               onClick={handleClose}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors"
+              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 
+                border border-gray-300 dark:border-gray-700 rounded-md 
+                hover:bg-gray-50 dark:hover:bg-gray-700 
+                focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
             >
               Hủy bỏ
             </button>
+
             <button
               onClick={handleUpdate}
-              className="px-4 py-2 text-sm font-medium text-white bg-primary border border-transparent rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors"
+              className="px-4 py-2 text-sm font-medium text-white bg-primary rounded-md 
+                hover:bg-primary-dark transition-colors 
+                focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
             >
-              {isEdit ? 'Cập nhật' : 'Thêm mới'}
+              {isEdit ? "Cập nhật" : "Thêm mới"}
             </button>
+
           </div>
+
         </DialogContent>
       </Dialog>
+
     );
   }
 );

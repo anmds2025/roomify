@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import React, { useEffect, useMemo, useCallback, Fragment, useState } from 'react';
+import { useEffect, useMemo, Fragment, useState } from 'react';
 import { useSnackbar } from 'notistack';
 import { ColumnDef } from '@tanstack/react-table';
 import { DataGrid, KeenIcon } from '@/components';
@@ -18,17 +18,11 @@ interface IWaterData {
   total: number;
 }
 
-interface IUpdateReadingModal {
-  isOpen: boolean;
-  onClose: () => void;
-  data: IWaterData | null;
-  onSave: (newReading: number) => Promise<void>;
-}
 
 const DataWater = () => {
   const { enqueueSnackbar } = useSnackbar();
   const homeManagement = useHomeManagement();
-  const { filteredData, isLoading, fetchRoomsByHome } = useRoomManagement();
+  const { filteredData, fetchRoomsByHome } = useRoomManagement();
   const { updateDataRoom } = useRoom();
 
   const [homeOptions, setHomeOptions] = useState<IOption[]>([]);
@@ -38,6 +32,30 @@ const DataWater = () => {
     isOpen: false,
     data: null,
   });
+
+  // Styles cho react-select (đẹp và thân thiện mobile)
+  const selectStyles = useMemo(() => ({
+    control: (base: any, state: any) => ({
+      ...base,
+      minHeight: 36,
+      height: 36,
+      borderRadius: 8,
+      borderColor: state.isFocused ? '#3b82f6' : base.borderColor,
+      boxShadow: state.isFocused ? '0 0 0 2px rgba(59,130,246,0.2)' : 'none',
+      '&:hover': { borderColor: state.isFocused ? '#3b82f6' : '#cbd5e1' }
+    }),
+    valueContainer: (base: any) => ({
+      ...base,
+      padding: '0 8px'
+    }),
+    indicatorsContainer: (base: any) => ({
+      ...base,
+      height: 36
+    }),
+    dropdownIndicator: (base: any) => ({ ...base, padding: 6 }),
+    clearIndicator: (base: any) => ({ ...base, padding: 6 }),
+    menu: (base: any) => ({ ...base, zIndex: 50 })
+  }), []);
 
   // Load danh sách tòa nhà khi vào trang
   useEffect(() => {
@@ -128,18 +146,22 @@ const DataWater = () => {
       {
         accessorKey: 'roomCode',
         header: 'Tên phòng',
+        meta: { className: 'min-w-[140px]', cellClassName: 'min-w-[140px]' }
       },
       {
         accessorKey: 'oldReading',
         header: 'Số cũ',
+        meta: { className: 'min-w-[100px] whitespace-nowrap', cellClassName: 'min-w-[100px] whitespace-nowrap' }
       },
       {
         accessorKey: 'newReading',
         header: 'Số mới',
+        meta: { className: 'min-w-[100px] whitespace-nowrap', cellClassName: 'min-w-[100px] whitespace-nowrap' }
       },
       {
         accessorKey: 'consumption',
         header: 'Tiêu thụ',
+        meta: { className: 'hidden md:table-cell min-w-[100px]', cellClassName: 'hidden md:table-cell min-w-[100px]' }
       },
       {
         accessorKey: 'unitPrice',
@@ -148,6 +170,7 @@ const DataWater = () => {
           const value = row.original.unitPrice || 0;
           return `${value.toLocaleString('vi-VN')} VND`;
         },
+        meta: { className: 'hidden md:table-cell min-w-[120px]', cellClassName: 'hidden md:table-cell min-w-[120px]' }
       },
       {
         accessorKey: 'total',
@@ -191,7 +214,19 @@ const DataWater = () => {
               onChange={(option) => setSelectedHome(String(option?.value || ''))}
               options={homeOptions}
               placeholder="Chọn tòa nhà..."
-              className="max-w-xs"
+              className="w-full sm:max-w-64"
+              styles={selectStyles}
+              theme={(theme) => ({
+                ...theme,
+                borderRadius: 8,
+                colors: {
+                  ...theme.colors,
+                  primary: '#3b82f6',
+                  primary25: '#DBEAFE',
+                  neutral20: '#cbd5e1',
+                  neutral30: '#94a3b8',
+                },
+              })}
             />
           </div>
 
@@ -200,6 +235,7 @@ const DataWater = () => {
             <DataGrid
               columns={columns}
               data={waterData}
+              tableSpacing="xs"
               paginationSize={20}
               paginationSizes={[5, 10, 20, 50, 100]}
               saveState

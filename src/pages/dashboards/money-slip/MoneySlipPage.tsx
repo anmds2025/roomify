@@ -146,11 +146,11 @@ const MoneySlipPage = () => {
       <Container width="fluid">
         <div className="grid gap-5 lg:gap-7.5 items-stretch">
           <div className="card">
-            <div className="card-header flex-wrap gap-3">
+            <div className="card-header flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <h3 className="card-title">Quản lý phiếu thu tiền</h3>
-              <div className="ml-auto flex items-center gap-3">
+              <div className='flex w-full flex-col sm:flex-row gap-2 sm:gap-3 sm:items-center sm:ml-auto'>
                 <select
-                  className="select select-sm w-40"
+                  className="select select-sm w-full sm:w-40"
                   value={selectedMonth}
                   onChange={(e) => setSelectedMonth(e.target.value)}
                 >
@@ -163,7 +163,7 @@ const MoneySlipPage = () => {
                 </select>
 
                 <select
-                  className="select select-sm w-56"
+                  className="select select-sm w-full sm:w-56"
                   value={selectedHome}
                   onChange={(e) => setSelectedHome(e.target.value)}
                   disabled={loadingHomes}
@@ -249,14 +249,28 @@ const MoneySlipPage = () => {
                           <div className="card-body p-4">
                             <div className="flex items-start justify-between mb-2">
                               <div className="font-semibold">{s.room_name || 'Phòng ?'}</div>
-                              <a
-                                className="btn btn-sm btn-light"
-                                href={`${import.meta.env.VITE_APP_SERVER_URL}${s.moneySlip_path}`}
-                                target="_blank"
-                                rel="noreferrer"
-                              >
-                                Xem
-                              </a>
+                              <div className='flex flex-col gap-2'>
+                                <a
+                                  className="btn btn-sm btn-light flex justify-center"
+                                  href={`${import.meta.env.VITE_APP_SERVER_URL}${s.moneySlip_path}`}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                >
+                                  Xem
+                                </a>
+                                <a
+                                  className="btn btn-sm btn-primary justify-center"
+                                  href={`https://zalo.me/share?text=${encodeURIComponent(
+                                    `Xem phiếu thu: ${s.room_name} - ${formatCurrency(s.totalPrice)}`
+                                  )}&url=${encodeURIComponent(
+                                    `${import.meta.env.VITE_APP_SERVER_URL}${s.moneySlip_path}`
+                                  )}`}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                >
+                                  Share Zalo
+                                </a>
+                              </div>
                             </div>
                             <div className="text-sm text-gray-600">Tháng: {s.month}</div>
                             <div className="text-sm text-gray-600">

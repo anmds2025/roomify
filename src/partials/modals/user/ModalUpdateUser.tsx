@@ -246,98 +246,107 @@ const ModalUpdateUser = forwardRef<HTMLDivElement, ModalUpdateUserProps>(
 
     return (
       <Dialog open={open} onOpenChange={handleClose}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-900">
-          <DialogHeader className="sticky top-0 bg-white dark:bg-gray-900">
-            <DialogTitle className="text-lg font-semibold text-gray-900 dark:text-gray-100 p-2">
-              {isEdit ? 'Cập nhật thông tin người dùng' : 'Thêm mới người dùng'}
+        <DialogContent className="w-[calc(100vw-2rem)] sm:max-w-3xl lg:max-w-4xl max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-900 p-0 rounded-xl">
+          
+          {/* Header */}
+          <DialogHeader className="sticky top-0 z-20 bg-white dark:bg-gray-900 border-b border-gray-200 px-4 py-3 sm:px-6">
+            <DialogTitle className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+              {isEdit ? "Cập nhật thông tin người dùng" : "Thêm mới người dùng"}
             </DialogTitle>
           </DialogHeader>
 
-          <div className="py-6 px-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-              {/* Cột trái - Thông tin cơ bản */}
-              <div className="space-y-8">
-                <div>
-                  <div className="flex items-center gap-2 mb-4 font-semibold text-gray-800 text-lg dark:text-black">
-                    <KeenIcon icon="user" className="w-4 h-4 text-blue-400" />
-                    Thông tin cơ bản
-                  </div>
-                  <div className="space-y-5">
-                    <FormField
-                      label="Họ tên"
-                      value={formData.fullname}
-                      onChange={(value) => handleFieldChange('fullname', value)}
-                      error={errors.fullname}
-                      required={true}
-                    />
-                    <FormField
-                      label="Email"
-                      value={formData.email}
-                      onChange={(value) => handleFieldChange('email', value)}
-                      error={errors.email || errors.emailInvalid}
-                      required={true}
-                      inputMode="email"
-                      type="email"
-                    />
-                    <FormField
-                      label="Số điện thoại"
-                      value={formData.phone}
-                      onChange={(value) => handleFieldChange('phone', value)}
-                      type="tel"
-                      error={errors.phone}
-                      required={true}
-                      inputMode="numeric"
-                    />
-                    <FormField
-                      label="Địa chỉ"
-                      value={formData.address}
-                      onChange={(value) => handleFieldChange('address', value)}
-                      type="textarea"
-                    />
-                  </div>
+          {/* Body */}
+          <div className="py-6 px-4 sm:px-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+
+              {/* LEFT: Thông tin cơ bản */}
+              <div className="space-y-6">
+                <div className="flex items-center gap-2 mb-2 font-semibold text-gray-800 text-lg dark:text-white">
+                  <KeenIcon icon="user" className="w-4 h-4 text-blue-500" />
+                  Thông tin cơ bản
+                </div>
+
+                <div className="space-y-4">
+                  <FormField
+                    label="Họ tên"
+                    value={formData.fullname}
+                    onChange={(value) => handleFieldChange("fullname", value)}
+                    error={errors.fullname}
+                    required
+                  />
+
+                  <FormField
+                    label="Email"
+                    value={formData.email}
+                    onChange={(value) => handleFieldChange("email", value)}
+                    error={errors.email || errors.emailInvalid}
+                    required
+                    inputMode="email"
+                    type="email"
+                  />
+
+                  <FormField
+                    label="Số điện thoại"
+                    value={formData.phone}
+                    onChange={(value) => handleFieldChange("phone", value)}
+                    type="tel"
+                    inputMode="numeric"
+                    error={errors.phone}
+                    required
+                  />
+
+                  <FormField
+                    label="Địa chỉ"
+                    value={formData.address}
+                    onChange={(value) => handleFieldChange("address", value)}
+                    type="textarea"
+                  />
                 </div>
               </div>
 
-              {/* Cột phải - Thông tin bổ sung */}
-              <div className="space-y-8">
-                <div>
-                  <div className="flex items-center gap-2 mb-4 font-semibold text-gray-800 text-lg dark:text-black">
-                    <KeenIcon icon="setting-2" className="w-4 h-4 text-green-400" />
-                    Cài đặt tài khoản
-                  </div>
-                  <div className="space-y-5">
-                    <FormField
-                      label="Cấp độ tài khoản"
-                      value={formData.level}
-                      onChange={(value) => handleFieldChange('level', value)}
-                      type="select"
-                      options={levelOptions}
-                      error={errors.level}
-                      required={true}
-                    />
-                  </div>
+              {/* RIGHT: Cài đặt tài khoản */}
+              <div className="space-y-6">
+                <div className="flex items-center gap-2 mb-2 font-semibold text-gray-800 text-lg dark:text-white">
+                  <KeenIcon icon="setting-2" className="w-4 h-4 text-green-500" />
+                  Cài đặt tài khoản
+                </div>
+
+                <div className="space-y-4">
+                  <FormField
+                    label="Cấp độ tài khoản"
+                    value={formData.level}
+                    onChange={(value) => handleFieldChange("level", value)}
+                    type="select"
+                    options={levelOptions}
+                    error={errors.level}
+                    required
+                  />
                 </div>
               </div>
+
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex justify-end gap-3 p-4 border-t border-gray-200">
+          {/* Footer Buttons */}
+          <div className="flex justify-end gap-3 p-4 border-t border-gray-200 bg-white dark:bg-gray-900 rounded-b-xl">
             <button
               onClick={handleClose}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors"
+              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
             >
               Hủy bỏ
             </button>
+
             <button
               onClick={handleUpdate}
-              className="px-4 py-2 text-sm font-medium text-white bg-primary border border-transparent rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors"
+              className="px-4 py-2 text-sm font-medium text-white bg-primary rounded-md hover:bg-primary-dark transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
             >
-              {isEdit ? 'Cập nhật' : 'Thêm mới'}
+              {isEdit ? "Cập nhật" : "Thêm mới"}
             </button>
           </div>
+
         </DialogContent>
       </Dialog>
+
     );
   }
 );

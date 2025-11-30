@@ -5,7 +5,7 @@ import { ColumnDef, PaginationState } from '@tanstack/react-table';
 import { DataGrid, KeenIcon, TDataGridSelectedRowIds } from '@/components';
 import { IHomeData } from './HomesData';
 import moment from 'moment';
-import { ModalConfirmDelete } from '@/partials/modals/confirm/ModalConfirmDelete';
+// import { ModalConfirmDelete } from '@/partials/modals/confirm/ModalConfirmDelete';
 import { ModalUpdateHome } from '@/partials/modals/home/ModalUpdateHome';
 import { useHomeManagement } from '@/hooks/useHomeManagement';
 
@@ -15,7 +15,7 @@ const SearchInput = React.memo(({ value, onChange, placeholder }: {
   onChange: (value: string) => void;
   placeholder: string;
 }) => (
-  <div className="input input-sm max-w-48">
+  <div className="input input-sm w-full sm:w-auto sm:max-w-60">
     <KeenIcon icon="magnifier" />
     <input
       type="text"
@@ -30,7 +30,7 @@ const SearchInput = React.memo(({ value, onChange, placeholder }: {
 const ActionButtons = React.memo(({ onAddNew }: { onAddNew: () => void }) => (
   <button 
     onClick={onAddNew} 
-    className="btn btn-sm btn-primary badge badge-outline badge-primary gap-1 items-center rounded-lg"
+    className="btn btn-sm btn-primary badge badge-outline badge-primary gap-1 items-center rounded-lg w-full sm:w-auto"
     style={{minWidth: "90px"}}
   >
     <KeenIcon icon="add-notepad" />
@@ -45,13 +45,8 @@ const Homes = () => {
     data,
     filteredData,
     searchTerm,
-    pagination,
-    isLoading,
     homeUpdate,
-    homeId,
-    openDeleteModal,
     openEditModal,
-    emptyHome,
     
     // Actions
     fetchHomes,
@@ -84,9 +79,12 @@ const Homes = () => {
         id: 'home_name',
         header: () => 'Tên tòa nhà',
         enableSorting: true,
-        cell: (info) => info.getValue(),
+        cell: (info) => (
+          <span className="block truncate max-w-[160px] sm:max-w-none">{info.getValue() as string}</span>
+        ),
         meta: {
-          className: 'min-w-[200px]',
+          className: 'min-w-[160px]',
+          cellClassName: 'min-w-[160px]'
         }
       },
       {
@@ -96,7 +94,8 @@ const Homes = () => {
         enableSorting: true,
         cell: (info) => info.getValue(),
         meta: {
-          className: 'min-w-[150px]',
+          className: 'hidden md:table-cell min-w-[150px]',
+          cellClassName: 'hidden md:table-cell min-w-[150px]'
         }
       },
       {
@@ -106,7 +105,8 @@ const Homes = () => {
         enableSorting: true,
         cell: (info) => info.getValue(),
         meta: {
-          className: 'min-w-[150px]',
+          className: 'min-w-[120px] whitespace-nowrap',
+          cellClassName: 'min-w-[120px] whitespace-nowrap'
         }
       },
       {
@@ -116,7 +116,8 @@ const Homes = () => {
         enableSorting: true,
         cell: (info) => info.getValue() || '-',
         meta: {
-          className: 'min-w-[200px]',
+          className: 'hidden md:table-cell min-w-[200px]',
+          cellClassName: 'hidden md:table-cell min-w-[200px]'
         }
       },
       {
@@ -124,9 +125,10 @@ const Homes = () => {
         id: 'electricity_price',
         header: () => 'Giá điện',
         enableSorting: true,
-        cell: (info) => info.getValue() ? `${info.getValue()} VNĐ/kWh` : '-',
+        cell: (info) => (info.getValue() ? `${info.getValue()} VNĐ/kWh` : '-'),
         meta: {
-          className: 'min-w-[120px]',
+          className: 'hidden lg:table-cell min-w-[120px]',
+          cellClassName: 'hidden lg:table-cell min-w-[120px]'
         }
       },
       {
@@ -134,9 +136,10 @@ const Homes = () => {
         id: 'water_price',
         header: () => 'Giá nước',
         enableSorting: true,
-        cell: (info) => info.getValue() ? `${info.getValue()} ${info.row.original.typeWater == 'month' ? 'VNĐ/người`' : 'VNĐ/m³`'}` : '-',
+        cell: (info) => (info.getValue() ? `${info.getValue()} ${info.row.original.typeWater == 'month' ? 'VNĐ/người' : 'VNĐ/m³'}` : '-'),
         meta: {
-          className: 'min-w-[120px]',
+          className: 'hidden lg:table-cell min-w-[120px]',
+          cellClassName: 'hidden lg:table-cell min-w-[120px]'
         }
       },
       {
@@ -145,11 +148,12 @@ const Homes = () => {
         header: () => 'Ngày cập nhật',
         enableSorting: true,
         cell: (info) => {
-          const date = info.getValue();
+          const date = info.getValue() as any;
           return date ? moment(date).format('DD/MM/YYYY') : '-';
         },
         meta: {
-          className: 'min-w-[150px]',
+          className: 'hidden md:table-cell min-w-[150px]',
+          cellClassName: 'hidden md:table-cell min-w-[150px]'
         }
       },
       {
@@ -165,7 +169,8 @@ const Homes = () => {
           </button>
         ),
         meta: {
-          className: 'w-[60px]'
+          className: 'w-[60px]',
+          cellClassName: 'w-[60px]'
         }
       },
       // Tạm thời ẩn chức năng delete vì backend chưa có endpoint
@@ -208,8 +213,8 @@ const Homes = () => {
     <Fragment>
       <div className="card card-grid h-full min-w-full">
         {/* Header */}
-        <div className="card-header flex justify-end">
-          <div className='flex gap-4'>
+        <div className="card-header flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className='flex w-full flex-col sm:flex-row gap-2 sm:gap-4 items-stretch sm:items-center'>
             <SearchInput
               value={searchTerm}
               onChange={updateSearchTerm}
@@ -225,6 +230,7 @@ const Homes = () => {
             columns={columns}
             data={filteredData}
             rowSelect={true}
+            tableSpacing="xs"
             paginationSize={20}
             paginationSizes={[5, 10, 20, 50, 100]}
             initialSorting={[{ id: 'home_name', desc: false }]}

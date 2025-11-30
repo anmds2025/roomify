@@ -1,5 +1,5 @@
 import React, { forwardRef, useCallback, useEffect, useMemo, useState, useRef } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -33,7 +33,7 @@ function renderField({ type, value, onChange, label, error, disabled, options, i
   if (type === 'select') {
     return (
       <Select value={value} onValueChange={onChange} disabled={disabled}>
-        <SelectTrigger className={error ? 'border-red-500 focus-visible:ring-red-500' : ''}>
+        <SelectTrigger className={(error ? 'border-red-500 focus-visible:ring-red-500 ' : '') + 'w-full'}>
           <SelectValue placeholder={`Chọn ${label.toLowerCase()}`} />
         </SelectTrigger>
         <SelectContent className="bg-white">
@@ -53,7 +53,7 @@ function renderField({ type, value, onChange, label, error, disabled, options, i
         placeholder={`Nhập ${label.toLowerCase()}`}
         onChange={e => onChange(e.target.value)}
         disabled={disabled}
-        className={error ? 'border-red-500 focus-visible:ring-red-500' : ''}
+        className={(error ? 'border-red-500 focus-visible:ring-red-500 ' : '') + 'w-full'}
       />
     );
   }
@@ -71,7 +71,7 @@ function renderField({ type, value, onChange, label, error, disabled, options, i
         }
       }}
       disabled={disabled}
-      className={error ? 'border-red-500 focus-visible:ring-red-500' : ''}
+      className={(error ? 'border-red-500 focus-visible:ring-red-500 ' : '') + 'w-full' }
       inputMode={inputMode}
     />
   );
@@ -338,15 +338,15 @@ const ModalUpdateHome = forwardRef<HTMLDivElement, ModalUpdateHomeProps>(
     
     return (
       <Dialog open={open} onOpenChange={handleClose}>
-         <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-900">
-          <DialogHeader className="sticky top-0 bg-white dark:bg-gray-900">
-            <DialogTitle className="text-lg font-semibold text-gray-900 dark:text-gray-100 p-2">
+         <DialogContent ref={ref} className="w-[calc(100vw-2rem)] sm:max-w-3xl lg:max-w-6xl max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-900 p-0 rounded-xl">
+          <DialogHeader className="sticky top-0 z-20 bg-white dark:bg-gray-900 border-b border-gray-200 px-4 py-3 sm:px-6">
+            <DialogTitle className="text-lg font-semibold text-gray-900 dark:text-gray-100">
               {isEdit ? 'Cập nhật thông tin tòa nhà' : 'Thêm mới tòa nhà'}
             </DialogTitle>
           </DialogHeader>
 
-          <div className="py-6 px-6">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="py-6 px-4 sm:px-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {/* Cột 1 - Thông tin cơ bản */}
               <div className="space-y-6">
                 <div>
@@ -484,7 +484,7 @@ const ModalUpdateHome = forwardRef<HTMLDivElement, ModalUpdateHomeProps>(
                       </Label>
                       
                       {/* QR Code Upload */}
-                      <div className="flex items-center gap-4">
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
                         <div 
                           className="image-input size-20 cursor-pointer" 
                           onClick={handleQrBoxClick}
@@ -533,10 +533,10 @@ const ModalUpdateHome = forwardRef<HTMLDivElement, ModalUpdateHomeProps>(
           </div>
 
           {/* Action Buttons */}
-          <div className="flex justify-end gap-3 p-4 border-t border-gray-200 sticky bottom-0 bg-white">
+          <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 p-4 border-t border-gray-200 sticky bottom-0 bg-white">
             <button
               onClick={handleClose}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors"
+              className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors"
             >
               Hủy bỏ
             </button>

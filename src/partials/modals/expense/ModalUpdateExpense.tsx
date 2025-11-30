@@ -319,126 +319,221 @@ const ModalUpdateExpense = forwardRef<HTMLDivElement, ModalUpdateExpenseProps>(
 
     return (
       <Dialog open={open} onOpenChange={handleClose}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-900">
-          <DialogHeader className="sticky top-0 bg-white dark:bg-gray-900">
+        <DialogContent 
+          className="
+            w-[calc(100vw-2rem)] 
+            sm:max-w-3xl 
+            lg:max-w-5xl
+            max-h-[90vh] 
+            overflow-y-auto 
+            bg-white 
+            dark:bg-gray-900 
+            p-0 
+            rounded-xl
+          "
+        >
+          {/* HEADER */}
+          <DialogHeader
+            className="
+              sticky 
+              top-0 
+              z-20 
+              bg-white 
+              dark:bg-gray-900 
+              border-b 
+              border-gray-200 
+              px-4 
+              py-3 
+              sm:px-6
+            "
+          >
             <DialogTitle className="text-lg font-semibold text-gray-900 dark:text-gray-100 p-2">
               {isEdit ? 'Cập nhật thông tin chi phí' : 'Thêm mới chi phí'}
             </DialogTitle>
           </DialogHeader>
 
-          <div className="py-6 px-6">
-              <div className="space-y-6">
-              {/* Cột trái - Thông tin cơ bản */}
-              <div className="space-y-8">
-                <div>
-                  <div className="flex items-center gap-2 mb-4 font-semibold text-gray-800 text-lg dark:text-black">
-                    <KeenIcon icon="user" className="w-4 h-4 text-blue-400 dark:text-black" />
-                    Thông tin cơ bản
-                  </div>
-                  <div className="space-y-5">
-                    <FormField
-                      label="Tiêu đề"
-                      value={formData.title}
-                      onChange={(value) => handleFieldChange('title', value)}
-                      error={errors.title}
-                      required={true}
-                    />
-                    <FormField
-                      label="Tháng"
-                      value={formData.month}
-                      onChange={(value) => handleFieldChange("month", value)}
-                      error={errors.month}
-                      required={true}
-                      type="select"
-                      options={[
-                        { label: "Tất cả tháng", value: "All" },
-                        ...generateMonthOptions() 
-                      ]}
-                    />
-                    <FormField
-                      label="Số tiền"
-                      value={formData.total.toString()}
-                      onChange={(value) => handleFieldChange('total', value)}
-                      type="number"
-                      error={errors.total}
-                      required={true}
-                    />
-                    <FormField
-                      label="Chọn nhà"
-                      value={formData.home_pk}
-                      onChange={(value) => handleFieldChange("home_pk", value)}
-                      error={errors.home_pk}
-                      required={true}
-                      type="select"
-                      options={homeOptions.map((t) => ({
-                        value: t.value.toString(),
-                        label: t.label,
-                      }))}
-                    />
-                    <div className="flex items-center gap-4">
-                      <div 
-                        className="image-input size-48 cursor-pointer" 
-                        onClick={handleQrBoxClick}
-                      >
-                        <div className="image-input-placeholder rounded-lg border-2 border-gray-300 hover:border-primary transition-colors">
-                          {qrImageUrl ? (
-                            <img
-                              src={qrImageUrl}
-                              alt="QR Code"
-                              className="h-full w-full object-cover rounded-lg"
-                            />
-                          ) : (
-                            <div className="h-full w-full flex items-center justify-center bg-gray-100 rounded-lg">
-                              <KeenIcon icon="qr-code" className="w-8 h-8 text-gray-400" />
-                            </div>
-                          )}
-                          <input
-                            type="file"
-                            accept="image/*"
-                            ref={qrFileInputRef}
-                            className="hidden"
-                            onChange={handleQrFileChange}
-                          />
-                          <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-lg opacity-0 hover:opacity-100 transition-opacity">
-                            <KeenIcon icon="camera" className="w-6 h-6 text-white" />
-                          </div>
+          {/* BODY */}
+          <div className="py-6 px-4 sm:px-6">
+            <div className="space-y-8">
+
+              {/* THÔNG TIN CƠ BẢN */}
+              <div>
+                <div className="flex items-center gap-2 mb-4 font-semibold text-gray-800 text-lg dark:text-gray-100">
+                  <KeenIcon icon="user" className="w-5 h-5 text-blue-500" />
+                  Thông tin cơ bản
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                  <FormField
+                    label="Tiêu đề"
+                    value={formData.title}
+                    onChange={(value) => handleFieldChange('title', value)}
+                    error={errors.title}
+                    required
+                  />
+
+                  <FormField
+                    label="Tháng"
+                    value={formData.month}
+                    onChange={(value) => handleFieldChange("month", value)}
+                    error={errors.month}
+                    required
+                    type="select"
+                    options={[
+                      { label: "Tất cả tháng", value: "All" },
+                      ...generateMonthOptions(),
+                    ]}
+                  />
+
+                  <FormField
+                    label="Số tiền"
+                    value={formData.total.toString()}
+                    onChange={(value) => handleFieldChange('total', value)}
+                    error={errors.total}
+                    type="number"
+                    required
+                  />
+
+                  <FormField
+                    label="Chọn nhà"
+                    value={formData.home_pk}
+                    onChange={(value) => handleFieldChange("home_pk", value)}
+                    error={errors.home_pk}
+                    required
+                    type="select"
+                    options={homeOptions.map((t) => ({
+                      value: t.value.toString(),
+                      label: t.label,
+                    }))}
+                  />
+                </div>
+
+                {/* Upload file */}
+                <div className="mt-6 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+
+                  {/* Ô upload */}
+                  <div 
+                    className="relative size-48 cursor-pointer group" 
+                    onClick={handleQrBoxClick}
+                  >
+                    <div className="image-input-placeholder rounded-xl border border-gray-300 group-hover:border-primary transition-colors h-full w-full overflow-hidden">
+
+                      {qrImageUrl ? (
+                        <img 
+                          src={qrImageUrl} 
+                          alt="QR Code"
+                          className="h-full w-full object-cover rounded-xl"
+                        />
+                      ) : (
+                        <div className="h-full w-full flex items-center justify-center bg-gray-100 rounded-xl">
+                          <KeenIcon icon="qr-code" className="w-10 h-10 text-gray-400" />
                         </div>
-                      </div>
-                      
-                      <div className="flex-1">
-                        <p className="text-xs text-gray-500">
-                          Click để upload ảnh cho chi phí
-                        </p>
-                        {qrImageFile && (
-                          <p className="text-xs text-green-600 mt-1">
-                            ✓ Đã chọn file: {qrImageFile.name}
-                          </p>
-                        )}
+                      )}
+
+                      <input
+                        type="file"
+                        accept="image/*"
+                        ref={qrFileInputRef}
+                        className="hidden"
+                        onChange={handleQrFileChange}
+                      />
+
+                      {/* Hover overlay */}
+                      <div className="
+                        absolute inset-0 
+                        flex items-center justify-center 
+                        bg-black/50 
+                        rounded-xl 
+                        opacity-0 
+                        group-hover:opacity-100 
+                        transition-opacity
+                      ">
+                        <KeenIcon icon="camera" className="w-7 h-7 text-white" />
                       </div>
                     </div>
                   </div>
+
+                  {/* File info */}
+                  <div>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      Click để tải ảnh lên cho chi phí
+                    </p>
+                    {qrImageFile && (
+                      <p className="text-sm text-green-600 mt-1">
+                        ✓ Đã chọn file: {qrImageFile.name}
+                      </p>
+                    )}
+                  </div>
+
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex justify-end gap-3 p-4 border-t border-gray-200">
+          {/* FOOTER */}
+          <div 
+            className="
+              sticky 
+              bottom-0 
+              bg-white 
+              dark:bg-gray-900 
+              border-t 
+              border-gray-200 
+              flex 
+              flex-col-reverse 
+              sm:flex-row 
+              sm:justify-end 
+              gap-3 
+              p-4
+            "
+          >
             <button
               onClick={handleClose}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors"
+              className="
+                w-full sm:w-auto 
+                px-4 py-2 
+                text-sm font-medium 
+                text-gray-700 
+                bg-white 
+                border border-gray-300 
+                rounded-md 
+                hover:bg-gray-50 
+                focus:outline-none 
+                focus:ring-2 
+                focus:ring-offset-2 
+                focus:ring-primary 
+                transition-colors
+              "
             >
               Hủy bỏ
             </button>
+
             <button
               onClick={handleUpdate}
-              className="px-4 py-2 text-sm font-medium text-white bg-primary border border-transparent rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors"
+              className="
+                w-full sm:w-auto 
+                px-4 py-2 
+                text-sm font-medium 
+                text-white 
+                bg-primary 
+                border border-transparent 
+                rounded-md 
+                hover:bg-primary-dark 
+                focus:outline-none 
+                focus:ring-2 
+                focus:ring-offset-2 
+                focus:ring-primary 
+                transition-colors
+              "
             >
               {isEdit ? 'Cập nhật' : 'Thêm mới'}
             </button>
           </div>
+
         </DialogContent>
       </Dialog>
+
     );
   }
 );

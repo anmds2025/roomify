@@ -1,4 +1,4 @@
-import React, { forwardRef, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { forwardRef, useCallback, useEffect, useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -28,13 +28,14 @@ interface RenderFieldProps {
   disabled?: boolean;
   options?: Array<{ value: string; label: string }>;
   inputMode?: "search" | "text" | "email" | "tel" | "url" | "none" | "numeric" | "decimal" | undefined;
+  placeholder?: string;
 }
 
-function renderField({ type, value, onChange, label, error, disabled, options, inputMode }: RenderFieldProps) {
+function renderField({ type, value, onChange, label, error, disabled, options, inputMode, placeholder }: RenderFieldProps) {
   if (type === 'select') {
     return (
       <Select value={value} onValueChange={onChange} disabled={disabled}>
-        <SelectTrigger className={error ? 'border-red-500 focus-visible:ring-red-500' : ''}>
+        <SelectTrigger className={(error ? 'border-red-500 focus-visible:ring-red-500 ' : '') + 'w-full'}>
           <SelectValue placeholder={`Chọn ${label.toLowerCase()}`} />
         </SelectTrigger>
         <SelectContent className="bg-white">
@@ -54,7 +55,7 @@ function renderField({ type, value, onChange, label, error, disabled, options, i
         placeholder={`Nhập ${label.toLowerCase()}`}
         onChange={e => onChange(e.target.value)}
         disabled={disabled}
-        className={error ? 'border-red-500 focus-visible:ring-red-500' : ''}
+        className={(error ? 'border-red-500 focus-visible:ring-red-500 ' : '') + 'w-full'}
       />
     );
   }
@@ -72,7 +73,7 @@ function renderField({ type, value, onChange, label, error, disabled, options, i
         }
       }}
       disabled={disabled}
-      className={error ? 'border-red-500 focus-visible:ring-red-500' : ''}
+      className={(error ? 'border-red-500 focus-visible:ring-red-500 ' : '') + 'w-full' }
       inputMode={inputMode}
     />
   );
@@ -109,7 +110,7 @@ const FormField = React.memo(({
       {required && <span className="text-red-500">*</span>}
     </Label>
     
-    {renderField({ type, value, onChange, label, error, disabled, options, inputMode })}
+    {renderField({ type, value, onChange, label, error, disabled, options, inputMode, placeholder })}
     {error && (
       <div className="flex items-center gap-1 mt-2 text-sm font-medium text-red-600">
         <KeenIcon icon="warning" className="w-4 h-4" />
@@ -310,14 +311,14 @@ const ModalUpdateRoom = forwardRef<HTMLDivElement, ModalUpdateRoomProps>(
 
     return (
       <Dialog open={open} onOpenChange={handleClose}>
-         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-900">
-            <DialogHeader className="sticky top-0 bg-white z-1 dark:bg-gray-900">
+         <DialogContent ref={ref} className="w-[calc(100vw-2rem)] sm:max-w-3xl lg:max-w-5xl max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-900 p-0 rounded-xl">
+            <DialogHeader className="sticky top-0 z-20 bg-white dark:bg-gray-900 border-b border-gray-200 px-4 py-3 sm:px-6">
               <DialogTitle className="text-lg font-semibold text-gray-900 dark:text-gray-100 p-2">
               {isEdit ? 'Cập nhật thông tin phòng' : 'Thêm mới phòng'}
             </DialogTitle>
           </DialogHeader>
 
-          <div className="py-6 px-6">
+          <div className="py-6 px-4 sm:px-6">
             <div className="space-y-6">
               {/* Thông tin cơ bản */}
               <div>
@@ -465,16 +466,16 @@ const ModalUpdateRoom = forwardRef<HTMLDivElement, ModalUpdateRoomProps>(
           </div>
 
           {/* Action Buttons */}
-          <div className="flex justify-end gap-3 pt-6 border-t border-gray-200">
+          <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 p-4 border-t border-gray-200 sticky bottom-0 bg-white">
             <button
               onClick={handleClose}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors"
+              className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors"
             >
               Hủy bỏ
             </button>
             <button
               onClick={handleUpdate}
-              className="px-4 py-2 text-sm font-medium text-white bg-primary border border-transparent rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors"
+              className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-white bg-primary border border-transparent rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors"
             >
               {isEdit ? 'Cập nhật' : 'Thêm mới'}
             </button>

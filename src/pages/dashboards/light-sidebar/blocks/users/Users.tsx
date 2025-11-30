@@ -16,7 +16,7 @@ const SearchInput = React.memo(({ value, onChange, placeholder }: {
   onChange: (value: string) => void;
   placeholder: string;
 }) => (
-  <div className="input input-sm max-w-48">
+  <div className="input input-sm w-full sm:w-auto sm:max-w-60">
     <KeenIcon icon="magnifier" />
     <input
       type="text"
@@ -35,7 +35,7 @@ const LevelFilter = React.memo(({ value, onChange }: {
   <select
     value={value}
     onChange={(e) => onChange(e.target.value)}
-    className="select select-sm min-w-40"
+    className="select select-sm w-full sm:w-40"
   >
     <option value="Tất cả">Tất cả</option>
     <option value="Basic">Basic</option>
@@ -55,7 +55,7 @@ const ActionButtons = React.memo(({ onAddNew, onRefresh, isLoading }: {
     <button 
       onClick={onRefresh}
       disabled={isLoading}
-      className="btn btn-sm btn-light gap-1 items-center rounded-lg"
+      className="btn btn-sm btn-primary badge badge-outline badge-light gap-1 items-center rounded-lg w-full sm:w-auto"
       style={{minWidth: "80px"}}
     >
       <KeenIcon icon="refresh" />
@@ -63,7 +63,7 @@ const ActionButtons = React.memo(({ onAddNew, onRefresh, isLoading }: {
     </button>
     <button 
       onClick={onAddNew} 
-      className="btn btn-sm btn-primary badge badge-outline badge-primary gap-1 items-center rounded-lg"
+      className="btn btn-sm btn-primary badge badge-outline badge-primary gap-1 items-center rounded-lg w-full sm:w-auto"
       style={{minWidth: "90px"}}
     >
       <KeenIcon icon="add-notepad" />
@@ -146,9 +146,14 @@ const Users = () => {
         id: 'fullname',
         header: () => 'Họ tên',
         enableSorting: true,
-        cell: (info) => info.getValue(),
+        cell: (info) => (
+          <span className="block truncate max-w-[160px] sm:max-w-none">
+            {info.getValue() as string}
+          </span>
+        ),
         meta: {
-          className: 'min-w-[200px]',
+          className: 'min-w-[160px]',
+          cellClassName: 'min-w-[160px]'
         }
       },
       {
@@ -158,7 +163,8 @@ const Users = () => {
         enableSorting: true,
         cell: (info) => info.getValue(),
         meta: {
-          className: 'min-w-[200px]',
+          className: 'hidden md:table-cell min-w-[200px]',
+          cellClassName: 'hidden md:table-cell min-w-[200px]'
         }
       },
       {
@@ -168,7 +174,8 @@ const Users = () => {
         enableSorting: true,
         cell: (info) => info.getValue(),
         meta: {
-          className: 'min-w-[150px]',
+          className: 'min-w-[120px] whitespace-nowrap',
+          cellClassName: 'min-w-[120px] whitespace-nowrap'
         }
       },
       {
@@ -176,9 +183,10 @@ const Users = () => {
         id: 'address',
         header: () => 'Địa chỉ',
         enableSorting: true,
-        cell: (info) => info.getValue(),
+        cell: (info) => info.getValue() || '-',
         meta: {
-          className: 'min-w-[200px]',
+          className: 'hidden md:table-cell min-w-[200px]',
+          cellClassName: 'hidden md:table-cell min-w-[200px]'
         }
       },
       {
@@ -188,20 +196,22 @@ const Users = () => {
         enableSorting: true,
         cell: (info) => {
           const date = info.getValue();
-          return date ? moment(date).format('DD/MM/YYYY') : '';
+          return date ? moment(date).format('DD/MM/YYYY') : '-';
         },
         meta: {
-          className: 'min-w-[150px]',
+          className: 'hidden lg:table-cell min-w-[150px]',
+          cellClassName: 'hidden lg:table-cell min-w-[150px]'
         }
       },
       {
         accessorFn: (row) => row.level,
         id: 'level',
-        header: () => 'Cấp độ tài khoản',
+        header: () => 'Cấp độ',
         enableSorting: true,
         cell: (info) => <LevelBadge level={info.row.original.level} />,
         meta: {
-          className: 'min-w-[150px]',
+          className: 'hidden lg:table-cell min-w-[150px]',
+          cellClassName: 'hidden lg:table-cell min-w-[150px]'
         }
       },
       {
@@ -217,7 +227,8 @@ const Users = () => {
           </button>
         ),
         meta: {
-          className: 'w-[60px]'
+          className: 'w-[60px]',
+          cellClassName: 'w-[60px]'
         }
       },
       {
@@ -233,7 +244,8 @@ const Users = () => {
           </button>
         ),
         meta: {
-          className: 'w-[60px]'
+          className: 'w-[60px]',
+          cellClassName: 'w-[60px]'
         }
       }
     ],
@@ -259,8 +271,8 @@ const Users = () => {
     <Fragment>
       <div className="card card-grid h-full min-w-full">
         {/* Header */}
-        <div className="card-header flex justify-end">
-          <div className='flex gap-4'>
+        <div className="card-header flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex w-full flex-col sm:flex-row gap-2 sm:gap-4 items-stretch sm:items-center">
             <SearchInput
               value={searchTerm}
               onChange={updateSearchTerm}

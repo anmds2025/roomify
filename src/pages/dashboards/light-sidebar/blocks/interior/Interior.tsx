@@ -18,7 +18,7 @@ const SearchInput = React.memo(({ value, onChange, placeholder }: {
   onChange: (value: string) => void;
   placeholder: string;
 }) => (
-  <div className="input input-sm max-w-48">
+  <div className="input input-sm w-full sm:w-auto sm:max-w-60">
     <KeenIcon icon="magnifier" />
     <input
       type="text"
@@ -39,7 +39,7 @@ const ActionButtons = React.memo(({ onAddNew, onRefresh, isLoading }: {
     <button 
       onClick={onRefresh}
       disabled={isLoading}
-      className="btn btn-sm btn-light gap-1 items-center rounded-lg"
+      className="btn btn-sm btn-primary badge badge-outline badge-light gap-1 items-center rounded-lg w-full sm:w-auto"
       style={{minWidth: "80px"}}
     >
       <KeenIcon icon="refresh" />
@@ -47,7 +47,7 @@ const ActionButtons = React.memo(({ onAddNew, onRefresh, isLoading }: {
     </button>
     <button 
       onClick={onAddNew} 
-      className="btn btn-sm btn-primary badge badge-outline badge-primary gap-1 items-center rounded-lg"
+      className="btn btn-sm btn-primary badge badge-outline badge-primary gap-1 items-center rounded-lg w-full sm:w-auto"
       style={{minWidth: "90px"}}
     >
       <KeenIcon icon="add-notepad" />
@@ -86,87 +86,90 @@ const Interior = () => {
     addNewInteriorHandler,
   } = useInteriorManagement();
 
+   
+
   // Table columns với useMemo để tối ưu performance
-  const columns = useMemo<ColumnDef<InteriorData>[]>(
-    () => [
-      {
-        id: 'id',
-        header: () => 'STT',
-        cell: (info) => {
-          return <div>{info.row.index + 1}</div>;
-        },
-        meta: {
-          className: 'min-w-[60px] text-center',
-        },
+  const columns = useMemo<ColumnDef<InteriorData>[]>(() => [
+    {
+      id: 'id',
+      header: () => 'STT',
+      cell: (info) => <div>{info.row.index + 1}</div>,
+      meta: {
+        className: 'min-w-[50px] text-center',
+        cellClassName: 'min-w-[50px] text-center',
       },
-      {
-        accessorFn: (row) => row.name,
-        id: 'name',
-        header: () => 'Tên nội thất',
-        enableSorting: true,
-        cell: (info) => info.getValue(),
-        meta: {
-          className: 'min-w-[200px]',
-        }
-      },
-      {
-        accessorFn: (row) => row.price,
-        id: 'price',
-        header: () => 'Giá',
-        enableSorting: true,
-        cell: (info) => info.getValue() + 'VND',
-        meta: {
-          className: 'min-w-[200px]',
-        }
-      },
-      {
-        accessorFn: (row) => row.timeUpdate?.$date,
-        id: 'timeUpdate',
-        header: () => 'Ngày cập nhật',
-        enableSorting: true,
-        cell: (info) => {
-          const date = info.getValue();
-          return date ? moment(date).format('DD/MM/YYYY') : '';
-        },
-        meta: {
-          className: 'min-w-[150px]',
-        }
-      },
-      {
-        id: 'edit',
-        header: () => '',
-        enableSorting: false,
-        cell: ({ row }) => (
-          <button 
-            className="btn btn-sm btn-icon btn-clear btn-light" 
-            onClick={() => openEditModalHandler(row.original)}
-          >
-            <KeenIcon icon="notepad-edit" />
-          </button>
-        ),
-        meta: {
-          className: 'w-[60px]'
-        }
-      },
-      {
-        id: 'delete',
-        header: () => '',
-        enableSorting: false,
-        cell: ({ row }) => (
-          <button 
-            className="btn btn-sm btn-icon btn-clear btn-light" 
-            onClick={() => openDeleteModalHandler(row.original)}
-          >
-            <KeenIcon icon="trash" />
-          </button>
-        ),
-        meta: {
-          className: 'w-[60px]'
-        }
+    },
+    {
+      accessorFn: (row) => row.name,
+      id: 'name',
+      header: () => 'Tên nội thất',
+      enableSorting: true,
+      cell: (info) => info.getValue(),
+      meta: {
+        className: 'min-w-[200px]',
       }
-    ],
-    [openEditModalHandler, openDeleteModalHandler]
-  );
+    },
+    {
+      accessorFn: (row) => row.price,
+      id: 'price',
+      header: () => 'Giá',
+      enableSorting: true,
+      cell: (info) => `${info.getValue()} VND`,
+      meta: {
+        className: 'min-w-[120px]',
+        cellClassName: 'min-w-[120px]',
+      },
+    },
+    {
+      accessorFn: (row) => row.timeUpdate?.$date,
+      id: 'timeUpdate',
+      header: () => 'Ngày cập nhật',
+      enableSorting: true,
+      cell: (info) => {
+        const date = info.getValue();
+        return date ? moment(date).format('DD/MM/YYYY') : '-';
+      },
+      meta: {
+        className: 'hidden lg:table-cell min-w-[140px]',
+        cellClassName: 'hidden lg:table-cell min-w-[140px]',
+      },
+    },
+    {
+      id: 'edit',
+      header: () => '',
+      enableSorting: false,
+      cell: ({ row }) => (
+        <button
+          className="btn btn-sm btn-icon btn-clear btn-light"
+          onClick={() => openEditModalHandler(row.original)}
+        >
+          <KeenIcon icon="notepad-edit" />
+        </button>
+      ),
+      meta: {
+        className: 'w-[50px]',
+        cellClassName: 'w-[50px]',
+      },
+    },
+    {
+      id: 'delete',
+      header: () => '',
+      enableSorting: false,
+      cell: ({ row }) => (
+        <button
+          className="btn btn-sm btn-icon btn-clear btn-light"
+          onClick={() => openDeleteModalHandler(row.original)}
+        >
+          <KeenIcon icon="trash" />
+        </button>
+      ),
+      meta: {
+        className: 'w-[50px]',
+        cellClassName: 'w-[50px]',
+      },
+    },
+  ], [openEditModalHandler, openDeleteModalHandler]);
+
 
   // Handlers
   const handleRowsSelectChange = useCallback((selectedRowIds: TDataGridSelectedRowIds) => {
@@ -187,15 +190,15 @@ const Interior = () => {
     <Fragment>
       <div className="card card-grid h-full min-w-full">
         {/* Header */}
-        <div className="card-header flex justify-end">
-          <div className='flex gap-4'>
+        <div className="card-header flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex w-full flex-col sm:flex-row gap-2 sm:gap-4 items-stretch sm:items-center">
             <SearchInput
               value={searchTerm}
               onChange={updateSearchTerm}
               placeholder="Tìm kiếm"
             />
-            <ActionButtons 
-              onAddNew={addNewInteriorHandler} 
+            <ActionButtons
+              onAddNew={addNewInteriorHandler}
               onRefresh={fetchInteriors}
               isLoading={isLoading}
             />

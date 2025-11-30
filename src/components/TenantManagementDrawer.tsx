@@ -22,7 +22,7 @@ const SearchInput = React.memo(({ value, onChange }: {
   value: string;
   onChange: (value: string) => void;
 }) => (
-  <div className="input input-sm">
+  <div className="input input-sm w-full">
     <KeenIcon icon="magnifier" />
     <input
       type="text"
@@ -164,7 +164,7 @@ export const TenantManagementDrawer: React.FC<TenantManagementDrawerProps> = ({
     >
       <div className="flex flex-col h-full">
         {/* Header */}
-        <div className="flex items-center justify-between p-5 border-b border-gray-200">
+        <div className="flex items-center justify-between p-5 border-b border-gray-200 sticky top-0 z-20 bg-white">
           <div className="flex items-center gap-2">
             <KeenIcon icon="profile-circle" className="text-xl" />
             <div>
@@ -186,10 +186,10 @@ export const TenantManagementDrawer: React.FC<TenantManagementDrawerProps> = ({
         <div className="p-5 border-b border-gray-200 space-y-4">
           <SearchInput value={searchTerm} onChange={handleSearchChange} />
           
-          <div className="flex gap-2">
+          <div className="flex w-full flex-col sm:flex-row gap-2">
             <button 
               onClick={onAddTenant}
-              className="btn btn-sm btn-primary flex items-center gap-2 hover:bg-primary-dark transition-colors"
+              className="btn btn-sm btn-primary flex items-center gap-2 hover:bg-primary-dark transition-colors w-full sm:w-auto"
             >
               <KeenIcon icon="plus" />
               Thêm người thuê

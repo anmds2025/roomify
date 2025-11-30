@@ -2,7 +2,7 @@
 import React, { useEffect, useMemo, useCallback, Fragment, useState } from 'react';
 import { useSnackbar } from 'notistack';
 import { useNavigate } from 'react-router-dom';
-import { Column, ColumnDef, PaginationState } from '@tanstack/react-table';
+import { ColumnDef, PaginationState } from '@tanstack/react-table';
 import { DataGrid, KeenIcon, TDataGridSelectedRowIds } from '@/components';
 import { IRoomData } from './RoomsData';
 import moment from 'moment';
@@ -16,7 +16,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
+  
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { TenantManagementDrawer } from '@/components/TenantManagementDrawer';
@@ -31,7 +31,7 @@ import { IMoneySlipData, IMoneySlipFormData } from '@/types/moneySlip';
 import { MoneySlipFormModal } from '@/components/MoneySlipFormModal';
 import { useMoneySlip } from '@/hooks/useMoneySlip';
 import { useContract } from '@/hooks/useContract';
-import { Modal, ModalBody, ModalContent, ModalHeader } from '@/components/modal';
+
 import { BulkMoneySlipModal } from '@/components/BulkMoneySlipModal';
 // Component cho search input
 const SearchInput = React.memo(({ value, onChange, placeholder }: {
@@ -39,7 +39,7 @@ const SearchInput = React.memo(({ value, onChange, placeholder }: {
   onChange: (value: string) => void;
   placeholder: string;
 }) => (
-  <div className="input input-sm max-w-48">
+  <div className="input input-sm w-full sm:w-auto sm:max-w-60">
     <KeenIcon icon="magnifier" />
     <input
       type="text"
@@ -56,11 +56,11 @@ const ActionButtons = React.memo(({ onAddNew, onRefresh, isLoading }: {
   onRefresh: () => void;
   isLoading: boolean;
 }) => (
-  <div className="flex gap-2">
+  <div className="flex w-full sm:w-auto flex-col sm:flex-row gap-2">
     <button 
       onClick={onRefresh}
       disabled={isLoading}
-      className="btn btn-sm btn-light gap-1 items-center rounded-lg"
+      className="btn btn-sm btn-light gap-1 items-center rounded-lg w-full sm:w-auto"
       style={{minWidth: "80px"}}
     >
       <KeenIcon icon="refresh" />
@@ -68,7 +68,7 @@ const ActionButtons = React.memo(({ onAddNew, onRefresh, isLoading }: {
     </button>
     <button 
       onClick={onAddNew} 
-      className="btn btn-sm btn-primary badge badge-outline badge-primary gap-1 items-center rounded-lg"
+      className="btn btn-sm btn-primary badge badge-outline badge-primary gap-1 items-center rounded-lg w-full sm:w-auto"
       style={{minWidth: "90px"}}
     >
       <KeenIcon icon="add-notepad" />
@@ -109,16 +109,12 @@ const Rooms = () => {
     data,
     filteredData,
     searchTerm,
-    pagination,
     isLoading,
     roomUpdate,
     homeSelect,
-    roomId,
     openDeleteModal,
     openEditModal,
     openCreateContractModal,
-    emptyRoom,
-    emptyHome,
     
     // Actions
     fetchRooms,
@@ -171,24 +167,8 @@ const Rooms = () => {
   // Bulk money slip state
   const [selectedRowIdsState, setSelectedRowIdsState] = useState<Set<string>>(new Set());
   const [bulkModalOpen, setBulkModalOpen] = useState(false);
-  const [bulkForm, setBulkForm] = useState({
-    name: '',
-    waterOld: '',
-    waterNew: '',
-    numPeo: '',
-    debt: '',
-    elecOld: '',
-    elecNew: ''
-  });
-  const [bulkEntries, setBulkEntries] = useState<Record<string, {
-    name: string;
-    waterOld: string;
-    waterNew: string;
-    numPeo: string;
-    debt: string;
-    elecOld: string;
-    elecNew: string;
-  }>>({});
+  // Removed bulkForm state (unused setter) to avoid linter warnings
+  // Removed bulkEntries state (unused) to reduce memory and avoid lints
 
   const selectedRooms = useMemo(() => {
     if (!selectedRowIdsState || selectedRowIdsState.size === 0) return [] as IRoomData[];
@@ -505,9 +485,12 @@ const Rooms = () => {
         id: 'room_name',
         header: () => 'Tên phòng',
         enableSorting: true,
-        cell: (info) => info.getValue(),
+        cell: (info) => (
+          <span className="block truncate max-w-[160px] sm:max-w-none">{info.getValue() as string}</span>
+        ),
         meta: {
-          className: 'min-w-[150px]',
+          className: 'min-w-[160px]',
+          cellClassName: 'min-w-[160px]'
         }
       },
       {
@@ -519,7 +502,8 @@ const Rooms = () => {
         enableHiding: false,
         cell: (info) => info.getValue() || '-',
         meta: {
-          className: 'min-w-[200px]',
+          className: 'hidden md:table-cell min-w-[180px]',
+          cellClassName: 'hidden md:table-cell min-w-[180px]'
         },
         filterFn: (row, colId, filterValue) => {
           const value = row.getValue(colId);
@@ -547,7 +531,8 @@ const Rooms = () => {
           return value ? `${value.toLocaleString()}` : '-';
         },
         meta: {
-          className: 'min-w-[120px]',
+          className: 'min-w-[120px] whitespace-nowrap',
+          cellClassName: 'min-w-[120px] whitespace-nowrap'
         }
       },
       {
@@ -560,7 +545,8 @@ const Rooms = () => {
           return value ? `${value}` : '-';
         },
         meta: {
-          className: 'min-w-[100px]',
+          className: 'hidden lg:table-cell min-w-[100px]',
+          cellClassName: 'hidden lg:table-cell min-w-[100px]'
         }
       },
       {
@@ -571,6 +557,7 @@ const Rooms = () => {
         cell: (info) => <StatusBadge status={info.row.original.status} />,
         meta: {
           className: 'min-w-[120px]',
+          cellClassName: 'min-w-[120px]'
         }
       },
       {
@@ -583,7 +570,8 @@ const Rooms = () => {
           return date ? moment(date).format('DD/MM/YYYY') : '-';
         },
         meta: {
-          className: 'min-w-[150px]',
+          className: 'hidden md:table-cell min-w-[150px]',
+          cellClassName: 'hidden md:table-cell min-w-[150px]'
         }
       },
       {
@@ -668,7 +656,8 @@ const Rooms = () => {
           </DropdownMenu>
         ),
         meta: {
-          className: 'w-[60px]'
+          className: 'w-[60px]',
+          cellClassName: 'w-[60px]'
         }
       }
     ],
@@ -702,21 +691,7 @@ const Rooms = () => {
       enqueueSnackbar('Vui lòng chọn ít nhất 1 phòng', { variant: 'error' });
       return;
     }
-    // Initialize per-room entries (prefill from room if available)
-    const initial: Record<string, any> = {};
-    selectedRooms.forEach((room) => {
-      const key = (room as any).pk || room._id?.$oid || String(room.room_name);
-      initial[key] = {
-        name: bulkForm.name || '',
-        waterOld: (room as any)?.numWaterOld?.toString?.() || '',
-        waterNew: '',
-        numPeo: (room as any)?.numPeo?.toString?.() || '',
-        debt: '0',
-        elecOld: (room as any)?.numElectricityOld?.toString?.() || '',
-        elecNew: ''
-      };
-    });
-    setBulkEntries(initial);
+    // Open modal; entries will be handled inside modal
     setBulkModalOpen(true);
   }, [selectedRooms, enqueueSnackbar]);
 
@@ -734,14 +709,14 @@ const Rooms = () => {
     <Fragment>
       <div className="card card-grid h-full min-w-full">
         {/* Header */}
-        <div className="card-header flex justify-end">
-          <div className='flex gap-4'>
-            <div className='max-h-[32px] min-w-48'>
+        <div className="card-header flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className='flex w-full flex-col sm:flex-row gap-2 sm:gap-4 items-stretch sm:items-center'>
+            <div className='w-full sm:w-auto'>
               <Select
                 value={selectedHome}
                 onValueChange={(value) => {filterByHome(value), setSelectedHome(value)}}
               >
-                <SelectTrigger className="max-h-[32px]">
+                <SelectTrigger className="max-h-[32px] w-full">
                   <SelectValue placeholder="Tất cả" />
                 </SelectTrigger>
                 <SelectContent className="bg-white">
@@ -768,7 +743,7 @@ const Rooms = () => {
             <button
               onClick={openBulkMoneySlip}
               disabled={selectedRooms.length === 0}
-              className={`btn btn-sm gap-1 items-center rounded-lg ${selectedRooms.length === 0 ? 'btn-light' : 'btn-primary'}`}
+              className={`btn btn-sm gap-1 items-center rounded-lg w-full sm:w-auto ${selectedRooms.length === 0 ? 'btn-light' : 'btn-primary'}`}
               style={{minWidth: '180px'}}
             >
               <KeenIcon icon="dollar" />
@@ -797,6 +772,7 @@ const Rooms = () => {
               columns={columns}
               data={filteredData}
               rowSelect={true}
+              tableSpacing="xs"
               paginationSize={20}
               paginationSizes={[5, 10, 20, 50, 100]}
               initialSorting={[{ id: 'room_name', desc: false }]}

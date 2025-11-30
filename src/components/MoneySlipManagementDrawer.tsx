@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Drawer } from '@/components/drawer';
 import { KeenIcon } from '@/components';
 import { IRoomData } from '@/pages/dashboards/light-sidebar/blocks/rooms/RoomsData';
-import { ITenantData } from '@/types/tenant';
+
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import { IMoneySlipData } from '@/types/moneySlip';
@@ -125,17 +125,14 @@ export const MoneySlipManagementDrawer: React.FC<MoneySlipManagementDrawerProps>
   const [searchTerm, setSearchTerm] = useState('');
 
   // Optimized search handler
-  const handleSearchChange = useCallback((value: string) => {
-    setSearchTerm(value);
-  }, []);
+
 
   // Filter tenants based on search term
   const filteredMoneySlips = useMemo(() => {
     if (!searchTerm.trim()) return moneySlips;
     
-    const searchLower = searchTerm.toLowerCase();
     return moneySlips.filter(moneySlip => 
-      moneySlip.user_nameB.includes(searchTerm)
+      (moneySlip.user_nameB || '').toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [moneySlips, searchTerm]);
 
@@ -163,7 +160,7 @@ export const MoneySlipManagementDrawer: React.FC<MoneySlipManagementDrawerProps>
     >
       <div className="flex flex-col h-full">
         {/* Header */}
-        <div className="flex items-center justify-between p-5 border-b border-gray-200">
+        <div className="flex items-center justify-between p-5 border-b border-gray-200 sticky top-0 z-20 bg-white">
           <div className="flex items-center gap-2">
             <KeenIcon icon="profile-circle" className="text-xl" />
             <div>
@@ -185,10 +182,10 @@ export const MoneySlipManagementDrawer: React.FC<MoneySlipManagementDrawerProps>
         <div className="p-5 border-b border-gray-200 space-y-4">
           {/* <SearchInput value={searchTerm} onChange={handleSearchChange} /> */}
           
-          <div className="flex gap-2">
+          <div className="flex w-full flex-col sm:flex-row gap-2">
             <button 
               onClick={onAddMoneySlip}
-              className="btn btn-sm btn-primary flex items-center gap-2 hover:bg-primary-dark transition-colors"
+              className="btn btn-sm btn-primary flex items-center gap-2 hover:bg-primary-dark transition-colors w-full sm:w-auto"
             >
               <KeenIcon icon="plus" />
               Thêm phiếu thu
@@ -196,7 +193,7 @@ export const MoneySlipManagementDrawer: React.FC<MoneySlipManagementDrawerProps>
             <button 
               onClick={onRefresh}
               disabled={isLoading}
-              className="btn btn-sm btn-light flex items-center gap-2 disabled:opacity-50 transition-colors"
+              className="btn btn-sm btn-light flex items-center gap-2 disabled:opacity-50 transition-colors w-full sm:w-auto"
             >
               <KeenIcon icon="refresh" className={isLoading ? 'animate-spin' : ''} />
               {isLoading ? 'Đang tải...' : 'Làm mới'}
