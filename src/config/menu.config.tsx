@@ -49,16 +49,6 @@ export const MENU_SIDEBAR: MenuConfigType = [
     ]
   },
   {
-    title: 'Quản lý người dùng',
-    icon: 'users',
-    children: [
-      {
-        title: 'Danh sách người dùng',
-        path: '/users'
-      },
-    ]
-  },
-  {
     title: 'Quản lý giấy cọc',
     icon: 'dollar',
     children: [
