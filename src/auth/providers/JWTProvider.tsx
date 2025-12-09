@@ -12,10 +12,11 @@ import {
 
 import { type AuthModel, type UserModel } from '@/auth';
 import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router';
 
 export const GET_USER_BY_ACCESSTOKEN_URL = `/user-admin`;
 export const LOGIN_URL = `/user/login`;
-export const REGISTER_URL = `/register`;
+export const REGISTER_URL = `user/register`;
 export const REQUEST_PASSWORD_URL = `/forgotpassword`;
 
 interface AuthContextProps {
@@ -23,6 +24,7 @@ interface AuthContextProps {
   currentUser: UserModel | undefined;
   setCurrentUser: Dispatch<SetStateAction<UserModel | undefined>>;
   login: (email: string, password: string, phone: string) => Promise<void>;
+  register: (phone: string, email: string, password: string) => Promise<{ Success: string } | null>;
   loginWithGoogle?: () => Promise<void>;
   loginWithFacebook?: () => Promise<void>;
   loginWithGithub?: () => Promise<void>;
@@ -37,7 +39,6 @@ const AuthContext = createContext<AuthContextProps | null>(null);
 const AuthProvider = ({ children }: PropsWithChildren) => {
   const [loading, setLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState<UserModel | undefined>();
-
   // Verity user session and validate bearer authentication
   const verify = async () => {
     if (currentUser) {
@@ -66,8 +67,6 @@ const AuthProvider = ({ children }: PropsWithChildren) => {
     return user;
   };
 
-
-
   // Login user with email and password
   const login = async (phone : string, email: string, password: string) => {
     try {
@@ -95,6 +94,32 @@ const AuthProvider = ({ children }: PropsWithChildren) => {
     } catch (error) {
       setCurrentUser(undefined);
       throw new Error(`Error ${error}`);
+    }
+  };
+
+  const register = async (phone: string, email: string, password: string) => {
+    try {
+      const formData = new URLSearchParams();
+      formData.append('phone', phone);
+      formData.append('email', email);
+      formData.append('password', password);
+
+      const response = await axios.post<{ Success: string }>(
+        REGISTER_URL,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+        }
+      );
+
+      return response.data;   // ❗ Trả về data, không trả về axios response
+
+    } catch (error: any) {
+      const message = error?.response?.data?.Error || 'Thông tin đăng ký không hợp lệ';
+      toast.error(message);
+      return null;
     }
   };
 
@@ -130,6 +155,7 @@ const AuthProvider = ({ children }: PropsWithChildren) => {
         currentUser,
         setCurrentUser,
         login,
+        register,
         requestPassword,
         logout,
         verify,

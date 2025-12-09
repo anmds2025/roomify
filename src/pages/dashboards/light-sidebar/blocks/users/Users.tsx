@@ -38,6 +38,8 @@ const LevelFilter = React.memo(({ value, onChange }: {
     className="select select-sm w-full sm:w-40"
   >
     <option value="Tất cả">Tất cả</option>
+    <option value="Basic">Admin</option>
+    <option value="Basic">Customer</option>
     <option value="Basic">Basic</option>
     <option value="Pro">Pro</option>
     <option value="Premium">Premium</option>

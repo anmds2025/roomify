@@ -162,40 +162,40 @@ const AppRouting = (): ReactElement => {
       case 'Root':
         return <Navigate to="/users" replace />;
       case 'Admin':
-        return <Navigate to="/users" replace />;
+        return <Navigate to="/homes" replace />;
       default:
-        return <Navigate to="/default" replace />;
+        return <Navigate to="/homes" replace />;
     }
   };
   return (
     <Routes>
-       <Route element={<RequireAuth allowedLelves={['Root', 'Admin', 'Basic', 'Pro', 'Premium', 'Enterprise']} />}>
+       <Route element={<RequireAuth allowedLelves={['Root', 'Admin', 'Customer']} />}>
         <Route element={<Demo1Layout />}>
           <Route
             path="/"
             element={<RedirectToFirstAllowedPage level={currentUser?.level || ""} />}
           />
 
-          <Route element={<RequireAuth allowedLelves={['Root', 'Admin']} />}>
+          <Route element={<RequireAuth allowedLelves={['Root']} />}>
             <Route path="/users" element={<UsersPage />} />
           </Route>
 
-          <Route element={<RequireAuth allowedLelves={['Root', 'Admin']} />}>
+          <Route element={<RequireAuth allowedLelves={['Root', 'Admin', 'Customer']} />}>
             <Route path="/homes" element={<HomesPage />} />
             <Route path="/deposit" element={<DepositPage />} />
           </Route>
 
-          <Route element={<RequireAuth allowedLelves={['Root', 'Admin']} />}>
+          <Route element={<RequireAuth allowedLelves={['Root', 'Admin', 'Customer']} />}>
             <Route path="/data-electricity" element={<DataElectricityPage />} />
             <Route path="/data-water" element={<DataWaterPage />} />
           </Route>
 
-          <Route element={<RequireAuth allowedLelves={['Root', 'Admin']} />}>
+          <Route element={<RequireAuth allowedLelves={['Root', 'Admin', 'Customer']} />}>
             <Route path="/rooms" element={<RoomPage />} />
             <Route path="/interior" element={<InteriorPage />} />
           </Route>
 
-          <Route element={<RequireAuth allowedLelves={['Root', 'Admin']} />}>
+          <Route element={<RequireAuth allowedLelves={['Root', 'Admin', 'Customer']} />}>
             <Route path="/finance" element={<FinancePage />} />
             <Route path="/expense" element={<ExpensePage />} />
             <Route path="/money-slips" element={<MoneySlipPage />} />

@@ -302,6 +302,10 @@ const SidebarMenu = () => {
           if (level == ('Admin')) {
             return true;
           }
+
+          if (level == ('Customer')) {
+            return true;
+          }
           
           if(child.path === '/profile')
           {

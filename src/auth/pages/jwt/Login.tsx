@@ -147,6 +147,14 @@ const Login = () => {
           >
             Quên mật khẩu
           </Link>
+          <Link
+            to={
+              '/auth/signup'
+            }
+            className="text-2sm link shrink-0 text-[#FEC010]"
+          >
+            Đăng ký
+          </Link>
         </div>
 
         <button
