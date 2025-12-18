@@ -1,5 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { useEffect, useMemo, Fragment, useState } from 'react';
+import type { KeyboardEvent as ReactKeyboardEvent } from 'react';
 import { useSnackbar } from 'notistack';
 import { ColumnDef } from '@tanstack/react-table';
 import { DataGrid, KeenIcon } from '@/components';
@@ -38,6 +39,8 @@ const DataElectricity = () => {
     isOpen: false,
     data: null,
   });
+  const [editingCell, setEditingCell] = useState<{ id: string; field: 'oldReading' | 'newReading' } | null>(null);
+  const [tempValue, setTempValue] = useState<string>('');
 
   // Styles cho react-select (đẹp và đồng bộ, thân thiện mobile)
   const selectStyles = useMemo(() => ({
@@ -144,6 +147,55 @@ const DataElectricity = () => {
     }
   };
 
+  // Xử lý khi click vào ô để chỉnh sửa inline
+  const handleCellClick = (id: string, field: 'oldReading' | 'newReading', currentValue: number | null) => {
+    setEditingCell({ id, field });
+    setTempValue(String(currentValue || 0));
+  };
+
+  // Xử lý khi blur (bấm ra ngoài) để lưu dữ liệu
+  const handleCellBlur = async (id: string, field: 'oldReading' | 'newReading') => {
+    if (!editingCell) return;
+
+    const room = electricityData.find((r) => r.id === id);
+    if (!room) return;
+
+    const newValue = Number(tempValue) || 0;
+    const oldValue = field === 'oldReading' ? room.oldReading : room.newReading;
+
+    // Nếu giá trị không thay đổi, không cần gọi API
+    if (newValue === oldValue) {
+      setEditingCell(null);
+      return;
+    }
+
+    try {
+      const payload = {
+        room_pk: id,
+        type: 'electricity',
+        newData: field === 'newReading' ? String(newValue) : String(room.newReading || 0),
+        oldData: field === 'oldReading' ? String(newValue) : String(room.oldReading),
+      };
+      
+      await updateDataRoom(payload);
+      await fetchRoomsByHome(selectedHome);
+      enqueueSnackbar('Cập nhật thành công', { variant: 'success' });
+    } catch {
+      enqueueSnackbar('Không thể cập nhật chỉ số điện', { variant: 'error' });
+    } finally {
+      setEditingCell(null);
+    }
+  };
+
+  // Xử lý khi nhấn Enter trong input
+  const handleKeyDown = (e: ReactKeyboardEvent<HTMLInputElement>, id: string, field: 'oldReading' | 'newReading') => {
+    if (e.key === 'Enter') {
+      e.currentTarget.blur();
+    } else if (e.key === 'Escape') {
+      setEditingCell(null);
+    }
+  };
+
   // Định nghĩa cột bảng
   const columns = useMemo<ColumnDef<IElectricityData>[]>(
     () => [
@@ -155,11 +207,55 @@ const DataElectricity = () => {
       {
         accessorKey: 'oldReading',
         header: 'Số cũ',
+        cell: ({ row }) => {
+          const isEditing = editingCell?.id === row.original.id && editingCell?.field === 'oldReading';
+          return isEditing ? (
+            <input
+              type="number"
+              value={tempValue}
+              onChange={(e) => setTempValue(e.target.value)}
+              onBlur={() => handleCellBlur(row.original.id, 'oldReading')}
+              onKeyDown={(e) => handleKeyDown(e, row.original.id, 'oldReading')}
+              autoFocus
+              className="input input-sm w-full max-w-[100px] border border-blue-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+            />
+          ) : (
+            <div
+              onClick={() => handleCellClick(row.original.id, 'oldReading', row.original.oldReading)}
+              className="cursor-pointer hover:bg-gray-100 px-2 py-1 rounded transition-colors"
+              title="Click để chỉnh sửa"
+            >
+              {row.original.oldReading}
+            </div>
+          );
+        },
         meta: { className: 'min-w-[100px] whitespace-nowrap', cellClassName: 'min-w-[100px] whitespace-nowrap' }
       },
       {
         accessorKey: 'newReading',
         header: 'Số mới',
+        cell: ({ row }) => {
+          const isEditing = editingCell?.id === row.original.id && editingCell?.field === 'newReading';
+          return isEditing ? (
+            <input
+              type="number"
+              value={tempValue}
+              onChange={(e) => setTempValue(e.target.value)}
+              onBlur={() => handleCellBlur(row.original.id, 'newReading')}
+              onKeyDown={(e) => handleKeyDown(e, row.original.id, 'newReading')}
+              autoFocus
+              className="input input-sm w-full max-w-[100px] border border-blue-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+            />
+          ) : (
+            <div
+              onClick={() => handleCellClick(row.original.id, 'newReading', row.original.newReading)}
+              className="cursor-pointer hover:bg-gray-100 px-2 py-1 rounded transition-colors"
+              title="Click để chỉnh sửa"
+            >
+              {row.original.newReading}
+            </div>
+          );
+        },
         meta: { className: 'min-w-[100px] whitespace-nowrap', cellClassName: 'min-w-[100px] whitespace-nowrap' }
       },
       {
@@ -199,7 +295,7 @@ const DataElectricity = () => {
         meta: { className: 'w-[60px]', cellClassName: 'w-[60px]' }
       },
     ],
-    []
+    [editingCell, tempValue]
   );
 
   return (
