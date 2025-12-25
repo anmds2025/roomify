@@ -6,6 +6,7 @@ import {
   ResetPasswordChanged,
   ResetPasswordCheckEmail,
   ResetPasswordEnterEmail,
+  ResetPasswordEnterOTP,
   Signup,
   TwoFactorAuth
 } from './pages/jwt';
@@ -23,6 +24,7 @@ const AuthPage = () => (
       <Route path="check-email" element={<CheckEmail />} />
       <Route path="reset-password" element={<ResetPassword />} />
       <Route path="/reset-password/enter-email" element={<ResetPasswordEnterEmail />} />
+      <Route path="/reset-password/enter-otp" element={<ResetPasswordEnterOTP />} />
       <Route path="/reset-password/check-email" element={<ResetPasswordCheckEmail />} />
       <Route path="/reset-password/change" element={<ResetPasswordChange />} />
       <Route path="/reset-password/changed" element={<ResetPasswordChanged />} />
@@ -36,6 +38,7 @@ const AuthPage = () => (
       <Route path="/classic/check-email" element={<CheckEmail />} />
       <Route path="/classic/reset-password" element={<ResetPassword />} />
       <Route path="/classic/reset-password/enter-email" element={<ResetPasswordEnterEmail />} />
+      <Route path="/classic/reset-password/enter-otp" element={<ResetPasswordEnterOTP />} />
       <Route path="/classic/reset-password/check-email" element={<ResetPasswordCheckEmail />} />
       <Route path="/classic/reset-password/change" element={<ResetPasswordChange />} />
       <Route path="/classic/reset-password/changed" element={<ResetPasswordChanged />} />

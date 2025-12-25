@@ -35,8 +35,6 @@ const AccountUserProfilePage = () => {
 
   return (
     <Fragment>
-      <PageNavbar />
-
       {currentLayout?.name === 'demo1-layout' && (
         <Container width="fluid">
           <Toolbar>

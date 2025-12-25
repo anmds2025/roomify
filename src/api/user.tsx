@@ -13,8 +13,10 @@ const UPDATE_USER_URL = `${API_URL}/user/update`;
 const USER_ROLE_URL = `${API_URL}/userRoles`;
 const UPDATE_PROFILE_URL = `${API_URL}/user/update-profile`;
 const CHANGEPASSWORD_URL = `${API_URL}/user/changePassword`;
-const CHECK_MAIL_PASSWORD = `${API_URL}/send-mail-check-password`;
-const SEND_NEW_PASSWORD = `${API_URL}/send-mail-new-password`;
+// Forgot password (OTP)
+// Backend: api/views/user.py -> MissPassword, CheckOTPPassword
+const FORGOT_PASSWORD_SEND_OTP_URL = `${API_URL}/user/missPassword`;
+const FORGOT_PASSWORD_VERIFY_OTP_URL = `${API_URL}/user/checkOTPPassword`;
 
 export interface UpdateUserPayload {
   pk: string
@@ -158,17 +160,27 @@ export const changePasswordApi = async (
   return response.data;
 };
 
-export const sendMailCheckPasswordApi = async (
-  email: string
-): Promise<any> => {
-  const response = await axios.post(CHECK_MAIL_PASSWORD, { email });
+// Step 1: Send OTP to email
+export const sendForgotPasswordOtpApi = async (email: string): Promise<any> => {
+  // Backend expects multipart/form-data and param name: email
+  const formData = createFormData({ email });
+  const response = await axios.post(FORGOT_PASSWORD_SEND_OTP_URL, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
   return response.data;
 };
 
-export const sendMailNewPasswordApi = async (
- email: string, token: string
-): Promise<any> => {
-  const response = await axios.post(SEND_NEW_PASSWORD, { email, token });
+// Step 2: Verify OTP -> backend will generate new password and send to email (current BE behavior)
+export const verifyForgotPasswordOtpApi = async (otp: string): Promise<any> => {
+  // Backend expects multipart/form-data and param name: otp
+  const formData = createFormData({ otp });
+  const response = await axios.post(FORGOT_PASSWORD_VERIFY_OTP_URL, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
   return response.data;
 };
 

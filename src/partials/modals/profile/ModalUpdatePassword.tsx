@@ -1,7 +1,5 @@
-import { forwardRef, useEffect, useRef, useState, useCallback } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { forwardRef, useCallback, useState } from 'react';
+import { Modal, ModalBody, ModalContent, ModalHeader } from '@/components/modal';
 import { KeenIcon } from '@/components';
 import { toast } from 'react-toastify';
 import { useUser } from '@/hooks/useUser';
@@ -26,7 +24,7 @@ interface PasswordErrors {
 }
 
 const ModalUpdatePassword = forwardRef<HTMLDivElement, ModalUpdatePasswordProps>(
-  ({ open, onClose }, ref) => {
+  ({ open, onClose }, _ref) => {
     const { changePassword } = useUser();
     const { currentUser } = useAuthContext();
 
@@ -152,72 +150,86 @@ const ModalUpdatePassword = forwardRef<HTMLDivElement, ModalUpdatePasswordProps>
     ];
 
     return (
-      <Dialog open={open} onOpenChange={handleClose}>
-        <DialogContent className="max-w-md bg-white">
-          <DialogHeader>
-            <DialogTitle className="text-lg font-semibold text-gray-900">
-              Thay đổi mật khẩu
-            </DialogTitle>
-          </DialogHeader>
+    <Modal open={open} onClose={handleClose} zIndex={1500}>
+      <ModalContent className="max-w-[520px]">
+        <ModalHeader className="py-4 px-5">
+          <div className="text-[#1A2B49] text-lg font-semibold flex items-center gap-2">
+            <KeenIcon icon="lock" className="text-[#1A2B49]" />
+            Thay đổi mật khẩu
+          </div>
+          <button className="btn btn-sm btn-icon btn-light btn-clear shrink-0" onClick={handleClose}>
+            <KeenIcon icon="cross" />
+          </button>
+        </ModalHeader>
 
-          <div className="space-y-4">
+        <ModalBody className="py-4 px-5">
+          <div className="flex flex-col gap-4">
             {passwordFields.map(({ key, label, showKey }) => (
-              <div key={key} className="space-y-2">
-                <Label htmlFor={key} className="text-sm font-medium text-gray-700">
-                  {label}
-                  <span className="text-red-500 ml-1">*</span>
-                </Label>
-                <div className="relative">
-                  <Input
-                    id={key}
+              <div key={key} className="w-full">
+                <div className="text-sm text-[#404041] mb-2">
+                  {label} <span className="text-red-500">*</span>
+                </div>
+
+                <div
+                  className="input w-full text-base relative"
+                  style={{
+                    borderColor:
+                      errors[key] || (key === 'passwordNew2' && errors.passwordMatch)
+                        ? 'red'
+                        : '#F4F4F4',
+                  }}
+                >
+                  <input
+                    style={{ color: '#1A2B49', padding: '0.5rem 0' }}
                     type={showPasswords[showKey] ? 'text' : 'password'}
+                    placeholder={`Nhập ${label.toLowerCase()}`}
                     value={passwordData[key]}
                     onChange={(e) => handleInputChange(key, e.target.value)}
-                    placeholder={`Nhập ${label.toLowerCase()}`}
-                    className={`pr-10 ${errors[key] || (key === 'passwordNew2' && errors.passwordMatch) ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
                   />
+
                   <button
                     type="button"
                     onClick={() => togglePasswordVisibility(showKey)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
+                    className="absolute right-3 top-1/2 -translate-y-1/2"
+                    aria-label={showPasswords[showKey] ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
                   >
                     <KeenIcon
-                      icon={showPasswords[showKey] ? "eye-slash" : "eye"}
-                      className="w-4 h-4"
+                      icon={showPasswords[showKey] ? 'eye-slash' : 'eye'}
+                      className="w-5 h-5 text-[#1A2B49]"
                     />
                   </button>
                 </div>
+
                 {(errors[key] || (key === 'passwordNew2' && errors.passwordMatch)) && (
-                  <p className="text-xs text-red-500 flex items-center gap-1">
+                  <div className="mt-2 text-xs text-red-600 flex items-center gap-1">
                     <KeenIcon icon="warning" className="w-3 h-3" />
-                    {key === 'passwordNew2' && errors.passwordMatch 
-                      ? 'Mật khẩu không trùng khớp' 
-                      : 'Trường này là bắt buộc'
-                    }
-                  </p>
+                    {key === 'passwordNew2' && errors.passwordMatch
+                      ? 'Mật khẩu mới và xác nhận mật khẩu không trùng khớp'
+                      : 'Trường này là bắt buộc'}
+                  </div>
                 )}
               </div>
             ))}
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex justify-end gap-3 pt-6 border-t border-gray-200">
+          <div className="w-full flex flex-col sm:flex-row gap-2 justify-end pt-5">
             <button
               onClick={handleClose}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors"
+              className="py-2 px-3 border border-[#F4F4F4] rounded text-base font-bold text-[#1A2B49] w-full sm:w-auto"
             >
               Hủy bỏ
             </button>
             <button
               onClick={handleUpdate}
-              className="px-4 py-2 text-sm font-medium text-white bg-primary border border-transparent rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors"
+              className="py-2 px-3 border border-[#F4F4F4] rounded text-base font-bold bg-[#1A2B49] text-white hover:bg-[#16243c] w-full sm:w-auto"
             >
               Cập nhật
             </button>
           </div>
-        </DialogContent>
-      </Dialog>
-    );
+        </ModalBody>
+      </ModalContent>
+    </Modal>
+  );
   }
 );
 

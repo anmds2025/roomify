@@ -1,20 +1,14 @@
 import clsx from 'clsx';
-import { useFormik } from 'formik';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import * as Yup from 'yup';
+import { Link, useNavigate } from 'react-router-dom';
 
-import { useAuthContext } from '@/auth/useAuthContext';
-import { KeenIcon } from '@/components';
-import { useLayout } from '@/providers';
 import { toast } from 'react-toastify';
 import { useUser } from '@/hooks/useUser';
-import { ModalCheckPassword } from '@/partials/modals/confirm/ModalCheckPassword';
 
 const ResetPassword = () => {
-  const { sendMailCheckPassword } = useUser();
+  const { sendForgotPasswordOtp } = useUser();
+  const navigate = useNavigate();
   const [inputEmail, setInputEmail] = useState<string>('');
-  const [openCheckModal, setOpenCheckModal] = useState(false);
   const [isError, setIsError] = useState({
     email: false,
   });
@@ -46,31 +40,22 @@ const ResetPassword = () => {
   };
 
   const handleSendMail = async () => {
-    if (validateFields()) {
-      try {
-        const response =  await sendMailCheckPassword(inputEmail);
-        if(response)
-        {
-          setOpenCheckModal(true)
-        }
-      } catch (error) {
-        console.error('Failed to update password', error);
-      }
-    }
-  };
+    if (!validateFields()) return;
 
-  const handleCloseActiveModal = () => {
-    setOpenCheckModal(false);
+    try {
+      await sendForgotPasswordOtp(inputEmail.trim());
+      // chuyển sang màn hình nhập OTP
+      navigate('/auth/reset-password/enter-otp', {
+        state: { email: inputEmail.trim() },
+      });
+    } catch (error) {
+      // toast đã được xử lý trong hook
+      console.error('Failed to send OTP', error);
+    }
   };
 
   return (
     <div className="card max-w-[370px] w-full p-10 gap-5">
-      <ModalCheckPassword
-        open={openCheckModal}
-        onClose={handleCloseActiveModal}
-        title= {"Khôi phục mật khẩu"}
-        message={'Hệ thống sẽ gửi email chứa liên kết khôi phục mật khẩu đến bạn nếu email đã được đăng ký trước đó. Vui lòng kiểm tra hộp thư của bạn và làm theo hướng dẫn.'}
-      />
       <div className="text-center mb-2.5">
         <div className='flex gap-2 items-center justify-center text-[#1A2B49] text-lg font-bold'>
           ADMIN

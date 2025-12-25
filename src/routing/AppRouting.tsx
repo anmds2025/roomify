@@ -314,7 +314,6 @@ const AppRouting = (): ReactElement => {
       
       <Route path="error/*" element={<ErrorsRouting />} />
       <Route path="auth/*" element={<AuthPage />} />
-      <Route path="/reset-password" element={<CheckUserMailPage />} />
       <Route path="*" element={<Navigate to="/error/404" />} />
       <Route path="/default" element={<DemoLayout />} />
     </Routes>

@@ -1,4 +1,4 @@
-import { changePasswordApi, deleteUserApi, getCurrentUserApi, getUserApi, sendMailCheckPasswordApi, sendMailNewPasswordApi, UpdateProfilePayload, updateProfileUserApi, updateUserApi, UpdateUserPayload } from '@/api/user';
+import { changePasswordApi, deleteUserApi, getCurrentUserApi, getUserApi, sendForgotPasswordOtpApi, verifyForgotPasswordOtpApi, UpdateProfilePayload, updateProfileUserApi, updateUserApi, UpdateUserPayload } from '@/api/user';
 import { useAuthContext } from '@/auth';
 import { useState, useCallback } from 'react';
 import { toast } from 'react-toastify';
@@ -163,40 +163,40 @@ export const useUser = () => {
         }
     };
 
-    const sendMailCheckPassword = async ( 
-        email: string
-    ) => {
+    // Forgot password flow (OTP)
+    const sendForgotPasswordOtp = async (email: string) => {
         setIsLoading(true);
         setError(null);
         setSuccessMessage(null);
     
         try {
-            const response = await sendMailCheckPasswordApi(email);
+            const response = await sendForgotPasswordOtpApi(email);
+            toast.success(response?.Success || 'Đã gửi OTP về email');
             return response;
         } catch (error: any) {
-            setError(error.response.data.error || 'Failed to send mail');
-            toast.error(error.response.data.error || 'Failed to send mail');
+            const msg = error?.response?.data?.Error || error?.message || 'Gửi OTP thất bại';
+            setError(msg);
+            toast.error(msg);
+            throw error;
         } finally {
             setIsLoading(false);
         }
     };
 
-    const sendMailNewPassword = async ({
-        email,
-        token,}: {
-        email: string;
-        token: string;
-    }) => {
+    const verifyForgotPasswordOtp = async (otp: string) => {
         setIsLoading(true);
         setError(null);
         setSuccessMessage(null);
 
-    try {
-        const response = await sendMailNewPasswordApi(email, token);
+        try {
+            const response = await verifyForgotPasswordOtpApi(otp);
+            toast.success(response?.Success || 'Xác thực OTP thành công');
             return response;
         } catch (error: any) {
-            setError(error.message || 'Failed to send mail');
-            toast.error(error.response.data.message || 'Failed to send mail');
+            const msg = error?.response?.data?.Error || error?.message || 'OTP không đúng';
+            setError(msg);
+            toast.error(msg);
+            throw error;
         } finally {
             setIsLoading(false);
         }
@@ -239,8 +239,8 @@ export const useUser = () => {
         updateUser,
         deleteUser,
         changePassword,
-        sendMailCheckPassword,
-        sendMailNewPassword,
+        sendForgotPasswordOtp,
+        verifyForgotPasswordOtp,
         updateUserProfile,
         updateProfileUser,
         getCurrentUser
