@@ -88,7 +88,6 @@ import { MoneySlipPage } from '@/pages/dashboards/money-slip/MoneySlipPage';
 import { HomesPage } from '@/pages/dashboards/homes/HomesPage';
 import { RoomPage } from '@/pages/dashboards/rooms/RoomPage';
 import { ContractSigningPage } from '@/pages/contract-signing/ContractSigningPage';
-import { CheckUserMailPage } from '@/pages/account/home/user-profile/CheckUserMailPage';
 import { ExpensePage } from '@/pages/dashboards/finance/ExpensePage';
 import { DepositPage } from '@/pages/dashboards/deposit/DepositPage';
 import { InteriorPage } from '@/pages/dashboards/interior/InteriorPage';
