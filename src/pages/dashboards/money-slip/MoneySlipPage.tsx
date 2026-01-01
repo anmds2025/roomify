@@ -7,6 +7,7 @@ import { IHomeData } from '@/pages/dashboards/light-sidebar/blocks/homes/HomesDa
 import { IRoomData } from '@/pages/dashboards/light-sidebar/blocks/rooms/RoomsData';
 import { IMoneySlipData } from '@/types/moneySlip';
 import { KeenIcon } from '@/components';
+import { toast } from 'react-toastify';
 
 const formatCurrency = (value?: string | number) => {
   if (value === undefined || value === null || value === '') return '0 VND';
@@ -141,6 +142,25 @@ const MoneySlipPage = () => {
     }, 0);
   }, [filteredSlips]);
 
+  const handleShareZalo = (s: any, phone: string) => {
+    const link = `${import.meta.env.VITE_APP_SERVER_URL}/${s.moneySlip_path}`;
+
+    const message = `Xem phiếu thu: ${s.room_name} - ${formatCurrency(
+      s.totalPrice
+    )}
+    ${link}`;
+
+    // 1️⃣ Copy nội dung
+    navigator.clipboard.writeText(message).then(() => {
+      toast.success("Đã sao chép nội dung, dán vào Zalo để gửi");
+
+      // 2️⃣ Đợi 1s rồi redirect sang Zalo
+      setTimeout(() => {
+        window.open(`https://zalo.me/${phone}`, "_blank");
+      }, 1000);
+    });
+  };
+
   return (
     <Fragment>
       <Container width="fluid">
@@ -258,18 +278,12 @@ const MoneySlipPage = () => {
                                 >
                                   Xem
                                 </a>
-                                <a
+                                <button
                                   className="btn btn-sm btn-primary justify-center"
-                                  href={`https://zalo.me/share?text=${encodeURIComponent(
-                                    `Xem phiếu thu: ${s.room_name} - ${formatCurrency(s.totalPrice)}`
-                                  )}&url=${encodeURIComponent(
-                                    `${import.meta.env.VITE_APP_SERVER_URL}${s.moneySlip_path}`
-                                  )}`}
-                                  target="_blank"
-                                  rel="noreferrer"
+                                  onClick={() => handleShareZalo(s, '0388794195')}
                                 >
                                   Share Zalo
-                                </a>
+                                </button>
                               </div>
                             </div>
                             <div className="text-sm text-gray-600">Tháng: {s.month}</div>
