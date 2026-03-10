@@ -37,6 +37,7 @@ type NormalizedSlip = IMoneySlipData & {
   room_name?: string;
   month?: string;
   totalPrice?: string;
+  phoneB?: string;
 };
 
 const MoneySlipPage = () => {
@@ -280,7 +281,7 @@ const MoneySlipPage = () => {
                                 </a>
                                 <button
                                   className="btn btn-sm btn-primary justify-center"
-                                  onClick={() => handleShareZalo(s, '0388794195')}
+                                  onClick={() => handleShareZalo(s, s.phoneB || '')}
                                 >
                                   Share Zalo
                                 </button>

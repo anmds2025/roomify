@@ -12,6 +12,8 @@ interface IUserData {
   level: string;
   avatar: string;
   image_QR: string;
+  point_balance?: number;
+  total_recharged_vnd?: number;
   timeUpdate: { $date: number }; 
   cccd_code: string;
   cccd_address: string;

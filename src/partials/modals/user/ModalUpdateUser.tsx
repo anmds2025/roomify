@@ -110,7 +110,7 @@ FormField.displayName = 'FormField';
 
 const ModalUpdateUser = forwardRef<HTMLDivElement, ModalUpdateUserProps>(
   ({ open, onClose, user, fetchUsers }, ref) => {
-    const { createUser, updateUser } = useUser();
+    const { createUser, updateUser, getRechargePackages, createRecharge, getRechargeTransactions } = useUser();
 
     // Form state
     const [formData, setFormData] = useState({
@@ -129,6 +129,10 @@ const ModalUpdateUser = forwardRef<HTMLDivElement, ModalUpdateUserProps>(
       level: false,
       emailInvalid: false,
     });
+
+    const [rechargePackages, setRechargePackages] = useState<Array<{ code: string; name: string; amount_vnd: number; point_value: number; bonus?: string }>>([]);
+    const [rechargeHistory, setRechargeHistory] = useState<Array<{ _id: { $oid: string }; package_name: string; amount_vnd: number; point_value: number; status: string; checkout_url?: string }>>([]);
+    const [isLoadingRecharge, setIsLoadingRecharge] = useState(false);
 
     // Initialize form data when user changes
     useEffect(() => {
@@ -244,6 +248,36 @@ const ModalUpdateUser = forwardRef<HTMLDivElement, ModalUpdateUserProps>(
       { value: 'Enterprise', label: 'Enterprise' }
     ], []);
 
+    const loadRechargeData = useCallback(async () => {
+      if (!isEdit) return;
+      setIsLoadingRecharge(true);
+      try {
+        const [packages, transactions] = await Promise.all([
+          getRechargePackages(),
+          getRechargeTransactions(),
+        ]);
+        setRechargePackages(packages || []);
+        setRechargeHistory((transactions || []).slice(0, 5));
+      } finally {
+        setIsLoadingRecharge(false);
+      }
+    }, [isEdit, getRechargePackages, getRechargeTransactions]);
+
+    useEffect(() => {
+      if (open) {
+        loadRechargeData();
+      }
+    }, [open, loadRechargeData]);
+
+    const handleRecharge = useCallback(async (packageCode: string) => {
+      const response = await createRecharge(packageCode);
+      if (response?.checkout_url) {
+        window.open(response.checkout_url, '_blank', 'noopener,noreferrer');
+      }
+      loadRechargeData();
+      if (fetchUsers) fetchUsers();
+    }, [createRecharge, loadRechargeData, fetchUsers]);
+
     return (
       <Dialog open={open} onOpenChange={handleClose}>
         <DialogContent className="w-[calc(100vw-2rem)] sm:max-w-3xl lg:max-w-4xl max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-900 p-0 rounded-xl">
@@ -321,6 +355,63 @@ const ModalUpdateUser = forwardRef<HTMLDivElement, ModalUpdateUserProps>(
                     error={errors.level}
                     required
                   />
+
+                  {isEdit && (
+                    <div className="rounded-xl border border-dashed border-blue-200 bg-blue-50/60 p-4 space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <div className="text-sm text-gray-600">Số điểm hiện tại</div>
+                          <div className="text-2xl font-bold text-blue-700">{user?.point_balance || 0} điểm</div>
+                        </div>
+                        <div className="text-right text-xs text-gray-500">
+                          <div>Tổng đã nạp</div>
+                          <div>{(user?.total_recharged_vnd || 0).toLocaleString('vi-VN')} đ</div>
+                        </div>
+                      </div>
+
+                      <div className="text-sm font-semibold text-gray-700">Chọn gói nạp điểm</div>
+                      <div className="grid grid-cols-1 gap-2">
+                        {(rechargePackages || []).map((pkg) => (
+                          <button
+                            key={pkg.code}
+                            type="button"
+                            disabled={isLoadingRecharge}
+                            onClick={() => handleRecharge(pkg.code)}
+                            className="w-full rounded-lg border border-blue-200 bg-white px-3 py-2 text-left hover:bg-blue-50 disabled:opacity-60"
+                          >
+                            <div className="flex items-center justify-between">
+                              <span className="font-medium text-gray-800">{pkg.name}</span>
+                              <span className="text-blue-700 font-semibold">{pkg.point_value} điểm</span>
+                            </div>
+                            <div className="text-xs text-gray-500 mt-1">
+                              {pkg.amount_vnd.toLocaleString('vi-VN')} đ {pkg.bonus ? `• ${pkg.bonus}` : ''}
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+
+                      <div>
+                        <div className="text-sm font-semibold text-gray-700 mb-2">Lịch sử nạp gần đây</div>
+                        <div className="space-y-2 max-h-40 overflow-y-auto">
+                          {(rechargeHistory || []).length === 0 ? (
+                            <div className="text-xs text-gray-500">Chưa có giao dịch nạp.</div>
+                          ) : (
+                            rechargeHistory.map((item) => (
+                              <div key={item._id.$oid} className="rounded-md border border-gray-200 bg-white p-2 text-xs">
+                                <div className="flex justify-between">
+                                  <span>{item.package_name}</span>
+                                  <span className={item.status === 'paid' ? 'text-green-600' : item.status === 'failed' ? 'text-red-600' : 'text-amber-600'}>
+                                    {item.status}
+                                  </span>
+                                </div>
+                                <div className="text-gray-500">{item.amount_vnd.toLocaleString('vi-VN')} đ • {item.point_value} điểm</div>
+                              </div>
+                            ))
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 

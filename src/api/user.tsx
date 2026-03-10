@@ -17,6 +17,9 @@ const CHANGEPASSWORD_URL = `${API_URL}/user/changePassword`;
 // Backend: api/views/user.py -> MissPassword, CheckOTPPassword
 const FORGOT_PASSWORD_SEND_OTP_URL = `${API_URL}/user/missPassword`;
 const FORGOT_PASSWORD_VERIFY_OTP_URL = `${API_URL}/user/checkOTPPassword`;
+const RECHARGE_PACKAGES_URL = `${API_URL}/user/recharge/packages`;
+const CREATE_RECHARGE_URL = `${API_URL}/user/recharge/create`;
+const RECHARGE_TRANSACTIONS_URL = `${API_URL}/user/recharge/transactions`;
 
 export interface UpdateUserPayload {
   pk: string
@@ -177,6 +180,80 @@ export const verifyForgotPasswordOtpApi = async (otp: string): Promise<any> => {
   // Backend expects multipart/form-data and param name: otp
   const formData = createFormData({ otp });
   const response = await axios.post(FORGOT_PASSWORD_VERIFY_OTP_URL, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  return response.data;
+};
+
+export interface RechargePackage {
+  code: string;
+  name: string;
+  amount_vnd: number;
+  point_value: number;
+  bonus?: string;
+}
+
+export interface CreateRechargeResponse {
+  transaction_id: string;
+  transaction_code: string;
+  amount_vnd: number;
+  point_value: number;
+  status: string;
+  checkout_url?: string;
+  qr_url?: string;
+  form_payload?: Record<string, string>;
+}
+
+export interface RechargeTransaction {
+  _id: { $oid: string };
+  package_code: string;
+  package_name: string;
+  amount_vnd: number;
+  point_value: number;
+  status: 'pending' | 'paid' | 'failed';
+  transaction_code: string;
+  checkout_url?: string;
+  qr_url?: string;
+  paid_at?: any;
+  timeCreate?: any;
+}
+
+export const getRechargePackagesApi = async (): Promise<{ objects: RechargePackage[]; exchange_rate: string }> => {
+  const response = await axios.post(RECHARGE_PACKAGES_URL, createFormData({}), {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  return response.data;
+};
+
+export const createRechargeApi = async (
+  packageCode: string,
+  user: UserModel
+): Promise<CreateRechargeResponse> => {
+  const formData = createFormData({
+    token: user?.token,
+    package_code: packageCode,
+  });
+
+  const response = await axios.post<CreateRechargeResponse>(CREATE_RECHARGE_URL, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  return response.data;
+};
+
+export const getRechargeTransactionsApi = async (
+  user: UserModel
+): Promise<{ objects: RechargeTransaction[] }> => {
+  const formData = createFormData({
+    token: user?.token,
+  });
+
+  const response = await axios.post<{ objects: RechargeTransaction[] }>(RECHARGE_TRANSACTIONS_URL, formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },

@@ -1,4 +1,4 @@
-import { changePasswordApi, deleteUserApi, getCurrentUserApi, getUserApi, sendForgotPasswordOtpApi, verifyForgotPasswordOtpApi, UpdateProfilePayload, updateProfileUserApi, updateUserApi, UpdateUserPayload } from '@/api/user';
+import { changePasswordApi, createRechargeApi, deleteUserApi, getCurrentUserApi, getRechargePackagesApi, getRechargeTransactionsApi, getUserApi, RechargePackage, sendForgotPasswordOtpApi, verifyForgotPasswordOtpApi, UpdateProfilePayload, updateProfileUserApi, updateUserApi, UpdateUserPayload } from '@/api/user';
 import { useAuthContext } from '@/auth';
 import { useState, useCallback } from 'react';
 import { toast } from 'react-toastify';
@@ -215,7 +215,7 @@ export const useUser = () => {
             const { id, full_name, avatar } = data;
             const updateFields: Record<string, any> = { id }; 
             if (full_name) updateFields.full_name = full_name;
-            if (avatar) updateFields.avatar = avatar;``
+            if (avatar) updateFields.avatar = avatar;
             // Gọi API
             // const response = await updateProfileApi(updateFields);
             setSuccessMessage('User updated successfully');
@@ -228,6 +228,53 @@ export const useUser = () => {
             setIsLoading(false);
         }
     };
+
+    const getRechargePackages = useCallback(async (): Promise<RechargePackage[]> => {
+        try {
+            const response = await getRechargePackagesApi();
+            return response?.objects || [];
+        } catch (error: any) {
+            toast.error(error?.response?.data?.Error || 'Không tải được gói nạp');
+            return [];
+        }
+    }, []);
+
+    const createRecharge = useCallback(async (packageCode: string) => {
+        setIsLoading(true);
+        setError(null);
+
+        try {
+            const user = currentUser || getStoredUser();
+            if (!user) {
+                toast.error('Bạn cần đăng nhập');
+                return null;
+            }
+            const response = await createRechargeApi(packageCode, user);
+            toast.success('Tạo giao dịch thành công, vui lòng thanh toán');
+            return response;
+        } catch (error: any) {
+            const msg = error?.response?.data?.Error || 'Không thể tạo giao dịch nạp điểm';
+            setError(msg);
+            toast.error(msg);
+            return null;
+        } finally {
+            setIsLoading(false);
+        }
+    }, [currentUser]);
+
+    const getRechargeTransactions = useCallback(async () => {
+        try {
+            const user = currentUser || getStoredUser();
+            if (!user) {
+                return [];
+            }
+            const response = await getRechargeTransactionsApi(user);
+            return response?.objects || [];
+        } catch (error: any) {
+            toast.error(error?.response?.data?.Error || 'Không tải được lịch sử nạp');
+            return [];
+        }
+    }, [currentUser]);
 
     
     return {
@@ -243,6 +290,9 @@ export const useUser = () => {
         verifyForgotPasswordOtp,
         updateUserProfile,
         updateProfileUser,
-        getCurrentUser
+        getCurrentUser,
+        getRechargePackages,
+        createRecharge,
+        getRechargeTransactions
     };
 };

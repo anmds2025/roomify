@@ -151,7 +151,7 @@ const ModalUpdatePassword = forwardRef<HTMLDivElement, ModalUpdatePasswordProps>
 
     return (
     <Modal open={open} onClose={handleClose} zIndex={1500}>
-      <ModalContent className="max-w-[520px]">
+      <ModalContent className="max-w-[520px] top-[15%]">
         <ModalHeader className="py-4 px-5">
           <div className="text-[#1A2B49] text-lg font-semibold flex items-center gap-2">
             <KeenIcon icon="lock" className="text-[#1A2B49]" />

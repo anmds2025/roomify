@@ -21,6 +21,8 @@ export interface UserModel {
   avatar?: string;
   image_QR?: string;
   image_signature?: string;
+  point_balance?: number;
+  total_recharged_vnd?: number;
 }
 
 export interface IOption {

@@ -94,6 +94,8 @@ import { InteriorPage } from '@/pages/dashboards/interior/InteriorPage';
 import { DataElectricity } from '@/pages/dashboards/light-sidebar/blocks/data/DataElectricity';
 import { DataElectricityPage } from '@/pages/dashboards/data/DataElectricityPage';
 import { DataWaterPage } from '@/pages/dashboards/data/DataWaterPage';
+import { PointManagementPage } from '@/pages/dashboards/point/PointManagementPage';
+
 
 const AppRouting = (): ReactElement => {
   const { setProgressBarLoader } = useLoaders();
@@ -198,6 +200,7 @@ const AppRouting = (): ReactElement => {
             <Route path="/finance" element={<FinancePage />} />
             <Route path="/expense" element={<ExpensePage />} />
             <Route path="/money-slips" element={<MoneySlipPage />} />
+            <Route path="/point-management" element={<PointManagementPage />} />
           </Route>
 
           <Route path="/account/home/user-profile" element={<AccountUserProfilePage />} />

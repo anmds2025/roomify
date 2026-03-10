@@ -49,6 +49,16 @@ export const MENU_SIDEBAR: MenuConfigType = [
     ]
   },
   {
+    title: 'Quản lý điểm',
+    icon: 'gift',
+    children: [
+      {
+        title: 'Quản lý điểm',
+        path: '/point-management'
+      }
+    ]
+  },
+  {
     title: 'Quản lý giấy cọc',
     icon: 'dollar',
     children: [
