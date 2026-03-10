@@ -244,7 +244,7 @@ export const useUser = () => {
         setError(null);
 
         try {
-            const user = currentUser || getStoredUser();
+            const user = currentUser;
             if (!user) {
                 toast.error('Bạn cần đăng nhập');
                 return null;
@@ -264,7 +264,7 @@ export const useUser = () => {
 
     const getRechargeTransactions = useCallback(async () => {
         try {
-            const user = currentUser || getStoredUser();
+            const user = currentUser;
             if (!user) {
                 return [];
             }
