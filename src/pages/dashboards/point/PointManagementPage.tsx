@@ -56,8 +56,11 @@ const PointManagementPage = () => {
         const form = document.createElement('form');
         form.action = response.checkout_url;
         form.method = 'POST';
-        form.target = '_blank';
-
+        
+        // Phân biệt thiết bị
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        form.target = '_self';
+        // Thêm các field
         const orderedFields = [
           'merchant',
           'currency',
@@ -69,7 +72,6 @@ const PointManagementPage = () => {
           'success_url',
           'error_url',
           'cancel_url',
-          'payment_method',
           'signature',
         ];
 
@@ -84,9 +86,14 @@ const PointManagementPage = () => {
           form.appendChild(input);
         });
 
+        // Submit form ngay lập tức, không dùng setTimeout
         document.body.appendChild(form);
         form.submit();
-        document.body.removeChild(form);
+        
+        // Xóa form sau khi submit (dùng setTimeout ngắn để đảm bảo form đã được xử lý)
+        setTimeout(() => {
+          document.body.removeChild(form);
+        }, 0);
       }
       await loadData();
     },
