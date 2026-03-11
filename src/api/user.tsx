@@ -20,6 +20,8 @@ const FORGOT_PASSWORD_VERIFY_OTP_URL = `${API_URL}/user/checkOTPPassword`;
 const RECHARGE_PACKAGES_URL = `${API_URL}/user/recharge/packages`;
 const CREATE_RECHARGE_URL = `${API_URL}/user/recharge/create`;
 const RECHARGE_TRANSACTIONS_URL = `${API_URL}/user/recharge/transactions`;
+const ADMIN_RECHARGE_TRANSACTIONS_URL = `${API_URL}/user/recharge/admin-get`;
+const ADMIN_RECHARGE_STATS_URL = `${API_URL}/user/recharge/admin-stats`;
 
 export interface UpdateUserPayload {
   pk: string
@@ -220,6 +222,45 @@ export interface RechargeTransaction {
   timeCreate?: any;
 }
 
+export interface AdminRechargeTransaction {
+  _id: { $oid: string };
+  user_info: {
+    phone: string;
+    full_name: string;
+    email: string;
+  };
+  user_pk: string;
+  package_code: string;
+  package_name: string;
+  amount_vnd: number;
+  point_value: number;
+  status: 'pending' | 'paid' | 'failed';
+  transaction_code: string;
+  checkout_url?: string;
+  qr_url?: string;
+  paid_at?: string;
+  timeCreate: string;
+  sepay_payment_id?: string;
+}
+
+export interface PaginationInfo {
+  current_page: number;
+  page_size: number;
+  total_count: number;
+  total_pages: number;
+  has_next: boolean;
+  has_previous: boolean;
+}
+
+export interface AdminRechargeStats {
+  total: { transactions: number; amount: number; points: number };
+  today: { transactions: number; amount: number; points: number };
+  yesterday: { transactions: number; amount: number; points: number };
+  this_week: { transactions: number; amount: number; points: number };
+  this_month: { transactions: number; amount: number; points: number };
+}
+
+
 export const getRechargePackagesApi = async (): Promise<{ objects: RechargePackage[]; exchange_rate: string }> => {
   const response = await axios.post(RECHARGE_PACKAGES_URL, createFormData({}), {
     headers: {
@@ -260,4 +301,37 @@ export const getRechargeTransactionsApi = async (
   });
   return response.data;
 };
+
+export const getAdminRechargeTransactionsApi = async (
+  user: UserModel
+): Promise<{ objects: AdminRechargeTransaction[] }> => {
+  const formData = createFormData({
+    token: user?.token,
+  });
+
+  const response = await axios.post<{ objects: AdminRechargeTransaction[] }>(ADMIN_RECHARGE_TRANSACTIONS_URL, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  return response.data;
+};
+
+
+export const getAdminRechargeStatsApi = async (
+  user: UserModel
+): Promise<{ objects: AdminRechargeStats[] }> => {
+  const formData = createFormData({
+    token: user?.token,
+  });
+
+  const response = await axios.post<{ objects: AdminRechargeStats[] }>(ADMIN_RECHARGE_STATS_URL, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  return response.data;
+};
+
+
 

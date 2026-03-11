@@ -1,4 +1,4 @@
-import { changePasswordApi, createRechargeApi, deleteUserApi, getCurrentUserApi, getRechargePackagesApi, getRechargeTransactionsApi, getUserApi, RechargePackage, sendForgotPasswordOtpApi, verifyForgotPasswordOtpApi, UpdateProfilePayload, updateProfileUserApi, updateUserApi, UpdateUserPayload } from '@/api/user';
+import { changePasswordApi, createRechargeApi, deleteUserApi, getCurrentUserApi, getRechargePackagesApi, getRechargeTransactionsApi, getUserApi, RechargePackage, sendForgotPasswordOtpApi, verifyForgotPasswordOtpApi, UpdateProfilePayload, updateProfileUserApi, updateUserApi, UpdateUserPayload, getAdminRechargeTransactionsApi, getAdminRechargeStatsApi } from '@/api/user';
 import { useAuthContext } from '@/auth';
 import { useState, useCallback } from 'react';
 import { toast } from 'react-toastify';
@@ -276,6 +276,34 @@ export const useUser = () => {
         }
     }, [currentUser]);
 
+    const getAdminRechargeTransactions = useCallback(async () => {
+        try {
+            const user = currentUser;
+            if (!user) {
+                return [];
+            }
+            const response = await getAdminRechargeTransactionsApi(user);
+            return response?.objects || [];
+        } catch (error: any) {
+            toast.error(error?.response?.data?.Error || 'Không tải được lịch sử nạp');
+            return [];
+        }
+    }, [currentUser]);
+
+    const getAdminRechargeStats = useCallback(async () => {
+        try {
+            const user = currentUser;
+            if (!user) {
+                return [];
+            }
+            const response = await getAdminRechargeStatsApi(user);
+            return response?.objects || [];
+        } catch (error: any) {
+            toast.error(error?.response?.data?.Error || 'Không tải được thống kê nạp');
+            return [];
+        }
+    }, [currentUser]);
+
     
     return {
         isLoading,
@@ -293,6 +321,8 @@ export const useUser = () => {
         getCurrentUser,
         getRechargePackages,
         createRecharge,
-        getRechargeTransactions
+        getRechargeTransactions,
+        getAdminRechargeTransactions,
+        getAdminRechargeStats,
     };
 };

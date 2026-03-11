@@ -95,6 +95,7 @@ import { DataElectricity } from '@/pages/dashboards/light-sidebar/blocks/data/Da
 import { DataElectricityPage } from '@/pages/dashboards/data/DataElectricityPage';
 import { DataWaterPage } from '@/pages/dashboards/data/DataWaterPage';
 import { PointManagementPage } from '@/pages/dashboards/point/PointManagementPage';
+import { AdminRechargePage } from '@/pages/dashboards/point/AdminRechargePage';
 
 
 const AppRouting = (): ReactElement => {
@@ -177,8 +178,9 @@ const AppRouting = (): ReactElement => {
             element={<RedirectToFirstAllowedPage level={currentUser?.level || ""} />}
           />
 
-          <Route element={<RequireAuth allowedLelves={['Root']} />}>
+          <Route element={<RequireAuth allowedLelves={['Root', 'Admin']} />}>
             <Route path="/users" element={<UsersPage />} />
+            <Route path="/admin-point-management" element={<AdminRechargePage  />} />
           </Route>
 
           <Route element={<RequireAuth allowedLelves={['Root', 'Admin', 'Customer']} />}>
@@ -202,6 +204,7 @@ const AppRouting = (): ReactElement => {
             <Route path="/money-slips" element={<MoneySlipPage />} />
             <Route path="/point-management" element={<PointManagementPage />} />
           </Route>
+          
 
           <Route path="/account/home/user-profile" element={<AccountUserProfilePage />} />
           <Route path="/profile" element={<AccountUserProfilePage />} />
