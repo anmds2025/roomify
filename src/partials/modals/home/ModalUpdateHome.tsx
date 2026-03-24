@@ -319,7 +319,7 @@ const ModalUpdateHome = forwardRef<HTMLDivElement, ModalUpdateHomeProps>(
         handleClose();
       } catch (error) {
         console.error('Failed to update home', error);
-        toast.error(error?.response?.data?.Error || "Lỗi cập nhật thông tin");
+        toast.error((error as any)?.response?.data?.Error || "Lỗi cập nhật thông tin");
       }
     }, [validateForm, home, formData, qrImageFile, updateHome, handleClose, fetchHomes, isEdit, uploadImage, deleteImage, extractPublicId]);
 
