@@ -274,9 +274,13 @@ export const createRechargeApi = async (
   packageCode: string,
   user: UserModel
 ): Promise<CreateRechargeResponse> => {
+  const returnUrl = typeof window !== 'undefined' ? `${window.location.origin}/point-management` : 'https://app.roomify.vn/point-management';
+  
   const formData = createFormData({
     token: user?.token,
     package_code: packageCode,
+    success_url: returnUrl,
+    cancel_url: returnUrl,
   });
 
   const response = await axios.post<CreateRechargeResponse>(CREATE_RECHARGE_URL, formData, {
@@ -330,6 +334,55 @@ export const getAdminRechargeStatsApi = async (
       'Content-Type': 'multipart/form-data',
     },
   });
+  return response.data;
+};
+
+export const payRoomFeeApi = async (
+  user: UserModel
+): Promise<{ Success?: string; Error?: string }> => {
+  const formData = createFormData({
+    token: user?.token,
+  });
+
+  const response = await axios.post<{ Success?: string; Error?: string }>(
+    `${API_URL}/user/payRoomFee`,
+    formData,
+    {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    }
+  );
+  return response.data;
+};
+
+export const getRoomPackagesInfoApi = async (): Promise<{ objects: Record<string, any> }> => {
+  const response = await axios.post(
+    `${API_URL}/user/getRoomPackages`,
+    createFormData({}),
+    {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }
+  );
+  return response.data;
+};
+
+export const buyRoomPackageApi = async (
+  packageCode: string,
+  user: UserModel
+): Promise<{ Success?: string; Error?: string }> => {
+  const formData = createFormData({
+    token: user?.token,
+    package_code: packageCode,
+  });
+
+  const response = await axios.post<{ Success?: string; Error?: string }>(
+    `${API_URL}/user/buyRoomPackage`,
+    formData,
+    {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }
+  );
   return response.data;
 };
 

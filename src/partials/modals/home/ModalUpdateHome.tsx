@@ -71,19 +71,19 @@ function renderField({ type, value, onChange, label, error, disabled, options, i
         }
       }}
       disabled={disabled}
-      className={(error ? 'border-red-500 focus-visible:ring-red-500 ' : '') + 'w-full' }
+      className={(error ? 'border-red-500 focus-visible:ring-red-500 ' : '') + 'w-full'}
       inputMode={inputMode}
     />
   );
 }
 
 // Component cho form field với shadcn UI
-const FormField = React.memo(({ 
-  label, 
-  value, 
-  onChange, 
-  type = "text", 
-  error = false, 
+const FormField = React.memo(({
+  label,
+  value,
+  onChange,
+  type = "text",
+  error = false,
   options,
   disabled = false,
   required = false,
@@ -104,7 +104,7 @@ const FormField = React.memo(({
       {label}
       {required && <span className="text-red-500">*</span>}
     </Label>
-    
+
     {renderField({ type, value, onChange, label, error, disabled, options, inputMode })}
     {error && (
       <div className="flex items-center gap-1 mt-2 text-sm font-medium text-red-600">
@@ -170,15 +170,13 @@ const ModalUpdateHome = forwardRef<HTMLDivElement, ModalUpdateHomeProps>(
           addressBank: home?.addressBank || '',
           imageQR: home?.imageQR || '',
         });
-        if(home.imageQR)
-        {
+        if (home.imageQR) {
           setQrImageFileStr(home?.imageQR);
         }
-        else
-        {
+        else {
           setQrImageFileStr(currentUser?.image_QR || "")
         }
-        
+
       }
     }, [home]);
 
@@ -208,7 +206,7 @@ const ModalUpdateHome = forwardRef<HTMLDivElement, ModalUpdateHomeProps>(
     }, []);
 
     const isEdit: Boolean = useCallback(() => Boolean(home._id?.$oid), [home])();
-    
+
     const handleClose = useCallback(() => {
       resetForm();
       onClose();
@@ -243,7 +241,7 @@ const ModalUpdateHome = forwardRef<HTMLDivElement, ModalUpdateHomeProps>(
       setErrors(newErrors);
 
       const hasError = Object.values(newErrors).some(error => error);
-      
+
       if (hasError) {
         if (newErrors.home_name) toast.error("Tên tòa nhà là bắt buộc");
         if (newErrors.phone) toast.error("Số điện thoại là bắt buộc");
@@ -262,19 +260,19 @@ const ModalUpdateHome = forwardRef<HTMLDivElement, ModalUpdateHomeProps>(
         // Upload QR code lên Cloudinary nếu có file được chọn
         if (qrImageFile) {
           toast.info("Đang upload QR code...");
-          
+
           try {
             const uploadResult = await uploadImage(
               qrImageFile,
               'qr_codes', // folder trên Cloudinary
               ['home_qr'] // tags
             );
-            
+
             qrImageUrl = uploadResult.secure_url;
             qrPublicId = uploadResult.public_id;
 
             toast.success("Upload QR code thành công!");
-            
+
             // Xóa QR code cũ nếu có
             if (home?.imageQR) {
               const oldPublicId = extractPublicId(home.imageQR);
@@ -310,18 +308,18 @@ const ModalUpdateHome = forwardRef<HTMLDivElement, ModalUpdateHomeProps>(
         };
 
         await updateHome(payload);
-        
+
         toast.success(isEdit ? 'Cập nhật tòa nhà thành công' : 'Thêm tòa nhà thành công');
-        
+
         // Refresh home list
         if (fetchHomes) {
           fetchHomes();
         }
-        
+
         handleClose();
       } catch (error) {
         console.error('Failed to update home', error);
-        toast.error("Lỗi cập nhật thông tin");
+        toast.error(error?.response?.data?.Error || "Lỗi cập nhật thông tin");
       }
     }, [validateForm, home, formData, qrImageFile, updateHome, handleClose, fetchHomes, isEdit, uploadImage, deleteImage, extractPublicId]);
 
@@ -335,10 +333,10 @@ const ModalUpdateHome = forwardRef<HTMLDivElement, ModalUpdateHomeProps>(
     const qrImageUrl = useMemo(() => {
       return qrImageFileStr || home?.imageQR || '';
     }, [qrImageFileStr, home?.imageQR]);
-    
+
     return (
       <Dialog open={open} onOpenChange={handleClose}>
-         <DialogContent ref={ref} className="w-[calc(100vw-2rem)] sm:max-w-3xl lg:max-w-6xl max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-900 p-0 rounded-xl">
+        <DialogContent ref={ref} className="w-[calc(100vw-2rem)] sm:max-w-3xl lg:max-w-6xl max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-900 p-0 rounded-xl">
           <DialogHeader className="sticky top-0 z-20 bg-white dark:bg-gray-900 border-b border-gray-200 px-4 py-3 sm:px-6">
             <DialogTitle className="text-lg font-semibold text-gray-900 dark:text-gray-100">
               {isEdit ? 'Cập nhật thông tin tòa nhà' : 'Thêm mới tòa nhà'}
@@ -385,7 +383,7 @@ const ModalUpdateHome = forwardRef<HTMLDivElement, ModalUpdateHomeProps>(
                         type="number"
                       />
                     )}
-                    
+
                   </div>
                 </div>
               </div>
@@ -482,11 +480,11 @@ const ModalUpdateHome = forwardRef<HTMLDivElement, ModalUpdateHomeProps>(
                       <Label className="text-sm font-medium text-gray-700">
                         QR Code
                       </Label>
-                      
+
                       {/* QR Code Upload */}
                       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
-                        <div 
-                          className="image-input size-20 cursor-pointer" 
+                        <div
+                          className="image-input size-20 cursor-pointer"
                           onClick={handleQrBoxClick}
                         >
                           <div className="image-input-placeholder rounded-lg border-2 border-gray-300 hover:border-primary transition-colors">
@@ -513,7 +511,7 @@ const ModalUpdateHome = forwardRef<HTMLDivElement, ModalUpdateHomeProps>(
                             </div>
                           </div>
                         </div>
-                        
+
                         <div className="flex-1">
                           <p className="text-xs text-gray-500">
                             Click để upload QR code cho thanh toán

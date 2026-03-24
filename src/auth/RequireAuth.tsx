@@ -1,6 +1,7 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { ScreenLoader } from '@/components/loaders';
 import { useAuthContext } from './useAuthContext';
+import { RoomFeeOverlay } from '@/components/RoomFeeOverlay';
 
 interface RequireAuthProps {
   allowedLelves: string[]; // Các quyền mà người dùng cần có để truy cập vào route
@@ -22,7 +23,12 @@ const RequireAuth = ({ allowedLelves }: RequireAuthProps) => {
     return <Navigate to="/unauthorized" replace />;
   }
 
-  return <Outlet />; 
+  return (
+    <>
+      <RoomFeeOverlay />
+      <Outlet /> 
+    </>
+  );
 };
 
 export { RequireAuth };

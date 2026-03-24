@@ -1,4 +1,4 @@
-import { changePasswordApi, createRechargeApi, deleteUserApi, getCurrentUserApi, getRechargePackagesApi, getRechargeTransactionsApi, getUserApi, RechargePackage, sendForgotPasswordOtpApi, verifyForgotPasswordOtpApi, UpdateProfilePayload, updateProfileUserApi, updateUserApi, UpdateUserPayload, getAdminRechargeTransactionsApi, getAdminRechargeStatsApi } from '@/api/user';
+import { getRoomPackagesInfoApi, buyRoomPackageApi, payRoomFeeApi, changePasswordApi, createRechargeApi, deleteUserApi, getCurrentUserApi, getRechargePackagesApi, getRechargeTransactionsApi, getUserApi, RechargePackage, sendForgotPasswordOtpApi, verifyForgotPasswordOtpApi, UpdateProfilePayload, updateProfileUserApi, updateUserApi, UpdateUserPayload, getAdminRechargeTransactionsApi, getAdminRechargeStatsApi } from '@/api/user';
 import { useAuthContext } from '@/auth';
 import { useState, useCallback } from 'react';
 import { toast } from 'react-toastify';
@@ -304,7 +304,60 @@ export const useUser = () => {
         }
     }, [currentUser]);
 
+    const getRoomPackagesInfo = useCallback(async () => {
+        try {
+            const res = await getRoomPackagesInfoApi();
+            return res.objects || {};
+        } catch (error: any) {
+            console.error('Không thể lấy thông tin gói phòng:', error);
+            return {};
+        }
+    }, []);
+
+    const buyRoomPackage = useCallback(async (packageCode: string) => {
+        setIsLoading(true);
+        setError(null);
+        try {
+            if (!currentUser) return false;
+            const res = await buyRoomPackageApi(packageCode, currentUser);
+            if (res.Success) {
+                toast.success(res.Success);
+                await getCurrentUser();
+                return true;
+            } else {
+                toast.error(res.Error || 'Mua gói thất bại');
+                return false;
+            }
+        } catch (error: any) {
+            toast.error(error?.response?.data?.Error || 'Lỗi khi mua gói');
+            return false;
+        } finally {
+            setIsLoading(false);
+        }
+    }, [currentUser, getCurrentUser]);
     
+    const payRoomFee = useCallback(async () => {
+        setIsLoading(true);
+        setError(null);
+        try {
+            if (!currentUser) return null;
+            const res = await payRoomFeeApi(currentUser);
+            if (res.Success) {
+                toast.success(res.Success);
+                await getCurrentUser();
+                return true;
+            } else {
+                toast.error(res.Error || 'Thanh toán thất bại');
+                return false;
+            }
+        } catch (error: any) {
+            toast.error(error?.response?.data?.Error || 'Thanh toán lỗi');
+            return false;
+        } finally {
+            setIsLoading(false);
+        }
+    }, [currentUser, getCurrentUser]);
+
     return {
         isLoading,
         error,
@@ -324,5 +377,8 @@ export const useUser = () => {
         getRechargeTransactions,
         getAdminRechargeTransactions,
         getAdminRechargeStats,
+        payRoomFee,
+        getRoomPackagesInfo,
+        buyRoomPackage,
     };
 };

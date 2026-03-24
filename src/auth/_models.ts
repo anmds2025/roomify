@@ -23,6 +23,12 @@ export interface UserModel {
   image_signature?: string;
   point_balance?: number;
   total_recharged_vnd?: number;
+  active_room_count?: number;
+  days_overdue?: number;
+  is_blocked?: boolean;
+  amount_needed?: number;
+  room_package?: string;
+  room_package_name?: string;
 }
 
 export interface IOption {

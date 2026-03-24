@@ -5,7 +5,7 @@ import { ColumnDef, PaginationState } from '@tanstack/react-table';
 import { DataGrid, KeenIcon, TDataGridSelectedRowIds } from '@/components';
 import { IHomeData } from './HomesData';
 import moment from 'moment';
-// import { ModalConfirmDelete } from '@/partials/modals/confirm/ModalConfirmDelete';
+import { ModalConfirmDelete } from '@/partials/modals/confirm/ModalConfirmDelete';
 import { ModalUpdateHome } from '@/partials/modals/home/ModalUpdateHome';
 import { useHomeManagement } from '@/hooks/useHomeManagement';
 
@@ -28,10 +28,10 @@ const SearchInput = React.memo(({ value, onChange, placeholder }: {
 
 // Component cho action buttons
 const ActionButtons = React.memo(({ onAddNew }: { onAddNew: () => void }) => (
-  <button 
-    onClick={onAddNew} 
+  <button
+    onClick={onAddNew}
     className="btn btn-sm btn-primary badge badge-outline badge-primary gap-1 items-center rounded-lg w-full sm:w-auto"
-    style={{minWidth: "90px"}}
+    style={{ minWidth: "90px" }}
   >
     <KeenIcon icon="add-notepad" />
     Thêm mới
@@ -47,17 +47,18 @@ const Homes = () => {
     searchTerm,
     homeUpdate,
     openEditModal,
-    
+
     // Actions
     fetchHomes,
     filterData,
     updateSearchTerm,
     updatePagination,
-    
+
     // Modal handlers
-    // openDeleteModalHandler,
-    // closeDeleteModalHandler,
-    // deleteHomeHandler,
+    openDeleteModal,
+    openDeleteModalHandler,
+    closeDeleteModalHandler,
+    deleteHomeHandler,
     openEditModalHandler,
     closeEditModalHandler,
     addNewHomeHandler,
@@ -161,8 +162,8 @@ const Homes = () => {
         header: () => '',
         enableSorting: false,
         cell: ({ row }) => (
-          <button 
-            className="btn btn-sm btn-icon btn-clear btn-light" 
+          <button
+            className="btn btn-sm btn-icon btn-clear btn-light"
             onClick={() => openEditModalHandler(row.original)}
           >
             <KeenIcon icon="notepad-edit" />
@@ -173,33 +174,32 @@ const Homes = () => {
           cellClassName: 'w-[60px]'
         }
       },
-      // Tạm thời ẩn chức năng delete vì backend chưa có endpoint
-      // {
-      //   id: 'delete',
-      //   header: () => '',
-      //   enableSorting: false,
-      //   cell: ({ row }) => (
-      //     <button 
-      //       className="btn btn-sm btn-icon btn-clear btn-light" 
-      //       onClick={() => openDeleteModalHandler(row.original)}
-      //     >
-      //       <KeenIcon icon="trash" />
-      //     </button>
-      //   ),
-      //   meta: {
-      //     className: 'w-[60px]'
-      //   }
-      // }
+      {
+        id: 'delete',
+        header: () => '',
+        enableSorting: false,
+        cell: ({ row }) => (
+          <button 
+            className="btn btn-sm btn-icon btn-clear btn-light" 
+            onClick={() => openDeleteModalHandler(row.original)}
+          >
+            <KeenIcon icon="trash" />
+          </button>
+        ),
+        meta: {
+          className: 'w-[60px]'
+        }
+      }
     ],
-    [openEditModalHandler]
+    [openEditModalHandler, openDeleteModalHandler]
   );
 
   // Handlers
   const handleRowsSelectChange = useCallback((selectedRowIds: TDataGridSelectedRowIds) => {
     enqueueSnackbar(
       selectedRowIds.size > 0 ? `${selectedRowIds.size} rows selected` : `No rows are selected`,
-      { 
-        variant: 'solid', 
+      {
+        variant: 'solid',
         state: 'dark'
       }
     );
@@ -243,19 +243,18 @@ const Homes = () => {
       </div>
 
       {/* Modals */}
-      {/* Tạm thời ẩn modal delete vì backend chưa có endpoint */}
-      {/* <ModalConfirmDelete
+      <ModalConfirmDelete
         open={openDeleteModal}
         onClose={closeDeleteModalHandler}
         onConfirm={deleteHomeHandler}
-        title="Xóa"
-        message="Bạn có muốn xoá tòa nhà này. Khi xác nhận thì sẽ không thể quay lại"
-      /> */}
-      
-      <ModalUpdateHome 
-        open={openEditModal} 
-        onClose={closeEditModalHandler} 
-        home={homeUpdate} 
+        title="Xóa Tòa Nhà"
+        message="Bạn có chắc chắn muốn xoá tòa nhà này? Hệ thống sẽ TRỰC TIẾP XÓA TOÀN BỘ CÁC PHÒNG đang nằm trong tòa nhà. Thao tác này KHÔNG THỂ HÀNH ĐỘNG QUAY LẠI!"
+      />
+
+      <ModalUpdateHome
+        open={openEditModal}
+        onClose={closeEditModalHandler}
+        home={homeUpdate}
         fetchHomes={fetchHomes}
       />
     </Fragment>

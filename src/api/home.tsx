@@ -53,7 +53,7 @@ export const updateHomeApi = async (payload: UpdateHomePayload, user: UserModel)
   };
   const formData = createFormData(extendedPayload);
 
-  const response = await axios.post<{ success: boolean }>(
+  const response = await axios.post<{ Success?: string; Error?: string }>(
     UPDATE_HOME_URL,
     formData,
     {
@@ -62,28 +62,27 @@ export const updateHomeApi = async (payload: UpdateHomePayload, user: UserModel)
       },
     }
   );
-  return response.data.success;
+  return !!response.data.Success;
 };
 
-// Tạm thời ẩn chức năng delete vì backend chưa có endpoint
-// export const deleteHomeApi = async (
-//   pk: string,
-//   user: UserModel
-// ): Promise<boolean> => {
-//   const formData = createFormData({
-//     pk,
-//     token: user?.token,
-//   });
+export const deleteHomeApi = async (
+  pk: string,
+  user: UserModel
+): Promise<boolean> => {
+  const formData = createFormData({
+    pk,
+    token: user?.token,
+  });
 
-//   const response = await axios.post<{ success: boolean }>(
-//     DELETE_HOME_URL,
-//     formData,
-//     {
-//       headers: {
-//         'Content-Type': 'multipart/form-data',
-//       },
-//     }
-//   );
+  const response = await axios.post<{ Success?: string; Error?: string }>(
+    DELETE_HOME_URL,
+    formData,
+    {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    }
+  );
 
-//   return response.data.success;
-// }; 
+  return !!response.data.Success;
+};

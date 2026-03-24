@@ -6,7 +6,7 @@ import { useSnackbar } from 'notistack';
 
 export const useHomeManagement = () => {
   const { enqueueSnackbar } = useSnackbar();
-  const { getHomes } = useHome();
+  const { getHomes, deleteHome } = useHome();
   const { currentUser } = useAuthContext();
   
   // State management
@@ -58,10 +58,35 @@ export const useHomeManagement = () => {
     setSearchTerm(term);
   }, []);
 
-  // Update pagination
   const updatePagination = useCallback((newPagination: { pageIndex: number; pageSize: number }) => {
     setPagination(newPagination);
   }, []);
+
+  const openDeleteModalHandler = useCallback((home: IHomeData) => {
+    setHomeId(home._id?.$oid || "");
+    setOpenDeleteModal(true);
+  }, []);
+
+  const closeDeleteModalHandler = useCallback(() => {
+    setHomeId("");
+    setOpenDeleteModal(false);
+  }, []);
+
+  const deleteHomeHandler = useCallback(async () => {
+    if (!homeId) return;
+    try {
+      const isSuccess = await deleteHome(homeId);
+      if (isSuccess) {
+        enqueueSnackbar('Xóa tòa nhà thành công', { variant: 'success' });
+        fetchHomes();
+      } else {
+        enqueueSnackbar('Lỗi khi xóa', { variant: 'error' });
+      }
+    } catch (e: any) {
+      enqueueSnackbar(e.message || 'Error deleting home', { variant: 'error' });
+    }
+    setOpenDeleteModal(false);
+  }, [homeId, fetchHomes, enqueueSnackbar, deleteHome]);
 
   const openEditModalHandler = useCallback((home: IHomeData) => {
     setHomeId(home._id?.$oid || "");
@@ -99,9 +124,9 @@ export const useHomeManagement = () => {
     updatePagination,
     
     // Modal handlers
-    // openDeleteModalHandler,
-    // closeDeleteModalHandler,
-    // deleteHomeHandler,
+    openDeleteModalHandler,
+    closeDeleteModalHandler,
+    deleteHomeHandler,
     openEditModalHandler,
     closeEditModalHandler,
     addNewHomeHandler,
